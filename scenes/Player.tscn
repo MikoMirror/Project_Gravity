@@ -1,9 +1,17 @@
-[gd_scene load_steps=6 format=3 uid="uid://1cc1ehwwh0tr"]
+[gd_scene load_steps=8 format=3 uid="uid://1cc1ehwwh0tr"]
 
 [ext_resource type="Shader" path="res://shaders/test.gdshader" id="1_h1cyh"]
-[ext_resource type="Script" path="res://scenes/Character.cs" id="1_u1vrf"]
+[ext_resource type="Script" path="res://scripts/Player.cs" id="1_tjtbf"]
+[ext_resource type="Shader" path="res://shaders/crosshair.gdshader" id="2_8ybvs"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_miooo"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_n5osw"]
+shader = ExtResource("2_8ybvs")
+shader_parameter/dot_color = Color(1, 1, 1, 0.8)
+shader_parameter/dot_size = 0.001
+shader_parameter/border_size = 0.0
+shader_parameter/border_color = Color(0, 0, 0, 0.8)
 
 [sub_resource type="QuadMesh" id="QuadMesh_fyf5m"]
 flip_faces = true
@@ -20,7 +28,7 @@ shader_parameter/corner_radius = 0.1
 shader_parameter/border_blur = 0.05
 
 [node name="Player" type="CharacterBody3D"]
-script = ExtResource("1_u1vrf")
+script = ExtResource("1_tjtbf")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_miooo")
@@ -30,6 +38,21 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.692655, -0.229486)
 
 [node name="Camera3D" type="Camera3D" parent="Head"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.274746)
+
+[node name="InteractionRay" type="RayCast3D" parent="Head/Camera3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00383413, 0.0034641, -0.0593775)
+target_position = Vector3(0, 0, -5)
+
+[node name="HandPosition" type="Marker3D" parent="Head/Camera3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.72241)
+
+[node name="dot" type="ColorRect" parent="Head/Camera3D"]
+material = SubResource("ShaderMaterial_n5osw")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Head/Camera3D"]
 extra_cull_margin = 16384.0

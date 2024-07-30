@@ -1,8 +1,12 @@
-[gd_scene load_steps=8 format=3 uid="uid://dvm56dg3eeiy8"]
+[gd_scene load_steps=10 format=3 uid="uid://dvm56dg3eeiy8"]
 
 [ext_resource type="Texture2D" uid="uid://qpaq4avau2v8" path="res://assets/custom_textures/rm301-eye-10-a.jpg" id="1_lmly3"]
 [ext_resource type="Shader" path="res://shaders/sky.gdshader" id="1_lo6gs"]
 [ext_resource type="PackedScene" uid="uid://1cc1ehwwh0tr" path="res://scenes/Player.tscn" id="3_wbh0h"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tmu1o"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_6tsrt"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nsx7l"]
 albedo_texture = ExtResource("1_lmly3")
@@ -48,6 +52,18 @@ tonemap_mode = 2
 glow_enabled = true
 
 [node name="Level1" type="Node3D"]
+
+[node name="RigidBody3D" type="RigidBody3D" parent="."]
+transform = Transform3D(0.893748, -0.44857, 0, 0.44857, 0.893748, 0, 0, 0, 1, 1, 2.676, 16.815)
+mass = 50.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D"]
+transform = Transform3D(0.355125, -1.49012e-08, 0, -1.49012e-08, 0.378317, 0, 0, 0, 0.360778, 0, 0, 0)
+shape = SubResource("BoxShape3D_tmu1o")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D/CollisionShape3D"]
+mesh = SubResource("BoxMesh_6tsrt")
+skeleton = NodePath("../..")
 
 [node name="stage" type="Node3D" parent="."]
 
