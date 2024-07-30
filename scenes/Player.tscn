@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=3 uid="uid://1cc1ehwwh0tr"]
 
 [ext_resource type="Shader" path="res://shaders/test.gdshader" id="1_h1cyh"]
-[ext_resource type="Script" path="res://scripts/Player.cs" id="1_tjtbf"]
+[ext_resource type="Script" path="res://scripts/Player/Player.cs" id="1_lrqu3"]
 [ext_resource type="Shader" path="res://shaders/crosshair.gdshader" id="2_8ybvs"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_miooo"]
@@ -28,7 +28,7 @@ shader_parameter/corner_radius = 0.1
 shader_parameter/border_blur = 0.05
 
 [node name="Player" type="CharacterBody3D"]
-script = ExtResource("1_tjtbf")
+script = ExtResource("1_lrqu3")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_miooo")
