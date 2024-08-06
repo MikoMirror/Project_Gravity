@@ -1,8 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://1cc1ehwwh0tr"]
+[gd_scene load_steps=9 format=3 uid="uid://1cc1ehwwh0tr"]
 
 [ext_resource type="Shader" path="res://shaders/test.gdshader" id="1_h1cyh"]
 [ext_resource type="Script" path="res://scripts/Player/Player.cs" id="1_lrqu3"]
 [ext_resource type="Shader" path="res://shaders/crosshair.gdshader" id="2_8ybvs"]
+[ext_resource type="Script" path="res://scripts/Player/GravityManager.cs" id="4_v6kp3"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_miooo"]
 
@@ -19,13 +20,13 @@ size = Vector2(2, 2)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_lbfqq"]
 shader = ExtResource("1_h1cyh")
-shader_parameter/aberration = 0.005
-shader_parameter/brightness = 1.0
-shader_parameter/grain_amount = 0.05
-shader_parameter/grain_size = 1.0
-shader_parameter/square_size = 0.8
-shader_parameter/corner_radius = 0.1
-shader_parameter/border_blur = 0.05
+shader_parameter/line_color = Color(1, 1, 1, 1)
+shader_parameter/line_count = 1.15
+shader_parameter/line_density = 0.084
+shader_parameter/line_faloff = 0.228
+shader_parameter/mask_size = 0.269
+shader_parameter/mask_edge = 0.5
+shader_parameter/animation_speed = 0.5
 
 [node name="Player" type="CharacterBody3D"]
 script = ExtResource("1_lrqu3")
@@ -60,10 +61,12 @@ mesh = SubResource("QuadMesh_fyf5m")
 skeleton = NodePath("../../../..")
 
 [node name="cameraPost" type="ColorRect" parent="Head/Camera3D/MeshInstance3D"]
-visible = false
 material = SubResource("ShaderMaterial_lbfqq")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="GravityManager" type="Node3D" parent="."]
+script = ExtResource("4_v6kp3")

@@ -1,63 +1,59 @@
 shader_type canvas_item;
 
-uniform sampler2D SCREEN_TEXTURE : hint_screen_texture, filter_linear_mipmap;
-uniform float aberration : hint_range(0.0, 1.0) = 0.005;
-uniform float brightness : hint_range(0.0, 2.0) = 1.0;
-uniform float grain_amount : hint_range(0.0, 0.5) = 0.05;
-uniform float grain_size : hint_range(1.0, 10.0) = 1.0;
-uniform float square_size : hint_range(0.0, 1.0) = 0.8;
-uniform float corner_radius : hint_range(0.0, 0.5) = 0.1;
-uniform float border_blur : hint_range(0.0, 0.1) = 0.05;
 
-float random(vec2 uv) {
-    return fract(sin(dot(uv, vec2(12.9898, 78.233))) * 43758.5453123);
+uniform sampler2D noise: repeat_enable;
+uniform vec4 line_color: source_color;
+uniform float line_count: hint_range(0.0, 2.0, 0.05) = 0.5;
+uniform float line_density: hint_range(0.0, 1.0) = 0.5;
+uniform float line_faloff: hint_range(0.0, 1.0) = 0.25;
+uniform float mask_size: hint_range(0.0, 1.0) = 0.1;
+uniform float mask_edge: hint_range(0.0, 1.0) = 0.5;
+uniform float animation_speed: hint_range(1.0, 20.0) = 0.5;
+
+
+
+
+float inv_lerp(float from, float to, float value){
+  return (value - from) / (to - from);
 }
 
-float rounded_square(vec2 uv, float size, float radius) {
-    vec2 q = abs(uv) - size + radius;
-    return min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - radius;
+
+
+
+vec2 polar_coordinates(vec2 uv, vec2 center, float zoom, float repeat)
+{
+	vec2 dir = uv - center;
+	float radius = length(dir) * 2.0;
+	float angle = atan(dir.y, dir.x) * 1.0/(PI * 2.0);
+	return mod(vec2(radius * zoom, angle * repeat), 1.0);
 }
 
-void fragment() {
-    vec2 uv = SCREEN_UV;
-    vec2 centered_uv = (uv - 0.5) * 2.0;
-    
-    // Adjust for aspect ratio to make it square
-    float aspect = SCREEN_PIXEL_SIZE.y / SCREEN_PIXEL_SIZE.x;
-    centered_uv.x *= aspect;
-    
-    // Rounded square vignette
-    float square_vignette = rounded_square(centered_uv, square_size, corner_radius);
-    square_vignette = smoothstep(-border_blur, border_blur, square_vignette);
-    
-    // Chromatic aberration
-    float offset = aberration * square_vignette;
-    vec2 uv_r = uv + vec2(offset, 0.0);
-    vec2 uv_b = uv - vec2(offset, 0.0);
-    
-    vec3 col;
-    col.r = texture(SCREEN_TEXTURE, uv_r).r;
-    col.g = texture(SCREEN_TEXTURE, uv).g;
-    col.b = texture(SCREEN_TEXTURE, uv_b).b;
-    
-    // Brightness adjustment
-    col *= brightness;
-    
-    // Film grain
-    float grain = random(uv * grain_size) * grain_amount;
-    col += grain;
-    
-    // Slight blur (approximation)
-    vec2 blur_uv = uv * 0.98 + 0.01;
-    vec3 blur_col = texture(SCREEN_TEXTURE, blur_uv).rgb;
-    col = mix(col, blur_col, 0.1);
-    
-    // Color grading for vintage look
-    col = mix(col, vec3(dot(col, vec3(0.299, 0.587, 0.114))), 0.2);
-    col = mix(col, vec3(0.8, 0.7, 0.6) * dot(col, vec3(0.299, 0.587, 0.114)), 0.1);
-    
-    // Apply square vignette with blurred border
-    col = mix(vec3(0.0), col, 1.0 - square_vignette);
-    
-    COLOR = vec4(col, 1.0);
+
+
+
+vec2 rotate_uv(vec2 uv, vec2 pivot, float rotation) {
+    float cosa = cos(rotation);
+    float sina = sin(rotation);
+    uv -= pivot;
+    return vec2(
+        cosa * uv.x - sina * uv.y,
+        cosa * uv.y + sina * uv.x 
+    ) + pivot;
+}
+
+
+
+
+void fragment(){
+	vec2 polar_uv = polar_coordinates(rotate_uv(UV, vec2(0.5), floor(fract(TIME) * animation_speed) ) , vec2(0.5), 0.01, line_count);
+	vec3 lines = texture(noise, polar_uv).rgb;
+	
+	float mask_value = length(UV - vec2(0.5));
+	float mask = inv_lerp(mask_size, mask_edge, mask_value);
+	float result = 1.0 - (mask * line_density);
+	
+	result = smoothstep(result, result + line_faloff, lines.r);
+	
+	COLOR.rgb = vec3(line_color.rgb);
+	COLOR.a = min(line_color.a, result);
 }

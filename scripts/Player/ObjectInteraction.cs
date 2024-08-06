@@ -11,76 +11,78 @@ public partial class Player
 		}
 	}
 
-	public void TryStartLifting()
+	 public void TryStartLifting()
 	{
-		if (HeldObject == null && !PolaroidCamera.InCameraMode)
+		InteractionRay.ForceRaycastUpdate();
+		if (InteractionRay.IsColliding())
 		{
-			InteractionRay.ForceRaycastUpdate();
-			if (InteractionRay.IsColliding())
+			var collider = InteractionRay.GetCollider();
+			if (collider is RigidBody3D rigidBody && rigidBody.Mass <= MaxLiftWeight)
 			{
-				var collider = InteractionRay.GetCollider();
-				if (collider is RigidBody3D rigidBody && rigidBody.Mass <= MaxLiftWeight)
-				{
-					StartLiftingObject(rigidBody);
-				}
+				StartLiftingObject(rigidBody);
 			}
 		}
 	}
 
-	private void StartLiftingObject(RigidBody3D rigidBody)
+	 private void StartLiftingObject(RigidBody3D rigidBody)
 	{
 		HeldObject = rigidBody;
 		IsLifting = true;
-		HighlightObject(HeldObject, true);
 
 		// Configure physics properties for lifting
 		HeldObject.GravityScale = 0;
 		HeldObject.LinearDamp = 5;
 		HeldObject.AngularDamp = 5;
-		HeldObject.CustomIntegrator = true;
 		HeldObject.Freeze = false;
 	}
 
-	public void StopLifting()
+	 public void StopLifting()
 	{
 		if (HeldObject != null)
 		{
-			HighlightObject(HeldObject, false);
 
 			// Reset physics properties
-			HeldObject.GravityScale = 1;
+			HeldObject.GravityScale = _gravityManager.IsGravityReversed ? -1 : 1;
 			HeldObject.LinearDamp = 0;
 			HeldObject.AngularDamp = 0;
-			HeldObject.CustomIntegrator = false;
+			HeldObject.Freeze = false;
 
 			// Apply a small impulse when releasing to prevent sticking
 			HeldObject.ApplyImpulse(-Camera.GlobalTransform.Basis.Z * 0.5f);
 
-			ResetObjectRotation();
 			HeldObject = null;
 		}
 		IsLifting = false;
 	}
 
-	private void UpdateLiftedObjectPosition(double delta)
+	 private void UpdateLiftedObjectPosition(double delta)
 	{
 		if (HeldObject == null) return;
 
-		Vector3 cameraPosition = Camera.GlobalPosition;
-		Vector3 cameraForward = -Camera.GlobalTransform.Basis.Z;
+		Vector3 targetPosition = Camera.GlobalPosition + (-Camera.GlobalTransform.Basis.Z * MaxLiftDistance);
+		Vector3 currentPosition = HeldObject.GlobalPosition;
 
-		LiftTarget = GetCursorWorldPosition();
+		// Smoothly move the object towards the target position
+		Vector3 newPosition = currentPosition.Lerp(targetPosition, LiftSpeed * (float)delta);
+		HeldObject.GlobalPosition = newPosition;
 
-		Vector3 directionToTarget = (LiftTarget - cameraPosition).Normalized();
-		Vector3 targetPos = cameraPosition + directionToTarget * MaxLiftDistance;
-		Vector3 currentPos = HeldObject.GlobalPosition;
-
-		Vector3 desiredVelocity = (targetPos - currentPos) / (float)delta;
-		LimitLiftSpeed(ref desiredVelocity);
-
-		HeldObject.LinearVelocity = desiredVelocity;
-		ApplyLiftedObjectRotation();
+		// Make the object face the camera
+		HeldObject.LookAt(Camera.GlobalPosition, Vector3.Up);
 	}
+
+private void RotateLiftedObject(InputEventMouseButton mouseButton)
+{
+	if (mouseButton.ButtonIndex == MouseButton.WheelUp)
+	{
+		VerticalRotation += RotationSpeed;
+	}
+	else if (mouseButton.ButtonIndex == MouseButton.WheelDown)
+	{
+		HorizontalRotation += RotationSpeed;
+	}
+	VerticalRotation = Mathf.Wrap(VerticalRotation, 0, 360);
+	HorizontalRotation = Mathf.Wrap(HorizontalRotation, 0, 360);
+}
 
 	private void LimitLiftSpeed(ref Vector3 velocity)
 	{
@@ -92,37 +94,27 @@ public partial class Player
 	}
 
 	private void ApplyLiftedObjectRotation()
-{
-	// Calculate the direction from the held object to the player
-	Vector3 objectToPlayer = (GlobalPosition - HeldObject.GlobalPosition).Normalized();
+	{
+		Vector3 objectToPlayer = (GlobalPosition - HeldObject.GlobalPosition).Normalized();
 
-	// Create a look-at basis that orients the object towards the player
-	Basis lookAtBasis = new Basis(
-		objectToPlayer.Cross(Vector3.Up).Normalized(),
-		Vector3.Up,
-		-objectToPlayer
-	);
+		Basis lookAtBasis = new Basis(
+			objectToPlayer.Cross(Vector3.Up).Normalized(),
+			Vector3.Up,
+			-objectToPlayer
+		);
 
-	// Create rotation quaternions for vertical and horizontal rotations
-	Quaternion verticalRotation = Quaternion.FromEuler(new Vector3(Mathf.DegToRad(VerticalRotation), 0, 0));
-	Quaternion horizontalRotation = Quaternion.FromEuler(new Vector3(0, Mathf.DegToRad(HorizontalRotation), 0));
+		Quaternion verticalRotation = Quaternion.FromEuler(new Vector3(Mathf.DegToRad(VerticalRotation), 0, 0));
+		Quaternion horizontalRotation = Quaternion.FromEuler(new Vector3(0, Mathf.DegToRad(HorizontalRotation), 0));
 
-	// Combine the rotations
-	Quaternion objectRotation = horizontalRotation * verticalRotation;
+		Quaternion objectRotation = horizontalRotation * verticalRotation;
+		Basis objectRotationBasis = new Basis(objectRotation);
 
-	// Convert the quaternion to a basis
-	Basis objectRotationBasis = new Basis(objectRotation);
+		Basis finalRotationBasis = lookAtBasis * objectRotationBasis;
+		finalRotationBasis = finalRotationBasis.Orthonormalized();
 
-	// Combine the look-at orientation with the object's own rotation
-	Basis finalRotationBasis = lookAtBasis * objectRotationBasis;
-
-	// Ensure the basis is orthonormalized to prevent deformation
-	finalRotationBasis = finalRotationBasis.Orthonormalized();
-
-	// Apply the rotation
-	HeldObject.AngularVelocity = Vector3.Zero;
-	HeldObject.GlobalTransform = new Transform3D(finalRotationBasis, HeldObject.GlobalPosition);
-}
+		HeldObject.AngularVelocity = Vector3.Zero;
+		HeldObject.GlobalTransform = new Transform3D(finalRotationBasis, HeldObject.GlobalPosition);
+	}
 
 	private void ResetObjectRotation()
 	{
@@ -172,22 +164,11 @@ public partial class Player
 		}
 	}
 
-	private void HighlightObject(RigidBody3D obj, bool highlight)
+ 	public void UpdateHeldObjectGravity(bool isGravityReversed)
 	{
-		if (obj.GetChildCount() > 0 && obj.GetChild(0) is MeshInstance3D meshInstance)
+		if (IsLifting && HeldObject != null)
 		{
-			StandardMaterial3D material = meshInstance.GetActiveMaterial(0) as StandardMaterial3D;
-			if (material == null)
-			{
-				material = new StandardMaterial3D();
-				meshInstance.SetSurfaceOverrideMaterial(0, material);
-			}
-
-			material.EmissionEnabled = highlight;
-			if (highlight)
-			{
-				material.Emission = new Color(1, 1, 0); // Yellow
-			}
+			HeldObject.GravityScale = isGravityReversed ? -1 : 1;
 		}
 	}
 }

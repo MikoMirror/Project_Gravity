@@ -3,10 +3,42 @@ using System;
 
 public partial class Player
 {
-	public override void _Input(InputEvent @event)
+	 public override void _Input(InputEvent @event)
 	{
-		HandleMouseInput(@event);
+		if (@event is InputEventMouseMotion mouseMotion)
+		{
+			HandleMouseLook(mouseMotion);
+		}
+		else if (@event is InputEventMouseButton mouseButton)
+		{
+			HandleMouseButtons(mouseButton);
+		}
+		else if (@event.IsActionPressed("change_gravity"))
+		{
+			_gravityManager.ToggleGravity();
+		}
+		else if (@event.IsActionPressed("sprint"))
+		{
+			IsSprinting = true;
+		}
+		else if (@event.IsActionReleased("sprint"))
+		{
+			IsSprinting = false;
+		}
 	}
+	
+	private void HandleMouseLook(InputEventMouseMotion mouseMotion)
+{
+	float xRotation = mouseMotion.Relative.X * MouseSensitivity;
+	float yRotation = mouseMotion.Relative.Y * MouseSensitivity;
+	_horizontalRotation -= xRotation;
+	_horizontalRotation = Mathf.Wrap(_horizontalRotation, -Mathf.Pi, Mathf.Pi);
+	VerticalRotation -= yRotation;
+	VerticalRotation = Mathf.Clamp(VerticalRotation, -Mathf.Pi / 2, Mathf.Pi / 2);
+
+	UpdateCameraRotation();
+}
+
 
 	private void HandleMouseInput(InputEvent @event)
 	{
@@ -20,23 +52,51 @@ public partial class Player
 		}
 	}
 
-	private void RotatePlayer(InputEventMouseMotion mouseMotion)
+	private void HandleKeyboardInput(InputEvent @event)
 	{
-		RotateY(Mathf.DegToRad(-mouseMotion.Relative.X * MouseSensitivity));
-		Head.RotateX(Mathf.DegToRad(-mouseMotion.Relative.Y * MouseSensitivity));
-
-		Vector3 headRotation = Head.Rotation;
-		headRotation.X = Mathf.Clamp(headRotation.X, Mathf.DegToRad(-89), Mathf.DegToRad(89));
-		Head.Rotation = headRotation;
+		if (@event.IsActionPressed("change_gravity"))
+		{
+			_gravityManager.ToggleGravity();
+			_gravityManager.FlipPlayerBody(this);
+		}
+			
+		if (@event.IsActionPressed("sprint"))
+		{
+			IsSprinting = true;
+		}
+		else if (@event.IsActionReleased("sprint"))
+		{
+			IsSprinting = false;
+		}
 	}
 
-   private void HandleMouseButtons(InputEventMouseButton mouseButton)
+	private void RotatePlayer(InputEventMouseMotion mouseMotion)
+{
+	float xRotation = mouseMotion.Relative.X * MouseSensitivity;
+	if (_gravityManager.IsGravityReversed)
 	{
-		if (mouseButton.ButtonIndex == MouseButton.Right && mouseButton.Pressed)
-		{
-			PolaroidCamera.ToggleCameraMode(this);
-		}
-		else if (mouseButton.ButtonIndex == MouseButton.Left && !PolaroidCamera.InCameraMode)
+		xRotation = -xRotation;
+	}
+	if (IsCameraInverted)
+	{
+		xRotation = -xRotation;
+	}
+	RotateY(Mathf.DegToRad(-xRotation));
+	float yRotation = mouseMotion.Relative.Y * MouseSensitivity;
+	if (IsCameraInverted)
+	{
+		yRotation = -yRotation;
+	}
+
+	Vector3 cameraRotation = Camera.Rotation;
+	cameraRotation.X -= Mathf.DegToRad(yRotation);
+	cameraRotation.X = Mathf.Clamp(cameraRotation.X, Mathf.DegToRad(-89), Mathf.DegToRad(89));
+	Camera.Rotation = cameraRotation;
+}
+
+	private void HandleMouseButtons(InputEventMouseButton mouseButton)
+	{
+		if (mouseButton.ButtonIndex == MouseButton.Left)
 		{
 			if (mouseButton.Pressed)
 			{
@@ -47,25 +107,6 @@ public partial class Player
 				StopLifting();
 			}
 		}
-		else if (IsLifting && HeldObject != null && !PolaroidCamera.InCameraMode)
-		{
-			RotateLiftedObject(mouseButton);
 		}
-	}
-
-	private void RotateLiftedObject(InputEventMouseButton mouseButton)
-{
-	if (mouseButton.ButtonIndex == MouseButton.WheelUp)
-	{
-		VerticalRotation += RotationSpeed;
-	}
-	else if (mouseButton.ButtonIndex == MouseButton.WheelDown)
-	{
-		HorizontalRotation += RotationSpeed;
-	}
-
-	// Wrap both rotations to keep them between 0 and 360 degrees
-	VerticalRotation = Mathf.Wrap(VerticalRotation, 0, 360);
-	HorizontalRotation = Mathf.Wrap(HorizontalRotation, 0, 360);
-}
+		
 }

@@ -3,6 +3,8 @@ using System;
 
 public partial class Player
 {
+	private float _horizontalRotation = 0f;
+
 	private void ApplyCameraShakes(double delta)
 	{
 		ApplyWalkShake(delta);
@@ -32,4 +34,12 @@ public partial class Player
 			Camera.Position = InitialCameraPosition;
 		}
 	}
-}
+	public void ResetCameraRotation()
+		{
+		Camera.Position = Camera.Position.Lerp(InitialCameraPosition, 0.1f);
+		}
+		private void UpdateCameraRotation()
+		{
+		Camera.Rotation = new Vector3(VerticalRotation, _horizontalRotation, 0);
+		}
+	}
