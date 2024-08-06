@@ -1,4 +1,3 @@
-// GravityManager.cs
 using Godot;
 using System;
 
@@ -36,42 +35,38 @@ public partial class GravityManager : Node
 	}
 
 	public void ToggleGravity()
-{
-	if (!_isFlipping)
 	{
 		IsGravityReversed = !IsGravityReversed;
 		_isFlipping = true;
 		_flipTimer = 0f;
 		_player.UpdateHeldObjectGravity(IsGravityReversed);
 	}
-}
 
-	
 	private void HandleGravityFlip(double delta)
-{
-	_flipTimer += (float)delta;
-	float targetRotation = IsGravityReversed ? Mathf.Pi : 0;
-	_currentRotation = Mathf.LerpAngle(_currentRotation, targetRotation, RotationSpeed * (float)delta);
-	
-	Quaternion rotation = Quaternion.FromEuler(new Vector3(0, 0, _currentRotation));
-	_player.Basis = new Basis(rotation);
-	
-	_player.UpDirection = IsGravityReversed ? Vector3.Down : Vector3.Up;
-
-	if (_flipTimer >= GravityFlipDuration)
 	{
-		_isFlipping = false;
-		_currentRotation = targetRotation;
-		_player.Basis = new Basis(Quaternion.FromEuler(new Vector3(0, 0, targetRotation)));
-		_player.ResetCameraRotation();
+		_flipTimer += (float)delta;
+		float targetRotation = IsGravityReversed ? Mathf.Pi : 0;
+		_currentRotation = Mathf.LerpAngle(_currentRotation, targetRotation, RotationSpeed * (float)delta);
+
+		Quaternion rotation = Quaternion.FromEuler(new Vector3(0, 0, _currentRotation));
+		_player.Basis = new Basis(rotation);
+
+		_player.UpDirection = IsGravityReversed ? Vector3.Down : Vector3.Up;
+
+		if (_flipTimer >= GravityFlipDuration)
+		{
+			_isFlipping = false;
+			_currentRotation = targetRotation;
+			_player.Basis = new Basis(Quaternion.FromEuler(new Vector3(0, 0, targetRotation)));
+			_player.ResetCameraRotation();
+		}
 	}
-}
 
 	public float GetCurrentGravity()
 	{
 		return IsGravityReversed ? GravityStrength : -GravityStrength;
 	}
-	
+
 	public void FlipPlayerBody(Player player)
 	{
 		var tween = CreateTween();
