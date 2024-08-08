@@ -4,14 +4,14 @@ using System;
 public partial class GravityManager : Node
 {
 	[Export] public float GravityStrength = 9.8f;
-	[Export] public float GravityFlipDuration = 1.5f;
-	[Export] public float RotationSpeed = 5.0f;
+	[Export] public float GravityFlipDuration = 0.5f;
+	[Export] public float RotationSpeed = 10.0f;
 	public bool IsGravityReversed { get; private set; } = false;
 	private float _flipTimer = 0f;
 	private bool _isFlipping = false;
-	private float _currentRotation = 0f;
 	private Player _player;
 	private Node3D _playerHead;
+	private GravityJumpsIndicator _jumpsIndicator;
 
 	public override void _Ready()
 	{
@@ -19,10 +19,18 @@ public partial class GravityManager : Node
 		if (_player == null)
 		{
 			GD.PrintErr("GravityManager must be a child of a Player node!");
+			return;
+		}
+		_playerHead = _player.GetNode<Node3D>("Head");
+		PackedScene indicatorScene = GD.Load<PackedScene>("res://scenes/gravity_jumps_indicator.tscn");
+		if (indicatorScene != null)
+		{
+			_jumpsIndicator = indicatorScene.Instantiate<GravityJumpsIndicator>();
+			AddChild(_jumpsIndicator);
 		}
 		else
 		{
-			_playerHead = _player.GetNode<Node3D>("Head");
+			GD.PrintErr("Failed to load GravityJumpsIndicator scene!");
 		}
 	}
 
@@ -36,28 +44,44 @@ public partial class GravityManager : Node
 
 	public void ToggleGravity()
 	{
-		IsGravityReversed = !IsGravityReversed;
-		_isFlipping = true;
-		_flipTimer = 0f;
-		_player.UpdateHeldObjectGravity(IsGravityReversed);
+		if (_jumpsIndicator.CanJump())
+		{
+			IsGravityReversed = !IsGravityReversed;
+			_isFlipping = true;
+			_flipTimer = 0f;
+			_player.UpdateHeldObjectGravity(IsGravityReversed);
+			_jumpsIndicator.UseJump();
+		}
+	}
+
+	public bool TryToggleGravity()
+	{
+		if (_jumpsIndicator.CanJump() && !_isFlipping)
+		{
+			IsGravityReversed = !IsGravityReversed;
+			_isFlipping = true;
+			_flipTimer = 0f;
+			_player.UpdateHeldObjectGravity(IsGravityReversed);
+			_jumpsIndicator.UseJump();
+			return true;
+		}
+		return false;
 	}
 
 	private void HandleGravityFlip(double delta)
 	{
 		_flipTimer += (float)delta;
-		float targetRotation = IsGravityReversed ? Mathf.Pi : 0;
-		_currentRotation = Mathf.LerpAngle(_currentRotation, targetRotation, RotationSpeed * (float)delta);
-
-		Quaternion rotation = Quaternion.FromEuler(new Vector3(0, 0, _currentRotation));
-		_player.Basis = new Basis(rotation);
-
+		float progress = Mathf.Clamp(_flipTimer / GravityFlipDuration, 0, 1);
+		float angle = IsGravityReversed ? Mathf.Pi : 0;
+		
+		Quaternion targetRotation = Quaternion.FromEuler(new Vector3(angle, 0, 0));
+		_player.Basis = _player.Basis.Slerp(new Basis(targetRotation), progress);
 		_player.UpDirection = IsGravityReversed ? Vector3.Down : Vector3.Up;
 
 		if (_flipTimer >= GravityFlipDuration)
 		{
 			_isFlipping = false;
-			_currentRotation = targetRotation;
-			_player.Basis = new Basis(Quaternion.FromEuler(new Vector3(0, 0, targetRotation)));
+			_player.Basis = new Basis(targetRotation);
 			_player.ResetCameraRotation();
 		}
 	}

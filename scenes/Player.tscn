@@ -56,11 +56,13 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Head/Camera3D"]
+visible = false
 extra_cull_margin = 16384.0
 mesh = SubResource("QuadMesh_fyf5m")
 skeleton = NodePath("../../../..")
 
 [node name="cameraPost" type="ColorRect" parent="Head/Camera3D/MeshInstance3D"]
+visible = false
 material = SubResource("ShaderMaterial_lbfqq")
 anchors_preset = 15
 anchor_right = 1.0

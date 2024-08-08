@@ -3,13 +3,15 @@ using System;
 
 public partial class Player : CharacterBody3D
 {
+	
 	private GravityManager _gravityManager;
+	private GravityJumpsIndicator _jumpsIndicator;
 
 	// Constants
 	public const float Speed = 5.0f;
 	public const float SprintSpeed = 8.0f;
 	public const float JumpVelocity = 4.5f;
-	public const float MouseSensitivity = 0.002f;
+	public const float MouseSensitivity = 0.05f;
 	public const float WalkShakeAmount = 0.05f;
 	public const float WalkShakeSpeed = 15.0f;
 	public const float LandingShakeAmount = 0.2f;
@@ -24,6 +26,9 @@ public partial class Player : CharacterBody3D
 	public const float RotationSpeed = 2.0f;
 	public const float GravityFlipDuration = 0.5f;
 	public bool IsCameraInverted { get; set; } = false;
+	private Vector3 _initialPosition;
+	private Quaternion _initialRotation;
+	private const float REWIND_DURATION = 1.0f;
 
 	// Player state
 	public float VerticalRotation = 0f;
@@ -44,6 +49,8 @@ public partial class Player : CharacterBody3D
 	private float _gravityFlipTimer = 0f;
 	private float _initialGravity;
 	private bool _isFlipping = false;
+	
+	
 
 	// Nodes
 	public Node3D Head;
@@ -55,6 +62,7 @@ public partial class Player : CharacterBody3D
 
 	  public override void _Ready()
 	{
+		 
 		InitializeNodes();
 		InitializeSettings();
 		_gravityManager = GetNode<GravityManager>("GravityManager");
@@ -62,6 +70,8 @@ public partial class Player : CharacterBody3D
 		{
 			GD.PrintErr("GravityManager not found! Make sure it's a child of the Player node.");
 		}
+		  _initialPosition = GlobalPosition;
+		_initialRotation = GlobalTransform.Basis.GetRotationQuaternion();
 	}
 
 

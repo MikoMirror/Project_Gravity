@@ -34,12 +34,14 @@ public partial class Player
 			Camera.Position = InitialCameraPosition;
 		}
 	}
-	public void ResetCameraRotation()
-		{
-		Camera.Position = Camera.Position.Lerp(InitialCameraPosition, 0.1f);
-		}
-		private void UpdateCameraRotation()
-		{
-		Camera.Rotation = new Vector3(VerticalRotation, _horizontalRotation, 0);
-		}
+	 public void ResetCameraRotation()
+	{
+		UpdateCameraRotation();
+	}
+		 
+	private void UpdateCameraRotation()
+	{
+		Quaternion cameraRotation = Quaternion.FromEuler(new Vector3(Mathf.DegToRad(VerticalRotation), 0, 0));
+		Camera.Transform = new Transform3D(new Basis(cameraRotation), Camera.Transform.Origin);
+	}
 	}

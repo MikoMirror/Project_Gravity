@@ -9,13 +9,17 @@ public partial class Player
 		{
 			HandleMouseLook(mouseMotion);
 		}
+		
 		else if (@event is InputEventMouseButton mouseButton)
 		{
 			HandleMouseButtons(mouseButton);
 		}
 		else if (@event.IsActionPressed("change_gravity"))
 		{
-			_gravityManager.ToggleGravity();
+			if (_gravityManager.TryToggleGravity())
+			{
+				_gravityManager.FlipPlayerBody(this);
+			}
 		}
 		else if (@event.IsActionPressed("sprint"))
 		{
@@ -27,17 +31,28 @@ public partial class Player
 		}
 	}
 	
-	private void HandleMouseLook(InputEventMouseMotion mouseMotion)
-{
-	float xRotation = mouseMotion.Relative.X * MouseSensitivity;
-	float yRotation = mouseMotion.Relative.Y * MouseSensitivity;
-	_horizontalRotation -= xRotation;
-	_horizontalRotation = Mathf.Wrap(_horizontalRotation, -Mathf.Pi, Mathf.Pi);
-	VerticalRotation -= yRotation;
-	VerticalRotation = Mathf.Clamp(VerticalRotation, -Mathf.Pi / 2, Mathf.Pi / 2);
+	 private void HandleMouseLook(InputEventMouseMotion mouseMotion)
+	{
+		float xRotation = mouseMotion.Relative.X * MouseSensitivity;
+		float yRotation = mouseMotion.Relative.Y * MouseSensitivity;
 
-	UpdateCameraRotation();
-}
+		if (_gravityManager.IsGravityReversed)
+		{
+			xRotation = -xRotation;
+		}
+		if (IsCameraInverted)
+		{
+			xRotation = -xRotation;
+			yRotation = -yRotation;
+		}
+
+		RotateY(Mathf.DegToRad(-xRotation));
+		
+		VerticalRotation -= yRotation;
+		VerticalRotation = Mathf.Clamp(VerticalRotation, -89, 89);
+		
+		UpdateCameraRotation();
+	}
 
 
 	private void HandleMouseInput(InputEvent @event)
@@ -70,6 +85,7 @@ public partial class Player
 		}
 	}
 
+
 	private void RotatePlayer(InputEventMouseMotion mouseMotion)
 {
 	float xRotation = mouseMotion.Relative.X * MouseSensitivity;
@@ -94,7 +110,7 @@ public partial class Player
 	Camera.Rotation = cameraRotation;
 }
 
-	private void HandleMouseButtons(InputEventMouseButton mouseButton)
+	  private void HandleMouseButtons(InputEventMouseButton mouseButton)
 	{
 		if (mouseButton.ButtonIndex == MouseButton.Left)
 		{
@@ -107,6 +123,6 @@ public partial class Player
 				StopLifting();
 			}
 		}
-		}
-		
+	}
+
 }
