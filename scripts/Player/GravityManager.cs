@@ -11,9 +11,9 @@ public partial class GravityManager : Node
 	private bool _isFlipping = false;
 	private Player _player;
 	private Node3D _playerHead;
-	private GravityJumpsIndicator _jumpsIndicator;
+	private PlayerUI _jumpsIndicator;
 
-	public override void _Ready()
+	 public override void _Ready()
 	{
 		_player = GetParent<Player>();
 		if (_player == null)
@@ -22,18 +22,13 @@ public partial class GravityManager : Node
 			return;
 		}
 		_playerHead = _player.GetNode<Node3D>("Head");
-		PackedScene indicatorScene = GD.Load<PackedScene>("res://scenes/gravity_jumps_indicator.tscn");
-		if (indicatorScene != null)
-		{
-			_jumpsIndicator = indicatorScene.Instantiate<GravityJumpsIndicator>();
-			AddChild(_jumpsIndicator);
-		}
-		else
-		{
-			GD.PrintErr("Failed to load GravityJumpsIndicator scene!");
-		}
-	}
 
+		_jumpsIndicator = _player.GetNode<PlayerUI>("PlayerUI"); // Assuming "PlayerUI" is the node name in your player scene
+		if (_jumpsIndicator == null)
+		{
+			GD.PrintErr("PlayerUI not found in Player!");
+		}
+		}
 	public override void _PhysicsProcess(double delta)
 	{
 		if (_isFlipping)
@@ -49,7 +44,7 @@ public partial class GravityManager : Node
 			IsGravityReversed = !IsGravityReversed;
 			_isFlipping = true;
 			_flipTimer = 0f;
-			_player.UpdateHeldObjectGravity(IsGravityReversed);
+			UpdateHeldObjectGravity(IsGravityReversed);
 			_jumpsIndicator.UseJump();
 		}
 	}
@@ -61,7 +56,7 @@ public partial class GravityManager : Node
 			IsGravityReversed = !IsGravityReversed;
 			_isFlipping = true;
 			_flipTimer = 0f;
-			_player.UpdateHeldObjectGravity(IsGravityReversed);
+			UpdateHeldObjectGravity(IsGravityReversed);
 			_jumpsIndicator.UseJump();
 			return true;
 		}
@@ -74,10 +69,13 @@ public partial class GravityManager : Node
 		float progress = Mathf.Clamp(_flipTimer / GravityFlipDuration, 0, 1);
 		float angle = IsGravityReversed ? Mathf.Pi : 0;
 		
-		Quaternion targetRotation = Quaternion.FromEuler(new Vector3(angle, 0, 0));
-		_player.Basis = _player.Basis.Slerp(new Basis(targetRotation), progress);
+		Quaternion startRotation = _player.Basis.GetRotationQuaternion().Normalized();
+		Quaternion targetRotation = Quaternion.FromEuler(new Vector3(angle, 0, 0)).Normalized();
+		Quaternion newRotation = startRotation.Slerp(targetRotation, progress).Normalized();
+		
+		_player.Basis = new Basis(newRotation);
 		_player.UpDirection = IsGravityReversed ? Vector3.Down : Vector3.Up;
-
+		
 		if (_flipTimer >= GravityFlipDuration)
 		{
 			_isFlipping = false;
@@ -103,5 +101,13 @@ public partial class GravityManager : Node
 	private void UpdatePlayerRotation(Player player, Quaternion rotation)
 	{
 		player.GlobalTransform = new Transform3D(new Basis(rotation), player.GlobalPosition);
+	}
+
+	public void UpdateHeldObjectGravity(bool isGravityReversed)
+	{
+		if (_player.IsLifting && _player.HeldObject != null)
+		{
+			_player.HeldObject.GravityScale = isGravityReversed ? -1 : 1;
+		}
 	}
 }

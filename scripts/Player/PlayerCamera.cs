@@ -4,6 +4,7 @@ using System;
 public partial class Player
 {
 	private float _horizontalRotation = 0f;
+	public Vector3 InitialCameraPosition; 
 
 	private void ApplyCameraShakes(double delta)
 	{

@@ -8,7 +8,7 @@ uniform vec4 border_color : source_color = vec4(0.0, 0.0, 0.0, 0.8);
 void fragment() {
     vec2 center = vec2(0.5, 0.5);
     float dist = distance(UV, center);
-    
+
     if (dist < dot_size - border_size) {
         COLOR = dot_color;
     } else if (dist < dot_size) {

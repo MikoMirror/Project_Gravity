@@ -1,9 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://1cc1ehwwh0tr"]
+[gd_scene load_steps=13 format=3 uid="uid://1cc1ehwwh0tr"]
 
-[ext_resource type="Shader" path="res://shaders/test.gdshader" id="1_h1cyh"]
 [ext_resource type="Script" path="res://scripts/Player/Player.cs" id="1_lrqu3"]
 [ext_resource type="Shader" path="res://shaders/crosshair.gdshader" id="2_8ybvs"]
+[ext_resource type="Shader" path="res://shaders/EngeFlash.gdshader" id="3_vtsco"]
 [ext_resource type="Script" path="res://scripts/Player/GravityManager.cs" id="4_v6kp3"]
+[ext_resource type="PackedScene" uid="uid://dygvnm43uahoa" path="res://scenes/PlayerUI.tscn" id="5_rhres"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_miooo"]
 
@@ -18,20 +19,53 @@ shader_parameter/border_color = Color(0, 0, 0, 0.8)
 flip_faces = true
 size = Vector2(2, 2)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_lbfqq"]
-shader = ExtResource("1_h1cyh")
-shader_parameter/line_color = Color(1, 1, 1, 1)
-shader_parameter/line_count = 1.15
-shader_parameter/line_density = 0.084
-shader_parameter/line_faloff = 0.228
-shader_parameter/mask_size = 0.269
-shader_parameter/mask_edge = 0.5
-shader_parameter/animation_speed = 0.5
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_876ij"]
+shader = ExtResource("3_vtsco")
+shader_parameter/glow_color = Color(0.309804, 0.498039, 1, 0)
+shader_parameter/glow_width = 0.089
+shader_parameter/glow_intensity = 0.363
+
+[sub_resource type="Animation" id="Animation_8ykc6"]
+resource_name = "FlashEffect"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:material:shader_parameter/glow_color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5, 1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(0.309804, 0.498039, 1, 0), Color(0.309804, 0.498039, 1, 1), Color(0.309804, 0.498039, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_umip1"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:material:shader_parameter/glow_color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0.309804, 0.498039, 1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_xg4i8"]
+_data = {
+"FlashEffect": SubResource("Animation_8ykc6"),
+"RESET": SubResource("Animation_umip1")
+}
 
 [node name="Player" type="CharacterBody3D"]
 script = ExtResource("1_lrqu3")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00181325, 0.00943557, -0.000107765)
 shape = SubResource("CapsuleShape3D_miooo")
 
 [node name="Head" type="Node3D" parent="."]
@@ -39,6 +73,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.692655, -0.229486)
 
 [node name="Camera3D" type="Camera3D" parent="Head"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.274746)
+near = 0.001
 
 [node name="InteractionRay" type="RayCast3D" parent="Head/Camera3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00383413, 0.0034641, -0.0593775)
@@ -56,19 +91,25 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Head/Camera3D"]
-visible = false
 extra_cull_margin = 16384.0
 mesh = SubResource("QuadMesh_fyf5m")
 skeleton = NodePath("../../../..")
 
 [node name="cameraPost" type="ColorRect" parent="Head/Camera3D/MeshInstance3D"]
-visible = false
-material = SubResource("ShaderMaterial_lbfqq")
+material = SubResource("ShaderMaterial_876ij")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="FadeAnimation" type="AnimationPlayer" parent="Head/Camera3D/MeshInstance3D/cameraPost"]
+libraries = {
+"": SubResource("AnimationLibrary_xg4i8")
+}
 
 [node name="GravityManager" type="Node3D" parent="."]
 script = ExtResource("4_v6kp3")
+
+[node name="PlayerUI" parent="." instance=ExtResource("5_rhres")]

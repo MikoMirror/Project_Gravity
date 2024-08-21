@@ -1,0 +1,49 @@
+[gd_scene load_steps=8 format=3 uid="uid://d25yeq8xge6yd"]
+
+[ext_resource type="Shader" path="res://shaders/cube.gdshader" id="1_y8ep0"]
+[ext_resource type="Shader" path="res://shaders/glass.gdshader" id="2_xo0xn"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_d2pqg"]
+points = PackedVector3Array(0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1vtpd"]
+render_priority = 0
+shader = ExtResource("2_xo0xn")
+shader_parameter/albedo = Color(1, 0.584314, 1, 0.541176)
+shader_parameter/roughness = 0.15
+shader_parameter/normal_strength = 1.0
+shader_parameter/edge_color = Color(0.248731, 0.000314198, 0.709581, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_h6lvm"]
+material = SubResource("ShaderMaterial_1vtpd")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vchwd"]
+render_priority = 0
+shader = ExtResource("1_y8ep0")
+shader_parameter/baseColor = Color(1, 1, 1, 1)
+shader_parameter/gradientBasis = Vector3(3, 3, 3)
+shader_parameter/gradientBasisDistort = Vector3(0, 0, 0)
+shader_parameter/gradientBasisSpeed = 0.0
+shader_parameter/refractionSplit = 2.0
+shader_parameter/refractionSplitPower = 1.0
+shader_parameter/refractionAffect = 0.8
+
+[sub_resource type="BoxMesh" id="BoxMesh_yf1fi"]
+material = SubResource("ShaderMaterial_vchwd")
+
+[node name="cube" type="RigidBody3D" groups=["rigid_bodies"]]
+mass = 10.0
+can_sleep = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, 0, 0, 0)
+shape = SubResource("ConvexPolygonShape3D_d2pqg")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CollisionShape3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("BoxMesh_h6lvm")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3d2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 0, 0, 0)
+mesh = SubResource("BoxMesh_yf1fi")

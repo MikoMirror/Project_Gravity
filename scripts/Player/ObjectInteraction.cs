@@ -203,11 +203,5 @@ public partial class Player
 		}
 	}
 
-	public void UpdateHeldObjectGravity(bool isGravityReversed)
-	{
-		if (IsLifting && HeldObject != null)
-		{
-			HeldObject.GravityScale = isGravityReversed ? -1 : 1;
-		}
-	}
+	
 }

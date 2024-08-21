@@ -120,7 +120,7 @@ group_uniforms settings;
 	    }
 	    return sum * 0.5 + 0.5;
 	}
-	
+
 float sphere_intersect( vec3 view_dir, vec3 sphere_pos, float radius )
 {
     float b = dot( -sphere_pos, view_dir );

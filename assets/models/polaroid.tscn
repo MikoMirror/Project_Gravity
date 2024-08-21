@@ -1,5 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://djyc5v2cba8tk"]
-
-[ext_resource type="PackedScene" uid="uid://b85bfmkxfqkpc" path="res://assets/glf/polaroid.glb" id="1_kjb71"]
-
-[node name="polaroid" instance=ExtResource("1_kjb71")]
