@@ -35,17 +35,31 @@ public partial class GravityOrb : Node3D
 
 	public bool TryActivate(Player player)
 {
+	GD.Print("TryActivate called"); // Debug log
 	if (_sphere == null || _sphere.Visible)
 	{
-		var jumpsIndicator = player.GetNode<PlayerUI>("PlayerUI"); // Access from Player
+		var jumpsIndicator = player.GetNode<PlayerUI>("PlayerUI");
 		if (jumpsIndicator != null)
 		{
+			GD.Print("Replenishing jump"); // Debug log
 			jumpsIndicator.ReplenishOneJump();
 			if (_sphere != null) _sphere.Visible = false;
 			player.TriggerFlashEffect();
 			return true;
 		}
+		else
+		{
+			GD.PrintErr("PlayerUI not found on Player"); // Debug log
+		}
 	}
 	return false;
+}
+
+public void Reset()
+{
+	if (_sphere != null)
+	{
+		_sphere.Visible = true;
+	}
 }
 }

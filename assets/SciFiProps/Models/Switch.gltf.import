@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bqmpgrhpi4hh"
-path="res://.godot/imported/Switch.gltf-6319174f78ab8b4905c70ac4bf76661b.scn"
+path="res://.godot/imported/Switch.gltf-a5f04f1d582c2ece40a1a370fe8198fc.scn"
 
 [deps]
 
-source_file="res://assets/SciFiProps/Models/Switch.gltf"
-dest_files=["res://.godot/imported/Switch.gltf-6319174f78ab8b4905c70ac4bf76661b.scn"]
+source_file="res://Assets/SciFiProps/Models/Switch.gltf"
+dest_files=["res://.godot/imported/Switch.gltf-a5f04f1d582c2ece40a1a370fe8198fc.scn"]
 
 [params]
 

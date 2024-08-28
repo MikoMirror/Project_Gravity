@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bm02k4e07cdd1"
-path="res://.godot/imported/Wires.gltf-eaa36de8da8d3021689837cba8f98fe7.scn"
+path="res://.godot/imported/Wires.gltf-f97666c0f18c033b27dbdfca86d1fdd0.scn"
 
 [deps]
 
-source_file="res://assets/SciFiProps/Models/Wires.gltf"
-dest_files=["res://.godot/imported/Wires.gltf-eaa36de8da8d3021689837cba8f98fe7.scn"]
+source_file="res://Assets/SciFiProps/Models/Wires.gltf"
+dest_files=["res://.godot/imported/Wires.gltf-f97666c0f18c033b27dbdfca86d1fdd0.scn"]
 
 [params]
 

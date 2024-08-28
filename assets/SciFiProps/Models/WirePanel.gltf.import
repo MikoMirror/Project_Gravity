@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://ctq074a2xig1o"
-path="res://.godot/imported/WirePanel.gltf-17b9c590baff3e21127fbf97759412ec.scn"
+path="res://.godot/imported/WirePanel.gltf-08ad27350cee25f1b665f1b799ae37d9.scn"
 
 [deps]
 
-source_file="res://assets/SciFiProps/Models/WirePanel.gltf"
-dest_files=["res://.godot/imported/WirePanel.gltf-17b9c590baff3e21127fbf97759412ec.scn"]
+source_file="res://Assets/SciFiProps/Models/WirePanel.gltf"
+dest_files=["res://.godot/imported/WirePanel.gltf-08ad27350cee25f1b665f1b799ae37d9.scn"]
 
 [params]
 

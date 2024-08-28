@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://doorl8vjh22no"
-path="res://.godot/imported/Cabinet.gltf-352fe49d1173b87e7664b2324c5e8ed4.scn"
+path="res://.godot/imported/Cabinet.gltf-f75b599ea1a8f6e4cc8ab345c857b139.scn"
 
 [deps]
 
-source_file="res://assets/SciFiProps/Models/Cabinet.gltf"
-dest_files=["res://.godot/imported/Cabinet.gltf-352fe49d1173b87e7664b2324c5e8ed4.scn"]
+source_file="res://Assets/SciFiProps/Models/Cabinet.gltf"
+dest_files=["res://.godot/imported/Cabinet.gltf-f75b599ea1a8f6e4cc8ab345c857b139.scn"]
 
 [params]
 

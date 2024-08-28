@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://br71y0l0rxt8h"
+path="res://.godot/imported/guertin_experimental_blur.glsl-54f4a0cb0b5625d71b133a5be9b41bf1.res"
+
+[deps]
+
+source_file="res://addons/JFA_driven_motion_blur_addon-master/addons/SphynxMotionBlurToolkit/Guertin/ShaderFiles/guertin_experimental_blur.glsl"
+dest_files=["res://.godot/imported/guertin_experimental_blur.glsl-54f4a0cb0b5625d71b133a5be9b41bf1.res"]
+
+[params]
+

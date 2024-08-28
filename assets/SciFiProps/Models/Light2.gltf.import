@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cnx2fp5md3bn6"
-path="res://.godot/imported/Light2.gltf-f53b37aa546a0375410a04267303d4b6.scn"
+path="res://.godot/imported/Light2.gltf-378ea83fed0816df309b7f5f66d19f52.scn"
 
 [deps]
 
-source_file="res://assets/SciFiProps/Models/Light2.gltf"
-dest_files=["res://.godot/imported/Light2.gltf-f53b37aa546a0375410a04267303d4b6.scn"]
+source_file="res://Assets/SciFiProps/Models/Light2.gltf"
+dest_files=["res://.godot/imported/Light2.gltf-378ea83fed0816df309b7f5f66d19f52.scn"]
 
 [params]
 

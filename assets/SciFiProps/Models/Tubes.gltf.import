@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cslhflifwenqr"
-path="res://.godot/imported/Tubes.gltf-4a2fce018aaa0b713f45277b52f25db3.scn"
+path="res://.godot/imported/Tubes.gltf-4efd91fad54051de31d3c24c4f8c50fd.scn"
 
 [deps]
 
-source_file="res://assets/SciFiProps/Models/Tubes.gltf"
-dest_files=["res://.godot/imported/Tubes.gltf-4a2fce018aaa0b713f45277b52f25db3.scn"]
+source_file="res://Assets/SciFiProps/Models/Tubes.gltf"
+dest_files=["res://.godot/imported/Tubes.gltf-4efd91fad54051de31d3c24c4f8c50fd.scn"]
 
 [params]
 

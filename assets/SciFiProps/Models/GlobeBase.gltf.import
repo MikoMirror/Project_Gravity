@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dxslfr1qdofix"
-path="res://.godot/imported/GlobeBase.gltf-81473fdc49fc6a653755b4a5c2961608.scn"
+path="res://.godot/imported/GlobeBase.gltf-eae575022f093791405f38341f1a3391.scn"
 
 [deps]
 
-source_file="res://assets/SciFiProps/Models/GlobeBase.gltf"
-dest_files=["res://.godot/imported/GlobeBase.gltf-81473fdc49fc6a653755b4a5c2961608.scn"]
+source_file="res://Assets/SciFiProps/Models/GlobeBase.gltf"
+dest_files=["res://.godot/imported/GlobeBase.gltf-eae575022f093791405f38341f1a3391.scn"]
 
 [params]
 

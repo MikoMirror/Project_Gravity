@@ -15,6 +15,10 @@ run/main_scene="res://scenes/Level1.tscn"
 config/features=PackedStringArray("4.3", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+GameState="*res://scripts/GameState.cs"
+
 [display]
 
 window/size/viewport_width=1920
@@ -28,7 +32,7 @@ project/assembly_name="The-photographer"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/Godot-MToon-Shader/plugin.cfg", "res://addons/unidot_importer/plugin.cfg", "res://addons/vrm/plugin.cfg")
+enabled=PackedStringArray("res://addons/JFA_driven_motion_blur_addon-master/addons/SphynxMotionBlurToolkit/plugin.cfg")
 
 [input]
 

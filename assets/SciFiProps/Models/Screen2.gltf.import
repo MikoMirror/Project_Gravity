@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://f6q0fpe5du30"
-path="res://.godot/imported/Screen2.gltf-151c717ab167118960531c85ea667918.scn"
+path="res://.godot/imported/Screen2.gltf-c5abc699b39fe30237e3f27e81e119c6.scn"
 
 [deps]
 
-source_file="res://assets/SciFiProps/Models/Screen2.gltf"
-dest_files=["res://.godot/imported/Screen2.gltf-151c717ab167118960531c85ea667918.scn"]
+source_file="res://Assets/SciFiProps/Models/Screen2.gltf"
+dest_files=["res://.godot/imported/Screen2.gltf-c5abc699b39fe30237e3f27e81e119c6.scn"]
 
 [params]
 

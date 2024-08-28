@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://ylkrbqh7unvl"
+path="res://.godot/imported/mcguire_overlay.glsl-7d6d3263ebb7a390eb55ea1176ab7486.res"
+
+[deps]
+
+source_file="res://addons/JFA_driven_motion_blur_addon-master/addons/SphynxMotionBlurToolkit/McGuire/ShaderFiles/mcguire_overlay.glsl"
+dest_files=["res://.godot/imported/mcguire_overlay.glsl-7d6d3263ebb7a390eb55ea1176ab7486.res"]
+
+[params]
+

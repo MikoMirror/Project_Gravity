@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://dygvnm43uahoa"]
+[gd_scene load_steps=4 format=3 uid="uid://dygvnm43uahoa"]
 
 [ext_resource type="Script" path="res://scripts/PlayerUI.cs" id="1_x64cr"]
+[ext_resource type="Script" path="res://scripts/fps.cs" id="2_6fliq"]
 
 [sub_resource type="CanvasTexture" id="CanvasTexture_htb62"]
 
@@ -13,7 +14,6 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_x64cr")
 ActiveColor = Color(0.52418, 0.490504, 1, 1)
-ReplenishColor = Color(0.52549, 0.490196, 1, 1)
 
 [node name="Jump1" type="TextureRect" parent="."]
 modulate = Color(0.705882, 0, 0.27451, 1)
@@ -27,17 +27,6 @@ grow_horizontal = 2
 grow_vertical = 2
 scale = Vector2(0.601034, 0.637446)
 texture = SubResource("CanvasTexture_htb62")
-
-[node name="Label" type="Label" parent="."]
-visible = false
-layout_mode = 0
-offset_left = 424.0
-offset_top = 565.0
-offset_right = 757.0
-offset_bottom = 620.0
-size_flags_horizontal = 0
-theme_override_font_sizes/font_size = 40
-text = "Press G to restart"
 
 [node name="Jump2" type="TextureRect" parent="."]
 modulate = Color(0.705882, 0, 0.27451, 1)
@@ -61,6 +50,17 @@ offset_bottom = 1008.0
 scale = Vector2(0.601034, 0.637446)
 texture = SubResource("CanvasTexture_htb62")
 
+[node name="RestartLabel" type="Label" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 424.0
+offset_top = 565.0
+offset_right = 757.0
+offset_bottom = 620.0
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 40
+text = "Press G to restart"
+
 [node name="teleportLabel" type="Label" parent="."]
 visible = false
 layout_mode = 1
@@ -78,3 +78,10 @@ grow_vertical = 0
 size_flags_horizontal = 0
 theme_override_font_sizes/font_size = 24
 text = "Press E  to teleport"
+
+[node name="Label2" type="Label" parent="."]
+layout_mode = 0
+offset_right = 160.0
+offset_bottom = 72.0
+theme_override_font_sizes/font_size = 24
+script = ExtResource("2_6fliq")

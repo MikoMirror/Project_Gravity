@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bb7ni83ch5eqm"
-path="res://.godot/imported/Floor.gltf-0b82cddd02850a9a33b6ac1809110419.scn"
+path="res://.godot/imported/Floor.gltf-4acb308dc22a9b883828ce530e762e85.scn"
 
 [deps]
 
-source_file="res://assets/SciFiProps/Models/Floor.gltf"
-dest_files=["res://.godot/imported/Floor.gltf-0b82cddd02850a9a33b6ac1809110419.scn"]
+source_file="res://Assets/SciFiProps/Models/Floor.gltf"
+dest_files=["res://.godot/imported/Floor.gltf-4acb308dc22a9b883828ce530e762e85.scn"]
 
 [params]
 

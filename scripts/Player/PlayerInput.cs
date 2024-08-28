@@ -29,7 +29,31 @@ public partial class Player
 		{
 			IsSprinting = false;
 		}
+		else if (@event.IsActionPressed("restart_level"))
+{
+	GD.Print("Player: Restart level action pressed");
+	try
+	{
+		var currentScene = GetTree().CurrentScene;
+		GD.Print($"Player: Current scene is {currentScene.Name}");
+		var levelManager = currentScene.GetNode<LevelManager>(".");
+		if (levelManager != null)
+		{
+			GD.Print("Player: LevelManager found, calling RestartLevel");
+			levelManager.RestartLevel();
+		}
+		else
+		{
+			GD.PrintErr("Player: LevelManager not found on the current scene");
+		}
 	}
+	catch (Exception e)
+	{
+		GD.PrintErr($"Player: Error during restart level - {e.Message}\n{e.StackTrace}");
+	}
+}
+}
+	
 	
 	 private void HandleMouseLook(InputEventMouseMotion mouseMotion)
 	{

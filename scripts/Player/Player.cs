@@ -51,9 +51,15 @@ public partial class Player : CharacterBody3D
 	private RayCast3D InteractionRay;
 	private Marker3D HandPosition;
 	private ColorRect CameraOverlay;
-	private AnimationPlayer _fadeAnimation;
+	private AnimationPlayer _animation;
 	private Vector3 _initialPosition;
 	private Quaternion _initialRotation;
+	private ColorRect _teleportOverlay;
+	private AnimationPlayer _animationPlayer;
+	private Camera3D _camera;
+	private Node3D _head;
+	private bool _isTeleporting = false;
+	private PlayerUI _playerUI;
 
 	public override void _Ready()
 	{
@@ -64,12 +70,19 @@ public partial class Player : CharacterBody3D
 		Camera = GetNode<Camera3D>("Head/Camera3D");
 		InteractionRay = Camera.GetNode<RayCast3D>("InteractionRay");
 		HandPosition = Camera.GetNode<Marker3D>("HandPosition");
-		CameraOverlay = GetNode<ColorRect>("Head/Camera3D/MeshInstance3D/cameraPost");
-		_fadeAnimation = GetNode<AnimationPlayer>("Head/Camera3D/MeshInstance3D/cameraPost/FadeAnimation");
+		CameraOverlay = GetNode<ColorRect>("Head/Camera3D/Flash");
+		_animation = GetNode<AnimationPlayer>("AnimationPlayer");
+		_teleportOverlay = GetNode<ColorRect>("Head/Camera3D/TeleportOverlay");
+		_animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
+		_camera = GetNode<Camera3D>("Head/Camera3D");
+		_head = GetNode<Node3D>("Head");
+		_playerUI = GetNode<PlayerUI>("PlayerUI");
 
 		if (_gravityManager == null)
 		{
 			GD.PrintErr("GravityManager not found! Make sure it's a child of the Player node.");
+				_camera = GetNode<Camera3D>("Head/Camera3D");
+				_head = GetNode<Node3D>("Head");
 		}
 		if (_jumpsIndicator == null)
 		{
@@ -112,7 +125,7 @@ public partial class Player : CharacterBody3D
 
 	public void TriggerFlashEffect()
 	{
-		_fadeAnimation.Play("FlashEffect");
+		_animation.Play("flash_effect");
 	}
 
 	public void ToggleGravity()
@@ -139,5 +152,58 @@ public partial class Player : CharacterBody3D
 			return true;
 		}
 		return false;
+	}
+
+	public void StartTeleportAnimation(Action onTeleportComplete)
+	{
+		if (_isTeleporting) return; // Prevent multiple teleportations at once
+
+		_isTeleporting = true;
+		_teleportOverlay.Visible = true;
+		_animationPlayer.Play("teleportation");
+
+		// Schedule the teleportation to occur after 1.4 seconds
+		GetTree().CreateTimer(1.4f).Timeout += () =>
+		{
+			onTeleportComplete?.Invoke();
+		};
+
+		// Schedule hiding the overlay after the animation completes
+		float animationLength = _animationPlayer.GetAnimation("teleportation").Length;
+		GetTree().CreateTimer(animationLength).Timeout += () =>
+		{
+			if (IsInstanceValid(_teleportOverlay) && !IsQueuedForDeletion())
+			{
+				_teleportOverlay.Visible = false;
+			}
+			_isTeleporting = false;
+		};
+	}
+
+	public void TeleportTo(Vector3 position, Vector3 forwardDirection)
+	{
+		if (!_isTeleporting) return; 
+
+		GlobalPosition = position;
+		_head.LookAt(GlobalPosition + forwardDirection);
+
+		// Save the camera's original global transform
+		Transform3D originalCameraTransform = _camera.GlobalTransform;
+
+		// Update the player's position and rotation
+		GlobalPosition = position;
+		_head.LookAt(GlobalPosition + forwardDirection);
+
+		// Set the camera back to its original global transform
+		_camera.GlobalTransform = originalCameraTransform;
+	}
+
+	public override void _ExitTree()
+	{
+		GD.Print("Player _ExitTree called");
+		if (IsInstanceValid(_playerUI) && _playerUI.IsInsideTree())
+		{
+			_playerUI.QueueFree();
+		}
 	}
 }

@@ -1,100 +1,156 @@
 using Godot;
+using System;
 
 public partial class Portal : Node3D
 {
-	[Export]
-	public bool IsSpawnPortal = false;
+	public enum PortalType { BetweenLevels, WithinLevel }
 
-	[Export]
-	public NodePath TargetPortalPath; 
+	[Export] private PortalType _type = PortalType.WithinLevel;
+	[Export] private string _targetLevelPath = "";
+	[Export] private string _targetPortalName = "";
+	[Export] private bool _isTeleportActive = true; 
 
-	private Portal _targetPortal;
-	private bool _isPlayerNearby = false;
-	private Player _player; 
-	private Label _teleportLabel;
-	private Area3D _portalArea; 
+	public PortalType Type
+	{
+		get => _type;
+		set => _type = value;
+	}
+
+	public string TargetLevelPath
+	{
+		get => _targetLevelPath;
+		set => _targetLevelPath = value;
+	}
+
+	public string TargetPortalName
+	{
+		get => _targetPortalName;
+		set => _targetPortalName = value;
+	}
+
+	public bool IsTeleportActive
+	{
+		get => _isTeleportActive;
+		set => _isTeleportActive = value;
+	}
+
+	private Area3D _portalArea;
+	private GameState _gameState;
+	private Player _playerInRange;
+	private PackedScene _levelLoadingScene;
+	private Control _levelLoadingInstance;
 
 	public override void _Ready()
 	{
-		if (!IsSpawnPortal && !string.IsNullOrEmpty(TargetPortalPath)) 
-		{
-			_targetPortal = GetNodeOrNull<Portal>(TargetPortalPath);
-		}
+		_portalArea = GetNode<Area3D>("PortalArea");
+		_gameState = GetNode<GameState>("/root/GameState");
 
-		_portalArea = GetNode<Area3D>("Area3D");
 		if (_portalArea != null)
-		{
-			_portalArea.BodyEntered += OnBodyEntered;
-			_portalArea.BodyExited += OnBodyExited;
-		}
-		else 
-		{
-			GD.PrintErr("Area3D node not found in Portal.");
-		}
-	}
-
-	private void TeleportPlayer()
-	{
-		if (_targetPortal != null)
-		{
-			_player.GlobalTransform = _targetPortal.GlobalTransform;
-			HideTeleportLabel();
-		}
+			{
+				_portalArea.BodyEntered += OnBodyEntered;
+				_portalArea.BodyExited += OnBodyExited;
+			}
 		else
-		{
-			GD.PrintErr("Portal: Target portal not set or not found.");
-		}
+			{
+				GD.PrintErr("Portal: PortalArea child node not found!");
+			}
+
+		_levelLoadingScene = GD.Load<PackedScene>("res://scenes/lelev_loading.tscn");
 	}
 
-	public override void _Process(double delta)
+	public override void _Input(InputEvent @event)
 	{
-		if (!IsSpawnPortal && _isPlayerNearby && Input.IsActionJustPressed("ui_interaction"))
+		if (_isTeleportActive && _playerInRange != null && @event.IsActionPressed("ui_interaction"))
 		{
-			TeleportPlayer();
+			if (Type == PortalType.BetweenLevels)
+			{
+				TeleportBetweenLevels(_playerInRange);
+			}
+			else
+			{
+				TeleportWithinLevel(_playerInRange);
+			}
 		}
 	}
 
 	private void OnBodyEntered(Node3D body)
 	{
-		if (body is Player player)
+		if (_isTeleportActive && body is Player player)
 		{
-			_player = player;
-			_isPlayerNearby = true;
-
-			if (!IsSpawnPortal) // Only show label if not a spawn portal
-			{
-				ShowTeleportLabel(player);
-			}
+			_playerInRange = player;
+			player.GetNode<PlayerUI>("PlayerUI").ShowTeleportLabel(true);
 		}
 	}
 
 	private void OnBodyExited(Node3D body)
 	{
-		if (body is Player)
+		if (_isTeleportActive && body is Player player && player == _playerInRange)
 		{
-			_isPlayerNearby = false;
-			HideTeleportLabel();
-		}
-	}
-	
-	private void ShowTeleportLabel(Player player)
-	{
-		_teleportLabel = player.GetNodeOrNull<Label>("PlayerUI/teleportLabel");
-		if (_teleportLabel != null)
-		{
-			_teleportLabel.Visible = true;
-		}
-		else
-		{
-			GD.PrintErr("TeleportLabel not found in PlayerUI.");
+			player.GetNode<PlayerUI>("PlayerUI").ShowTeleportLabel(false);
+				_playerInRange = null;
 		}
 	}
 
-	private void HideTeleportLabel()
+	private void TeleportBetweenLevels(Player player)
 	{
-		if (_teleportLabel != null)
+		if (string.IsNullOrEmpty(TargetLevelPath) || string.IsNullOrEmpty(TargetPortalName))
 		{
-			_teleportLabel.Visible = false;
+			GD.PrintErr("Portal: Target level path or portal name is not set!");
+			return;
+		}
+
+		var gameState = GetNode<GameState>("/root/GameState");
+		gameState.StorePlayerData(player, TargetPortalName);
+		GD.Print($"Portal: Stored player data. Target portal: {TargetPortalName}");
+
+		ShowLevelLoading();
+
+		gameState.IsComingFromPortal = true;
+		GetTree().ChangeSceneToFile(TargetLevelPath);
+	}
+
+	private void TeleportWithinLevel(Player player)
+	{
+		if (string.IsNullOrEmpty(TargetPortalName))
+		{
+			GD.PrintErr("Portal: Target portal name is not set!");
+			return;
+		}
+
+		var targetPortal = GetTree().CurrentScene.FindChild(TargetPortalName, true, false) as Portal;
+		if (targetPortal != null)
+		{
+			ShowLevelLoading();
+
+			player.TeleportTo(targetPortal.GlobalPosition, targetPortal.GlobalTransform.Basis.Z);
+
+			GetTree().CreateTimer(0.5f).Timeout += HideLevelLoading;
+		}
+		else
+		{
+			GD.PrintErr($"Portal: Target portal '{TargetPortalName}' not found in the current scene!");
+		}
+	}
+
+	private void ShowLevelLoading()
+	{
+		if (_levelLoadingInstance == null)
+		{
+			_levelLoadingInstance = _levelLoadingScene.Instantiate<Control>();
+			GetTree().Root.AddChild(_levelLoadingInstance);
+			_levelLoadingInstance.Name = "LevelLoading"; 
+		}
+		_levelLoadingInstance.Visible = true;
+		GD.Print("Portal: LevelLoading shown and added to the scene");
+	}
+
+	private void HideLevelLoading()
+	{
+		if (_levelLoadingInstance != null)
+		{
+			_levelLoadingInstance.Visible = false;
+			_levelLoadingInstance.QueueFree();
+			_levelLoadingInstance = null;
 		}
 	}
 }

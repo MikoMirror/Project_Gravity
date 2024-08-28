@@ -1,9 +1,9 @@
-[gd_scene load_steps=11 format=4 uid="uid://ckbd6gg70wpso"]
+[gd_scene load_steps=11 format=4 uid="uid://0g1bm5vx4bhw"]
 
-[ext_resource type="Texture2D" uid="uid://cdaoowvj01mbx" path="res://assets/OWN/Models/portal/portal_DefaultMaterial_BaseColor.jpg" id="1_475rm"]
-[ext_resource type="Script" path="res://scripts/Objects/Portal.cs" id="1_cdyt0"]
-[ext_resource type="Texture2D" uid="uid://dph8ket5gupvx" path="res://assets/OWN/Models/portal/portal_DefaultMaterial_Roughness.png" id="2_n1y8f"]
-[ext_resource type="Texture2D" uid="uid://nxpikeiaf5h" path="res://assets/OWN/Models/portal/portal_DefaultMaterial_Normal.jpg" id="3_w3dhg"]
+[ext_resource type="Texture2D" uid="uid://cdaoowvj01mbx" path="res://Assets/OWN/Models/portal/portal_DefaultMaterial_BaseColor.jpg" id="1_475rm"]
+[ext_resource type="Script" path="res://scripts/Objects/Portal.cs" id="1_k31n7"]
+[ext_resource type="Texture2D" uid="uid://dph8ket5gupvx" path="res://Assets/OWN/Models/portal/portal_DefaultMaterial_Roughness.png" id="2_n1y8f"]
+[ext_resource type="Texture2D" uid="uid://nxpikeiaf5h" path="res://Assets/OWN/Models/portal/portal_DefaultMaterial_Normal.jpg" id="3_w3dhg"]
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_q0fxf"]
 points = PackedVector3Array(-0.000309348, -0.500057, -1.575, -0.000309348, -0.666667, -1.50007, -1.11372, -0.500057, -1.11372, -0.000309348, -0.125028, -1.575, 1.11341, -0.500057, -1.11372, -1.06069, -0.666667, -1.06069, 1.06038, -0.666667, -1.06069, -1.50007, -0.666667, -5.96046e-07, -1.575, -0.500057, -5.96046e-07, -1.11372, -0.125028, -1.11372, -0.000309348, -1.7941e-05, -1.50007, 1.11341, -0.125028, -1.11372, 1.575, -0.500057, -0.000308871, 1.49976, -0.666667, -0.000308871, -1.06069, -0.666667, 1.06038, -1.11372, -0.500057, 1.11341, -1.575, -0.125028, -5.96046e-07, -1.50007, -1.7941e-05, -5.96046e-07, -1.06069, -1.7941e-05, -1.06069, -1.07288e-06, 0.05, -1.10016, 1.06038, -1.7941e-05, -1.06069, -0.777942, 0.05, -0.777942, 1.575, -0.125028, -0.000308871, 1.11341, -0.500057, 1.11341, 1.06038, -0.666667, 1.06038, -1.07288e-06, -0.666667, 1.49976, -1.07288e-06, -0.500057, 1.575, -1.11372, -0.125028, 1.11341, -1.06069, -1.7941e-05, 1.06038, -0.777942, 0.05, 0.777633, -1.10016, 0.05, -5.96046e-07, 0.777632, 0.05, -0.777942, 1.49976, -1.7941e-05, -0.000308871, 1.06038, -1.7941e-05, 1.06038, 1.11341, -0.125028, 1.11341, -1.07288e-06, -0.125028, 1.575, -1.07288e-06, -1.7941e-05, 1.49976, -1.07288e-06, 0.05, 1.09985, 1.09985, 0.05, -5.96046e-07, 0.777632, 0.05, 0.777633)
@@ -92,7 +92,7 @@ height = 0.115041
 radius = 1.1465
 
 [node name="portal" type="Node3D"]
-script = ExtResource("1_cdyt0")
+script = ExtResource("1_k31n7")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="."]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
@@ -105,9 +105,9 @@ shape = SubResource("ConvexPolygonShape3D_q0fxf")
 mesh = SubResource("ArrayMesh_ssipv")
 skeleton = NodePath("")
 
-[node name="Area3D" type="Area3D" parent="."]
+[node name="PortalArea" type="Area3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.365392, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PortalArea"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.214411, 0)
 shape = SubResource("CylinderShape3D_x26u5")

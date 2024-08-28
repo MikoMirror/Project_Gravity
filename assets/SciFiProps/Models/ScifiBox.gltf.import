@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://b37o25cecvqxx"
-path="res://.godot/imported/ScifiBox.gltf-e7d9b7090e1391b424123a4a0ff5eb9f.scn"
+path="res://.godot/imported/ScifiBox.gltf-8c813c54e0b12dfb2123f33ffff5c52c.scn"
 
 [deps]
 
-source_file="res://assets/SciFiProps/Models/ScifiBox.gltf"
-dest_files=["res://.godot/imported/ScifiBox.gltf-e7d9b7090e1391b424123a4a0ff5eb9f.scn"]
+source_file="res://Assets/SciFiProps/Models/ScifiBox.gltf"
+dest_files=["res://.godot/imported/ScifiBox.gltf-8c813c54e0b12dfb2123f33ffff5c52c.scn"]
 
 [params]
 

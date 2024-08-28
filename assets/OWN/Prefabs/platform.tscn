@@ -1,6 +1,6 @@
 [gd_scene load_steps=11 format=4 uid="uid://cjcbyfq2e6vpb"]
 
-[ext_resource type="Material" uid="uid://46r6xac6upfw" path="res://assets/OWN/Materials/neonPlatform.tres" id="1_snv61"]
+[ext_resource type="Material" uid="uid://46r6xac6upfw" path="res://Assets/OWN/Materials/neonPlatform.tres" id="1_snv61"]
 [ext_resource type="Script" path="res://scripts/Objects/activatePlatform.cs" id="1_wtsb8"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_3n5qa"]

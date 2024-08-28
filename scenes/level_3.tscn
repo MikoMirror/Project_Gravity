@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3 uid="uid://cqwe8vemd2w56"]
+
+[ext_resource type="PackedScene" uid="uid://egv34vmwijbn" path="res://Assets/OWN/Prefabs/floor.tscn" id="1_o8efb"]
+[ext_resource type="PackedScene" uid="uid://0g1bm5vx4bhw" path="res://Assets/OWN/Prefabs/portal.tscn" id="2_kylm6"]
+
+[node name="Level3" type="Node3D"]
+
+[node name="floor" parent="." instance=ExtResource("1_o8efb")]
+transform = Transform3D(1.2, 0, 0, 0, 0.1, 0, 0, 0, 1.2, 0, 0, -0.3386)
+
+[node name="floor2" parent="." instance=ExtResource("1_o8efb")]
+transform = Transform3D(1.2, 0, 0, 0, 0.1, 0, 0, 0, 1.2, 0, 0, -6.3386)
+
+[node name="floor3" parent="." instance=ExtResource("1_o8efb")]
+transform = Transform3D(1.2, 0, 0, 0, 0.1, 0, 0, 0, 1.2, 0, 0, -12.3386)
+
+[node name="floor5" parent="." instance=ExtResource("1_o8efb")]
+transform = Transform3D(1.2, 0, 0, 0, 0.1, 0, 0, 0, 1.2, 6, 0, -0.3386)
+
+[node name="floor6" parent="." instance=ExtResource("1_o8efb")]
+transform = Transform3D(1.2, 0, 0, 0, 0.1, 0, 0, 0, 1.2, 6, 0, -12.3386)
+
+[node name="portal" parent="." instance=ExtResource("2_kylm6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1, 1)

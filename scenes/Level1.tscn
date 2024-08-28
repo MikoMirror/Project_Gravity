@@ -1,16 +1,16 @@
 [gd_scene load_steps=15 format=3 uid="uid://dvm56dg3eeiy8"]
 
-[ext_resource type="PackedScene" uid="uid://d25yeq8xge6yd" path="res://assets/OWN/Prefabs/cube.tscn" id="1_ltoxr"]
-[ext_resource type="PackedScene" uid="uid://egv34vmwijbn" path="res://assets/OWN/Prefabs/floor.tscn" id="1_s63yx"]
-[ext_resource type="PackedScene" uid="uid://86m6jxi3j4ww" path="res://assets/OWN/Prefabs/Light1.prefab.scn" id="2_v6k67"]
-[ext_resource type="PackedScene" uid="uid://gib0iy56aabr" path="res://scenes/gravity_energy.tscn" id="3_psqg6"]
+[ext_resource type="Script" path="res://scripts/LevelManager.cs" id="1_5nbne"]
+[ext_resource type="PackedScene" uid="uid://d25yeq8xge6yd" path="res://Assets/OWN/Prefabs/cube.tscn" id="1_ltoxr"]
+[ext_resource type="PackedScene" uid="uid://egv34vmwijbn" path="res://Assets/OWN/Prefabs/floor.tscn" id="1_s63yx"]
+[ext_resource type="PackedScene" uid="uid://86m6jxi3j4ww" path="res://Assets/OWN/Prefabs/Light1.prefab.scn" id="2_v6k67"]
 [ext_resource type="PackedScene" uid="uid://1cc1ehwwh0tr" path="res://scenes/Player.tscn" id="3_wbh0h"]
-[ext_resource type="PackedScene" uid="uid://ckbd6gg70wpso" path="res://assets/OWN/Prefabs/portal.tscn" id="5_6tps4"]
-[ext_resource type="PackedScene" uid="uid://bff2itbvjsgc5" path="res://assets/OWN/Prefabs/ceiling_1.tscn" id="5_227gc"]
-[ext_resource type="PackedScene" uid="uid://cjcbyfq2e6vpb" path="res://assets/OWN/Prefabs/platform.tscn" id="5_j401j"]
-[ext_resource type="PackedScene" uid="uid://blpnfwjnb0kin" path="res://assets/OWN/Prefabs/cable.tscn" id="5_s0kvi"]
-[ext_resource type="PackedScene" uid="uid://c5avl3x8ogvyf" path="res://assets/OWN/Prefabs/wall_2.tscn" id="6_7oqgd"]
-[ext_resource type="PackedScene" uid="uid://bogppjxcn8okv" path="res://assets/OWN/Prefabs/door.tscn" id="8_yq823"]
+[ext_resource type="PackedScene" uid="uid://0g1bm5vx4bhw" path="res://Assets/OWN/Prefabs/portal.tscn" id="5_6tps4"]
+[ext_resource type="PackedScene" uid="uid://bff2itbvjsgc5" path="res://Assets/OWN/Prefabs/ceiling_1.tscn" id="5_227gc"]
+[ext_resource type="PackedScene" uid="uid://cjcbyfq2e6vpb" path="res://Assets/OWN/Prefabs/platform.tscn" id="5_j401j"]
+[ext_resource type="PackedScene" uid="uid://blpnfwjnb0kin" path="res://Assets/OWN/Prefabs/cable.tscn" id="5_s0kvi"]
+[ext_resource type="PackedScene" uid="uid://c5avl3x8ogvyf" path="res://Assets/OWN/Prefabs/wall_2.tscn" id="6_7oqgd"]
+[ext_resource type="PackedScene" uid="uid://bogppjxcn8okv" path="res://Assets/OWN/Prefabs/door.tscn" id="8_yq823"]
 
 [sub_resource type="Environment" id="Environment_h4ijt"]
 ambient_light_sky_contribution = 0.0
@@ -24,6 +24,7 @@ compositor_effects = Array[CompositorEffect]([null])
 
 [node name="Level1" type="Node3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0, 0)
+script = ExtResource("1_5nbne")
 
 [node name="stage" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 20.9386)
@@ -112,7 +113,7 @@ transform = Transform3D(3, 0, 0, 0, -1, 2.62268e-07, 0, -8.74228e-08, -3, 5.9847
 transform = Transform3D(3, 0, 0, 0, -1, 2.62268e-07, 0, -8.74228e-08, -3, -0.0152903, 6.05209, -0.387369)
 
 [node name="ceiling12" parent="stage/Ceiling" instance=ExtResource("5_227gc")]
-transform = Transform3D(3, 0, 0, 0, -1, 2.62268e-07, 0, -8.74228e-08, -3, -0.0152903, 2.05209, -24.1874)
+transform = Transform3D(3, 0, 0, 0, -1, 2.62268e-07, 0, -8.74228e-08, -3, -0.0152903, 2.05209, -24.3874)
 
 [node name="ceiling6" parent="stage/Ceiling" instance=ExtResource("5_227gc")]
 transform = Transform3D(3, 0, 0, 0, -1, 2.62268e-07, 0, -8.74228e-08, -3, 5.98471, 6.05209, -12.3874)
@@ -265,12 +266,6 @@ shadow_enabled = true
 environment = SubResource("Environment_h4ijt")
 compositor = SubResource("Compositor_tl5p6")
 
-[node name="GravityEnergy" parent="." instance=ExtResource("3_psqg6")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.3014, 0.0590779, 9.0665)
-
-[node name="Player" parent="." instance=ExtResource("3_wbh0h")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 2, 19)
-
 [node name="Door" parent="." instance=ExtResource("8_yq823")]
 transform = Transform3D(1.5, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.005, -0.415)
 
@@ -285,10 +280,11 @@ environment = SubResource("Environment_8riqv")
 [node name="cube" parent="." instance=ExtResource("1_ltoxr")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0.446663, 12)
 
-[node name="portal" parent="." instance=ExtResource("5_6tps4")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.10105, 0.512798, 19.0901)
-IsSpawnPortal = true
-
 [node name="portal2" parent="." instance=ExtResource("5_6tps4")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.101049, 0.512798, -3.90994)
-TargetPortalPath = NodePath("../portal")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.101049, 0.112798, -3.90994)
+_type = 0
+_targetLevelPath = "res://scenes/level_2.tscn"
+_targetPortalName = "portal1"
+
+[node name="Player" parent="." instance=ExtResource("3_wbh0h")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 1, 14)

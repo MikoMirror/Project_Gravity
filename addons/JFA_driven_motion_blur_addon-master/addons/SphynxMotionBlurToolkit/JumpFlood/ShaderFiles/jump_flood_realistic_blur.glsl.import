@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://b1fr5qhhrbpst"
+path="res://.godot/imported/jump_flood_realistic_blur.glsl-43bf23df39451eca5a070fbb8b2a3db0.res"
+
+[deps]
+
+source_file="res://addons/JFA_driven_motion_blur_addon-master/addons/SphynxMotionBlurToolkit/JumpFlood/ShaderFiles/jump_flood_realistic_blur.glsl"
+dest_files=["res://.godot/imported/jump_flood_realistic_blur.glsl-43bf23df39451eca5a070fbb8b2a3db0.res"]
+
+[params]
+

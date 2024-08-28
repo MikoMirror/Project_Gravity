@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bvsi5uqctoyni"
-path.s3tc="res://.godot/imported/panel_kiosk_r.png-af38c09c9f5d02a05dbc387e85f40bb3.s3tc.ctex"
+path.s3tc="res://.godot/imported/panel_kiosk_r.png-f262b55e76b51cc277e84ebd4a1b62b6.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -14,8 +14,8 @@ generator_parameters={
 
 [deps]
 
-source_file="res://assets/OWN/Models/panel/panel_kiosk_r.png"
-dest_files=["res://.godot/imported/panel_kiosk_r.png-af38c09c9f5d02a05dbc387e85f40bb3.s3tc.ctex"]
+source_file="res://Assets/OWN/Models/panel/panel_kiosk_r.png"
+dest_files=["res://.godot/imported/panel_kiosk_r.png-f262b55e76b51cc277e84ebd4a1b62b6.s3tc.ctex"]
 
 [params]
 

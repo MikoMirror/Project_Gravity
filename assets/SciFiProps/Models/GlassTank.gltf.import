@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://w3fgp2qjsmkk"
-path="res://.godot/imported/GlassTank.gltf-930974e96025784717cc9f7556401185.scn"
+path="res://.godot/imported/GlassTank.gltf-72ffabbf003e070db45c50f72c6de016.scn"
 
 [deps]
 
-source_file="res://assets/SciFiProps/Models/GlassTank.gltf"
-dest_files=["res://.godot/imported/GlassTank.gltf-930974e96025784717cc9f7556401185.scn"]
+source_file="res://Assets/SciFiProps/Models/GlassTank.gltf"
+dest_files=["res://.godot/imported/GlassTank.gltf-72ffabbf003e070db45c50f72c6de016.scn"]
 
 [params]
 

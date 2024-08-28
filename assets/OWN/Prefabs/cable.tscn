@@ -1,7 +1,8 @@
-[gd_scene load_steps=10 format=4 uid="uid://blpnfwjnb0kin"]
+[gd_scene load_steps=11 format=4 uid="uid://blpnfwjnb0kin"]
 
 [ext_resource type="Script" path="res://scripts/Objects/Cable.cs" id="1_uwagx"]
-[ext_resource type="Material" uid="uid://died7hy8cml2v" path="res://assets/OWN/Materials/neonCable.tres" id="1_xur1y"]
+[ext_resource type="Material" uid="uid://b0ymxchfyo0d4" path="res://Assets/OWN/Materials/neonCable.tres" id="1_xur1y"]
+[ext_resource type="Material" uid="uid://bwb250wu86ov5" path="res://Assets/OWN/Materials/BlackMEtal.tres" id="2_5nplh"]
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_a4v56"]
 points = PackedVector3Array(1, 1, 1, -1, 1, 1, 1, -1, 1, 1, 1, -1, -1, -1, 1, -1, 1, -1, 1, -1, -1, -1, -1, -1)
@@ -56,7 +57,6 @@ _surfaces = [{
 "format": 34896613399,
 "index_count": 72,
 "index_data": PackedByteArray("FwAnABUAFwAlACcAEwArABEAEwApACsADwAvAA0ADwAtAC8ACwAbAAkACwAZABsABwAfAAUABwAdAB8AAwAjAAEAAwAhACMAIgAmACQAIgAgACYAHgAqACgAHgAcACoAGgAuACwAGgAYAC4ACgAOAAwACgAIAA4ABgASABAABgAEABIAAgAWABQAAgAAABYA"),
-"material": ExtResource("1_xur1y"),
 "name": "neonCable",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -71,7 +71,7 @@ length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("StaticBody3D/CollisionShape3D/Cube_001:mesh:surface_1/material:emission")
+tracks/0/path = NodePath("StaticBody3D/CollisionShape3D/Cube_001:surface_material_override/0:emission")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -87,14 +87,14 @@ length = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("StaticBody3D/CollisionShape3D/Cube_001:mesh:surface_1/material:emission")
+tracks/0/path = NodePath("StaticBody3D/CollisionShape3D/Cube_001:surface_material_override/0:emission")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.1),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [Color(1, 0, 0.00432002, 1), Color(0, 0.866667, 0, 1)]
+"values": [Color(1, 0, 0.00432002, 1), Color(0.220192, 0.884481, 2.31028e-06, 1)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_gsy5s"]
@@ -116,6 +116,8 @@ shape = SubResource("ConvexPolygonShape3D_a4v56")
 transform = Transform3D(1, 0, 0, 0, 1, 7.10543e-15, 0, -7.10543e-15, 1, 0, 0, 0)
 mesh = SubResource("ArrayMesh_lwsyy")
 skeleton = NodePath("")
+surface_material_override/0 = ExtResource("1_xur1y")
+surface_material_override/1 = ExtResource("2_5nplh")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {

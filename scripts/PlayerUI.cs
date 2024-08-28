@@ -7,25 +7,30 @@ public partial class PlayerUI : Control
 	private int _remainingJumps = MAX_JUMPS;
 	private TextureRect[] _jumpIndicators;
 	private Label _restartLabel;
-	
+	private Label _teleportLabel;
+	private bool _canTeleport = false;
+
 	[Export]
 	private Color InactiveColor = Colors.Gray;
+
+	[Export]
+	private Color ActiveColor = new Color(180 / 255f, 0f, 70 / 255f);
 	
 	[Export]
-	private Color ActiveColor = new Color(180/255f, 0f, 70/255f);
+	private Color ReplenishColor = new Color(180 / 255f, 0f, 70 / 255f);
 
-	[Export]
-	private Color ReplenishColor = new Color(180/255f, 0f, 70/255f);
+	[Signal]
+	public delegate void TeleportRequestedEventHandler();
 
-	 public override void _Ready()
+	public override void _Ready()
 	{
 		_jumpIndicators = new TextureRect[MAX_JUMPS];
 		for (int i = 0; i < MAX_JUMPS; i++)
 		{
 			_jumpIndicators[i] = GetNode<TextureRect>($"Jump{i + 1}");
-			_jumpIndicators[i].Modulate = ActiveColor;
+			_jumpIndicators[i].Modulate = ActiveColor; // Start with all jumps active
 		}
-		
+
 		_restartLabel = new Label();
 		_restartLabel.Text = "Press 'G' to restart the level";
 		_restartLabel.Visible = false;
@@ -37,7 +42,17 @@ public partial class PlayerUI : Control
 		_restartLabel.VerticalAlignment = VerticalAlignment.Bottom;
 		_restartLabel.HorizontalAlignment = HorizontalAlignment.Center;
 		AddChild(_restartLabel);
-		UpdateIndicator();
+
+		_teleportLabel = GetNode<Label>("teleportLabel");
+		_teleportLabel.Visible = false;
+	}
+
+	public override void _Input(InputEvent @event)
+	{
+		if (_canTeleport && @event.IsActionPressed("ui_interaction"))
+		{
+			EmitSignal(SignalName.TeleportRequested);
+		}
 	}
 
 	public bool CanJump() => _remainingJumps > 0;
@@ -50,7 +65,7 @@ public partial class PlayerUI : Control
 			UpdateIndicator();
 		}
 	}
-	
+
 	public void ReplenishOneJump()
 	{
 		if (_remainingJumps < MAX_JUMPS)
@@ -60,7 +75,7 @@ public partial class PlayerUI : Control
 		}
 	}
 
-	 private void UpdateIndicator(bool isReplenishing = false)
+	private void UpdateIndicator(bool isReplenishing = false)
 	{
 		for (int i = 0; i < MAX_JUMPS; i++)
 		{
@@ -69,6 +84,7 @@ public partial class PlayerUI : Control
 				if (isReplenishing && i == _remainingJumps - 1)
 				{
 					_jumpIndicators[i].Modulate = ReplenishColor;
+					CreateTween().TweenProperty(_jumpIndicators[i], "modulate", ActiveColor, 0.5f).SetDelay(0.5f);
 				}
 				else
 				{
@@ -88,5 +104,16 @@ public partial class PlayerUI : Control
 	{
 		_remainingJumps = MAX_JUMPS;
 		UpdateIndicator();
+	}
+
+	public void UpdateUI()
+	{
+		UpdateIndicator();
+	}
+
+	public void ShowTeleportLabel(bool show)
+	{
+		_canTeleport = show;
+		_teleportLabel.Visible = show;
 	}
 }

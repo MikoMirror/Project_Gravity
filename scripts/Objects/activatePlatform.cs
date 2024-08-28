@@ -113,4 +113,18 @@ public partial class activatePlatform : Node3D
 			cableAnimPlayer.PlayBackwards("cable_enable");
 		}
 	}
+
+	public void ResetState()
+	{
+		_isActivated = false;
+		_objectsOnPlatform = 0;
+		_platformAnimationPlayer.PlayBackwards(ActivateAnimationName);
+		_associatedDoor?.Close();
+
+		// Deactivate all cables
+		foreach (var cableAnimPlayer in _cableAnimationPlayers)
+		{
+			cableAnimPlayer.PlayBackwards("cable_enable");
+		}
+	}
 }

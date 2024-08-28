@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dpv4c8tjwatd7"
-path="res://.godot/imported/Wall.gltf-095c2918c752e9ca9def12df64b9fdef.scn"
+path="res://.godot/imported/Wall.gltf-acbe5df7431186209064ea00cacfae1d.scn"
 
 [deps]
 
-source_file="res://assets/SciFiProps/Models/Wall.gltf"
-dest_files=["res://.godot/imported/Wall.gltf-095c2918c752e9ca9def12df64b9fdef.scn"]
+source_file="res://Assets/SciFiProps/Models/Wall.gltf"
+dest_files=["res://.godot/imported/Wall.gltf-acbe5df7431186209064ea00cacfae1d.scn"]
 
 [params]
 
