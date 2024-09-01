@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c3ub1clrow2td"
-path="res://.godot/imported/portal.glb-566985e92a9e12781f28edb14c264e01.scn"
+path="res://.godot/imported/portal.glb-7d87e4970373d93ee61dae789bb34f33.scn"
 
 [deps]
 
-source_file="res://Assets/OWN/Models/portal/portal.glb"
-dest_files=["res://.godot/imported/portal.glb-566985e92a9e12781f28edb14c264e01.scn"]
+source_file="res://assets/OWN/Models/portal/portal.glb"
+dest_files=["res://.godot/imported/portal.glb-7d87e4970373d93ee61dae789bb34f33.scn"]
 
 [params]
 

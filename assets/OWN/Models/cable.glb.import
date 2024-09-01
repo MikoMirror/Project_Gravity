@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c61mgr88dl1fo"
-path="res://.godot/imported/cable.glb-5130e8f00954b9e519dff8e8126262ae.scn"
+path="res://.godot/imported/cable.glb-a893c394e957335ff60387bd0c4792a1.scn"
 
 [deps]
 
-source_file="res://Assets/OWN/Models/cable.glb"
-dest_files=["res://.godot/imported/cable.glb-5130e8f00954b9e519dff8e8126262ae.scn"]
+source_file="res://assets/OWN/Models/cable.glb"
+dest_files=["res://.godot/imported/cable.glb-a893c394e957335ff60387bd0c4792a1.scn"]
 
 [params]
 

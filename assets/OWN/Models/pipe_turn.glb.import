@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bjc75lfsdvytu"
-path="res://.godot/imported/pipe_turn.glb-8cb7f28678e800a064aac958be9aa341.scn"
+path="res://.godot/imported/pipe_turn.glb-0babff90e38e31e6258c3927c5ef52b2.scn"
 
 [deps]
 
-source_file="res://Assets/OWN/Models/pipe_turn.glb"
-dest_files=["res://.godot/imported/pipe_turn.glb-8cb7f28678e800a064aac958be9aa341.scn"]
+source_file="res://assets/OWN/Models/pipe_turn.glb"
+dest_files=["res://.godot/imported/pipe_turn.glb-0babff90e38e31e6258c3927c5ef52b2.scn"]
 
 [params]
 

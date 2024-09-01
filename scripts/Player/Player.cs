@@ -156,7 +156,7 @@ public partial class Player : CharacterBody3D
 
 	public void StartTeleportAnimation(Action onTeleportComplete)
 	{
-		if (_isTeleporting) return; // Prevent multiple teleportations at once
+		if (_isTeleporting) return; 
 
 		_isTeleporting = true;
 		_teleportOverlay.Visible = true;

@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bg56cunima8lg"
-path.s3tc="res://.godot/imported/cube_Image_1.png-7cf3f7be999f003c8f5205eaf1105995.s3tc.ctex"
+path.s3tc="res://.godot/imported/cube_Image_1.png-034ff1f2b45d48f810ca8493fb290875.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -14,8 +14,8 @@ generator_parameters={
 
 [deps]
 
-source_file="res://Assets/OWN/Models/cube/cube_Image_1.png"
-dest_files=["res://.godot/imported/cube_Image_1.png-7cf3f7be999f003c8f5205eaf1105995.s3tc.ctex"]
+source_file="res://assets/OWN/Models/cube/cube_Image_1.png"
+dest_files=["res://.godot/imported/cube_Image_1.png-034ff1f2b45d48f810ca8493fb290875.s3tc.ctex"]
 
 [params]
 

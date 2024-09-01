@@ -32,7 +32,7 @@ project/assembly_name="The-photographer"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/JFA_driven_motion_blur_addon-master/addons/SphynxMotionBlurToolkit/plugin.cfg")
+enabled=PackedStringArray("res://addons/JFA_driven_motion_blur_addon-master/addons/SphynxMotionBlurToolkit/plugin.cfg", "res://addons/memmory_puzle_editor/plugin.cfg")
 
 [input]
 

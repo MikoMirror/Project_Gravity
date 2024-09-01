@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cup6vfhfs27x6"
-path.s3tc="res://.godot/imported/metal_albedo.png-fdbac6189089896106e64c1b53db1faa.s3tc.ctex"
+path.s3tc="res://.godot/imported/metal_albedo.png-406f40fc0274114128b26afcc07536e5.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://Assets/OWN/Materials/metal/metal_albedo.png"
-dest_files=["res://.godot/imported/metal_albedo.png-fdbac6189089896106e64c1b53db1faa.s3tc.ctex"]
+source_file="res://assets/OWN/Materials/metal/metal_albedo.png"
+dest_files=["res://.godot/imported/metal_albedo.png-406f40fc0274114128b26afcc07536e5.s3tc.ctex"]
 
 [params]
 

@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bsuaa6b72ovld"
-path="res://.godot/imported/ceiling3.glb-11d9d55a369b9809bfd716defdcb9ee6.scn"
+path="res://.godot/imported/ceiling3.glb-8b23826081d51f9238fdfca3e1b0a2a4.scn"
 
 [deps]
 
-source_file="res://Assets/OWN/Models/ceiling3.glb"
-dest_files=["res://.godot/imported/ceiling3.glb-11d9d55a369b9809bfd716defdcb9ee6.scn"]
+source_file="res://assets/OWN/Models/ceiling3.glb"
+dest_files=["res://.godot/imported/ceiling3.glb-8b23826081d51f9238fdfca3e1b0a2a4.scn"]
 
 [params]
 

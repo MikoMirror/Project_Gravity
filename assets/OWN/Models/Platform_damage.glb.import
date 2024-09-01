@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cl5febv5vbg5v"
-path="res://.godot/imported/Platform_damage.glb-7c82cc3996776deb44e805bcd35aa941.scn"
+path="res://.godot/imported/Platform_damage.glb-c4bc478683cc2384eaa38ec3adca2937.scn"
 
 [deps]
 
-source_file="res://Assets/OWN/Models/Platform_damage.glb"
-dest_files=["res://.godot/imported/Platform_damage.glb-7c82cc3996776deb44e805bcd35aa941.scn"]
+source_file="res://assets/OWN/Models/Platform_damage.glb"
+dest_files=["res://.godot/imported/Platform_damage.glb-c4bc478683cc2384eaa38ec3adca2937.scn"]
 
 [params]
 
