@@ -8,13 +8,16 @@ public partial class MemmoryPuzleEditorPlugin : EditorPlugin
 
 	public override void _EnterTree()
 	{
+		GD.Print("MemmoryPuzleEditorPlugin _EnterTree called");
 		inspectorPlugin = new PlatformStatesInspectorPlugin();
 		AddInspectorPlugin(inspectorPlugin);
 	}
 
 	public override void _ExitTree()
 	{
+		GD.Print("MemmoryPuzleEditorPlugin _ExitTree called");
 		RemoveInspectorPlugin(inspectorPlugin);
+		inspectorPlugin = null;
 	}
 }
 
@@ -24,11 +27,13 @@ public partial class PlatformStatesInspectorPlugin : EditorInspectorPlugin
 
 	public override bool _CanHandle(GodotObject @object)
 	{
-		return @object is MemmoryPuzle;
+		GD.Print("PlatformStatesInspectorPlugin _CanHandle called for object: ", @object);
+		return @object is MemoryPuzle;
 	}
 
 	public override bool _ParseProperty(GodotObject @object, Variant.Type type, string name, PropertyHint hintType, string hintString, PropertyUsageFlags usageFlags, bool wide)
 	{
+		GD.Print("PlatformStatesInspectorPlugin _ParseProperty called for object: ", @object, " name: ", name);
 		if (@object == null || name == null)
 		{
 			return false;
@@ -54,15 +59,16 @@ public partial class PlatformStatesInspectorPlugin : EditorInspectorPlugin
 
 	private EditorProperty GetEditorForProperty(string name, Variant.Type type, PropertyHint hintType, string hintString, PropertyUsageFlags usageFlags, GodotObject @object)
 	{
+		GD.Print("PlatformStatesInspectorPlugin GetEditorForProperty called for property: ", name);
 		if (type == Variant.Type.Int)
 		{
 			var container = new VBoxContainer();
 			var spinBox = new SpinBox
 			{
-				MinValue = 1,
-				MaxValue = 20,
-				Step = 1,
-				Value = 1
+					MinValue = 1,
+					MaxValue = 20,
+					Step = 1,
+					Value = 1
 			};
 			container.AddChild(spinBox);
 
@@ -78,10 +84,10 @@ public partial class PlatformStatesInspectorPlugin : EditorInspectorPlugin
 				{
 					platformStatesEditor.UpdateGrid();
 				}
-				var memmoryPuzle = @object as MemmoryPuzle;
-				if (memmoryPuzle != null)
+				var memoryPuzle = @object as MemoryPuzle;
+				if (memoryPuzle != null)
 				{
-					memmoryPuzle.UpdatePuzzle();
+					memoryPuzle.UpdatePuzzle();
 				}
 			};
 

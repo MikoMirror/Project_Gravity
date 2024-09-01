@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public partial class MemmoryPlatform : Node3D
+public partial class MemoryPlatform : Node3D
 {
 	[Export]
 	public NodePath AreaPath;
@@ -29,6 +29,18 @@ public partial class MemmoryPlatform : Node3D
 
 	public override void _Ready()
 	{
+		GD.Print("MemoryPlatform _Ready called");
+
+		// Initialize paths if they're not set
+		if (AreaPath == null || AreaPath.IsEmpty)
+		{
+			AreaPath = "./Area3D";
+		}
+		if (NeonPath == null || NeonPath.IsEmpty)
+		{
+			NeonPath = "./NeonMesh";
+		}
+
 		area = GetNode<Area3D>(AreaPath);
 		neonMesh = GetNode<MeshInstance3D>(NeonPath);
 
@@ -40,15 +52,18 @@ public partial class MemmoryPlatform : Node3D
 		if (area != null)
 		{
 			area.BodyEntered += OnBodyEntered;
-			area.BodyExited += OnBodyExited;
 		}
 
 		UpdateNeonColor();
+
+		// Debug prints
+		GD.Print($"AreaPath: {AreaPath}, Area: {area}");
+		GD.Print($"NeonPath: {NeonPath}, NeonMesh: {neonMesh}, NeonMaterial: {neonMaterial}");
 	}
 
 	private void OnBodyEntered(Node body)
 	{
-		if (body is CollisionObject3D)
+		if (body is CollisionObject3D && IsActive)
 		{
 			if (!hasBeenActivated)
 			{
@@ -56,11 +71,6 @@ public partial class MemmoryPlatform : Node3D
 				UpdateNeonColor();
 			}
 		}
-	}
-
-	private void OnBodyExited(Node body)
-	{
-		// You can add logic here if needed when a body exits the area
 	}
 
 	private void UpdateNeonColor()

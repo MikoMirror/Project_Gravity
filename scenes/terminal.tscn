@@ -80,7 +80,7 @@ points = PackedVector3Array(0.475821, 1.38853, 0.188249, 0.475821, 1.02498, -0.1
 
 [sub_resource type="QuadMesh" id="QuadMesh_mfmb6"]
 
-[sub_resource type="Image" id="Image_antl3"]
+[sub_resource type="Image" id="Image_uprc8"]
 data = {
 "data": PackedByteArray("AAAAAA=="),
 "format": "Red8",
@@ -90,12 +90,12 @@ data = {
 }
 
 [sub_resource type="ImageTexture" id="ImageTexture_8yljs"]
-image = SubResource("Image_antl3")
+image = SubResource("Image_uprc8")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_yq3w4"]
 render_priority = 0
 shader = ExtResource("2_dy1n5")
-shader_parameter/grid_size = Vector2(3, 3)
+shader_parameter/grid_size = Vector2(3, 4)
 shader_parameter/active_color = Color(0, 1, 0, 1)
 shader_parameter/inactive_color = Color(0.745098, 0.745098, 0.745098, 1)
 shader_parameter/line_color = Color(0, 0, 0, 1)

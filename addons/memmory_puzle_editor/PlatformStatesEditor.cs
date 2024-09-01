@@ -5,10 +5,11 @@ using System;
 public partial class PlatformStatesEditor : EditorProperty
 {
 	private GridContainer grid;
-	private MemmoryPuzle targetObject;
+	private MemoryPuzle targetObject;
 
 	public override void _Ready()
 	{
+		GD.Print("PlatformStatesEditor _Ready called");
 		var vbox = new VBoxContainer();
 		grid = new GridContainer();
 		vbox.AddChild(grid);
@@ -18,7 +19,8 @@ public partial class PlatformStatesEditor : EditorProperty
 
 	public override void _UpdateProperty()
 	{
-		targetObject = GetEditedObject() as MemmoryPuzle;
+		GD.Print("PlatformStatesEditor _UpdateProperty called");
+		targetObject = GetEditedObject() as MemoryPuzle;
 		if (targetObject == null) return;
 
 		UpdateGrid();
@@ -26,6 +28,7 @@ public partial class PlatformStatesEditor : EditorProperty
 
 	public void UpdateGrid()
 	{
+		GD.Print("PlatformStatesEditor UpdateGrid called");
 		if (targetObject == null) return;
 
 		int rows = targetObject.RowCount;
@@ -47,21 +50,25 @@ public partial class PlatformStatesEditor : EditorProperty
 				int index = row * columns + col;
 				var checkBox = new CheckBox
 				{
-					ButtonPressed = index < currentStates.Count, // Fixed comparison issue
+					ButtonPressed = index < currentStates.Count && currentStates[index], // Set initial state
 					SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter,
 					SizeFlagsVertical = Control.SizeFlags.ShrinkCenter,
 					CustomMinimumSize = new Vector2(20, 20),
 					FocusMode = Control.FocusModeEnum.None
 				};
 
-				checkBox.Toggled += (toggled) => 
-				{
-					EmitChanged(GetEditedProperty(), GetPlatformStates());
-					targetObject.UpdatePuzzle();
-				};
+				checkBox.Toggled += OnCheckBoxToggled;
 				grid.AddChild(checkBox);
 			}
 		}
+	}
+
+	private void OnCheckBoxToggled(bool toggled)
+	{
+		GD.Print("PlatformStatesEditor OnCheckBoxToggled called");
+		EmitChanged(GetEditedProperty(), GetPlatformStates());
+		targetObject.PlatformStates = GetPlatformStates();
+		targetObject.UpdatePlatformStates(); // Call this instead of UpdatePuzzle
 	}
 
 	private Godot.Collections.Array<bool> GetPlatformStates()

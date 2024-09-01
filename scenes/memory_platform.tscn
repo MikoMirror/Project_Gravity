@@ -1,53 +1,7 @@
 [gd_scene load_steps=13 format=4 uid="uid://d0clh86bh612s"]
 
-[ext_resource type="Script" path="res://scripts/Objects/MemmoryPlatform.cs" id="1_ts2ov"]
-[ext_resource type="Shader" path="res://shaders/Material Shader/Neon.gdshader" id="2_d63se"]
-
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_107i8"]
-points = PackedVector3Array(1.52052, -2.23517e-07, -1.55229, -1.52052, 1.48255e-08, -1.55229, -1.52052, 2.23419e-07, 1.55199, 1.52022, -1.49674e-08, 1.55229)
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_0r18s"]
-render_priority = 0
-shader = ExtResource("2_d63se")
-shader_parameter/albedo = Color(0.1, 0.1, 0.1, 1)
-shader_parameter/emission_color = Color(0, 0, 0, 1)
-shader_parameter/emission_strength = 5.0
-shader_parameter/roughness = 0.2
-shader_parameter/metallic = 0.0
-shader_parameter/fresnel = 0.1
-shader_parameter/rim_thickness = 0.1
-
-[sub_resource type="ArrayMesh" id="ArrayMesh_3so42"]
-_surfaces = [{
-"aabb": AABB(-1.52052, -2.23517e-07, -1.55229, 3.04104, 1e-05, 3.10458),
-"format": 34896613377,
-"index_count": 6,
-"index_data": PackedByteArray("AQADAAAAAQACAAMA"),
-"name": "MemorryLightActivate",
-"primitive": 3,
-"uv_scale": Vector4(0, 0, 0, 0),
-"vertex_count": 4,
-"vertex_data": PackedByteArray("AAAaBgAAAAAAAHEL/v8AAP7/VwX//wAA//8AAAAAAAA=")
-}]
-blend_shape_mode = 0
-
-[sub_resource type="ArrayMesh" id="ArrayMesh_ypvcm"]
-resource_name = "memmory_platform_Cube_006"
-_surfaces = [{
-"aabb": AABB(-1.52052, -2.23517e-07, -1.55229, 3.04104, 1e-05, 3.10458),
-"attribute_data": PackedByteArray("w4WmXS1Lpl0tSw8jw4UPIw=="),
-"format": 34896613399,
-"index_count": 6,
-"index_data": PackedByteArray("AQADAAAAAQACAAMA"),
-"material": SubResource("ShaderMaterial_0r18s"),
-"name": "MemorryLightActivate",
-"primitive": 3,
-"uv_scale": Vector4(0, 0, 0, 0),
-"vertex_count": 4,
-"vertex_data": PackedByteArray("AAAaBgAAVNUAAHEL/v9U1f7/VwX//1TV//8AAAAAVNVVVVRVVVVUVVVVVFVVVVRV")
-}]
-blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_3so42")
+[ext_resource type="Script" path="res://scripts/Objects/MemoryPlatform.cs" id="1_60bw4"]
+[ext_resource type="Shader" path="res://shaders/Material Shader/Neon.gdshader" id="2_v6yrg"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_cfgy2"]
 size = Vector3(1.89676, 0.0889893, 2.02283)
@@ -124,19 +78,56 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_vdwrg")
 
-[node name="MemmoryPlatform" type="Node3D"]
-script = ExtResource("1_ts2ov")
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_107i8"]
+points = PackedVector3Array(1.52052, -2.23517e-07, -1.55229, -1.52052, 1.48255e-08, -1.55229, -1.52052, 2.23419e-07, 1.55199, 1.52022, -1.49674e-08, 1.55229)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0r18s"]
+render_priority = 0
+shader = ExtResource("2_v6yrg")
+shader_parameter/albedo = Color(0.1, 0.1, 0.1, 1)
+shader_parameter/emission_color = Color(0, 0, 0, 1)
+shader_parameter/emission_strength = 5.0
+shader_parameter/roughness = 0.2
+shader_parameter/metallic = 0.0
+shader_parameter/fresnel = 0.1
+shader_parameter/rim_thickness = 0.1
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_3so42"]
+_surfaces = [{
+"aabb": AABB(-1.52052, -2.23517e-07, -1.55229, 3.04104, 1e-05, 3.10458),
+"format": 34896613377,
+"index_count": 6,
+"index_data": PackedByteArray("AQADAAAAAQACAAMA"),
+"name": "MemorryLightActivate",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 4,
+"vertex_data": PackedByteArray("AAAaBgAAAAAAAHEL/v8AAP7/VwX//wAA//8AAAAAAAA=")
+}]
+blend_shape_mode = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_ypvcm"]
+resource_name = "memmory_platform_Cube_006"
+_surfaces = [{
+"aabb": AABB(-1.52052, -2.23517e-07, -1.55229, 3.04104, 1e-05, 3.10458),
+"attribute_data": PackedByteArray("w4WmXS1Lpl0tSw8jw4UPIw=="),
+"format": 34896613399,
+"index_count": 6,
+"index_data": PackedByteArray("AQADAAAAAQACAAMA"),
+"material": SubResource("ShaderMaterial_0r18s"),
+"name": "MemorryLightActivate",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 4,
+"vertex_data": PackedByteArray("AAAaBgAAVNUAAHEL/v9U1f7/VwX//1TV//8AAAAAVNVVVVRVVVVUVVVVVFVVVVRV")
+}]
+blend_shape_mode = 0
+shadow_mesh = SubResource("ArrayMesh_3so42")
+
+[node name="MemoryPlatform" type="Node3D"]
+script = ExtResource("1_60bw4")
 AreaPath = NodePath("Area3D")
-NeonPath = NodePath("CollisionShape3D/Neon")
-IsActive = true
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(0.636943, 0, 0, 0, -0.0694317, 0, 0, 0, 0.623638, 0, 0, 0)
-shape = SubResource("ConvexPolygonShape3D_107i8")
-
-[node name="Neon" type="MeshInstance3D" parent="CollisionShape3D"]
-mesh = SubResource("ArrayMesh_ypvcm")
-skeleton = NodePath("")
+NeonPath = NodePath("StaticBody3D/CollisionShape3D/Neon")
 
 [node name="Area3D" type="Area3D" parent="."]
 
@@ -152,4 +143,12 @@ shape = SubResource("ConvexPolygonShape3D_nk3dq")
 
 [node name="Carcas" type="MeshInstance3D" parent="StaticBody3D/CollisionShape3D2"]
 mesh = SubResource("ArrayMesh_btk4l")
+skeleton = NodePath("")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+transform = Transform3D(0.636943, 0, 0, 0, -0.0694317, 0, 0, 0, 0.623638, 0, 0, 0)
+shape = SubResource("ConvexPolygonShape3D_107i8")
+
+[node name="Neon" type="MeshInstance3D" parent="StaticBody3D/CollisionShape3D"]
+mesh = SubResource("ArrayMesh_ypvcm")
 skeleton = NodePath("")

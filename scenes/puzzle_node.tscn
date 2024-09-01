@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://g2327cxm76jq"]
 
-[ext_resource type="Script" path="res://scripts/MemmoryPuzle.cs" id="1_sgadp"]
+[ext_resource type="Script" path="res://scripts/MemoryPuzle.cs" id="1_sgadp"]
 [ext_resource type="PackedScene" uid="uid://bflfuelqq3gsi" path="res://scenes/terminal.tscn" id="2_vbf6y"]
 
 [node name="Puzzle_node" type="Node3D"]

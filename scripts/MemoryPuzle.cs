@@ -2,8 +2,14 @@ using Godot;
 using System;
 
 [Tool]
-public partial class MemmoryPuzle : Node3D
+public partial class MemoryPuzle : Node3D
 {
+	[Signal]
+	public delegate void PlatformStatesChangedEventHandler();
+
+	[Signal]
+	public delegate void SetupCompletedEventHandler();
+
 	[Export]
 	public string TerminalScenePath = "res://scenes/terminal.tscn";
 
@@ -20,7 +26,8 @@ public partial class MemmoryPuzle : Node3D
 			if (_rowCount != value)
 			{
 				_rowCount = value;
-				UpdatePuzzle();
+				UpdatePlatformStatesArray();
+				CallDeferred(nameof(UpdatePuzzle));
 			}
 		}
 	}
@@ -34,13 +41,14 @@ public partial class MemmoryPuzle : Node3D
 			if (_columnCount != value)
 			{
 				_columnCount = value;
-				UpdatePuzzle();
+				UpdatePlatformStatesArray();
+				CallDeferred(nameof(UpdatePuzzle));
 			}
 		}
 	}
 
 	[Export]
-	public string PlatformScenePath = "res://scenes/memmory_platform.tscn"; // Set the default path
+	public string PlatformScenePath = "res://scenes/memory_platform.tscn";
 
 	[Export]
 	public Vector3 Spacing 
@@ -66,20 +74,29 @@ public partial class MemmoryPuzle : Node3D
 	{
 		if (!Engine.IsEditorHint())
 		{
-			UpdatePuzzle();
+			CallDeferred(nameof(UpdatePuzzle));
 		}
 	}
 
-	public override void _Notification(int what)
+	private void UpdatePlatformStatesArray()
 	{
-		if (what == NotificationReady)
+		int newSize = RowCount * ColumnCount;
+		if (PlatformStates.Count != newSize)
 		{
-			UpdatePuzzle();
+			var newStates = new Godot.Collections.Array<bool>();
+			for (int i = 0; i < newSize; i++)
+			{
+				newStates.Add(i < PlatformStates.Count ? PlatformStates[i] : false);
+			}
+			PlatformStates = newStates;
+			EmitSignal(SignalName.PlatformStatesChanged);
 		}
 	}
 
 	public void UpdatePuzzle()
 	{
+		if (!IsInsideTree()) return;
+
 		if (string.IsNullOrEmpty(PlatformScenePath))
 		{
 			GD.PushError("PlatformScenePath is not set.");
@@ -89,7 +106,9 @@ public partial class MemmoryPuzle : Node3D
 		GD.Print($"UpdatePuzzle called. PlatformScenePath: {PlatformScenePath}");
 		ClearPlatforms();
 		CreatePlatformGrid();
-		UpdateTerminalGridSize(); // Ensure this is called
+		UpdateTerminalGridSize();
+
+		EmitSignal(SignalName.SetupCompleted);
 	}
 
 	private void ClearPlatforms()
@@ -108,6 +127,8 @@ public partial class MemmoryPuzle : Node3D
 
 	private void CreatePlatformGrid()
 	{
+		if (!IsInsideTree()) return;
+
 		if (string.IsNullOrEmpty(PlatformScenePath))
 		{
 			GD.PushError("PlatformScenePath is not set.");
@@ -128,21 +149,37 @@ public partial class MemmoryPuzle : Node3D
 		{
 			for (int col = 0; col < ColumnCount; col++)
 			{
-				Node3D platformNode = platformScene.Instantiate<Node3D>();
-				if (platformNode == null)
+				Node3D instantiatedNode = platformScene.Instantiate<Node3D>();
+				if (instantiatedNode == null)
 				{
-					GD.PushError("Failed to instantiate platform node.");
+					GD.PushError("Failed to instantiate platform scene as Node3D.");
 					continue;
 				}
 
-				AddChild(platformNode);
-				platformNode.Owner = GetTree().EditedSceneRoot;
-				platformNode.Name = platformCount.ToString();
-				platformNode.Position = new Vector3(col * Spacing.X, 0, row * Spacing.Z);
+				GD.Print($"Instantiated node type: {instantiatedNode.GetType()}");
 
-				GD.Print($"Platform node instantiated at position: {platformNode.Position}");
+				// Check if the node has the MemoryPlatform script attached
+				MemoryPlatform memoryPlatform = instantiatedNode.GetNodeOrNull<MemoryPlatform>(".");
+				if (memoryPlatform == null)
+				{
+					// If the script is not attached, add it dynamically
+					memoryPlatform = new MemoryPlatform();
+					instantiatedNode.AddChild(memoryPlatform);
+					memoryPlatform.Owner = instantiatedNode;
+					GD.Print("MemoryPlatform script added dynamically.");
+				}
 
-				platformInstances[row, col] = platformNode;
+				AddChild(instantiatedNode);
+				instantiatedNode.Owner = GetTree()?.EditedSceneRoot ?? this;
+				instantiatedNode.Name = platformCount.ToString();
+				instantiatedNode.Position = new Vector3(col * Spacing.X, 0, row * Spacing.Z);
+
+				int index = row * ColumnCount + col;
+				memoryPlatform.IsActive = index < PlatformStates.Count && PlatformStates[index];
+
+				GD.Print($"Platform node instantiated at position: {instantiatedNode.Position}, Active: {memoryPlatform.IsActive}");
+
+				platformInstances[row, col] = instantiatedNode;
 				platformCount++;
 			}
 		}
@@ -178,7 +215,7 @@ public partial class MemmoryPuzle : Node3D
 		{
 			terminalNode.Position = new Vector3((ColumnCount - 1) * Spacing.X, 0, RowCount * Spacing.Z);
 			GD.Print($"Terminal node moved to position: {terminalNode.Position}");
-			UpdateTerminalGridSize(); // Update the grid size after positioning the terminal
+			UpdateTerminalGridSize();
 		}
 	}
 
@@ -197,7 +234,7 @@ public partial class MemmoryPuzle : Node3D
 		Node3D terminalNode = FindTerminalNode();
 		if (terminalNode != null)
 		{
-			var screen = terminalNode.GetNode<MeshInstance3D>("StaticBody3D/CollisionShape3D2/Screen");
+			var screen = terminalNode.GetNodeOrNull<MeshInstance3D>("StaticBody3D/CollisionShape3D2/Screen");
 			if (screen != null)
 			{
 				var material = screen.GetActiveMaterial(0) as ShaderMaterial;
@@ -234,6 +271,27 @@ public partial class MemmoryPuzle : Node3D
 		{
 			terminalNode.Position = new Vector3((ColumnCount - 1) * Spacing.X, 0, RowCount * Spacing.Z);
 			GD.Print($"Terminal node moved to position: {terminalNode.Position}");
+		}
+	}
+
+	public void UpdatePlatformStates()
+	{
+		if (platformInstances == null) return;
+
+		for (int row = 0; row < RowCount; row++)
+		{
+			for (int col = 0; col < ColumnCount; col++)
+			{
+				int index = row * ColumnCount + col;
+				if (platformInstances[row, col] != null && index < PlatformStates.Count)
+				{
+					MemoryPlatform memoryPlatform = platformInstances[row, col].GetNodeOrNull<MemoryPlatform>(".");
+					if (memoryPlatform != null)
+					{
+						memoryPlatform.IsActive = PlatformStates[index];
+					}
+				}
+			}
 		}
 	}
 }

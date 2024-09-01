@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://dvm56dg3eeiy8"]
+[gd_scene load_steps=18 format=3 uid="uid://dvm56dg3eeiy8"]
 
 [ext_resource type="Script" path="res://scripts/LevelManager.cs" id="1_5nbne"]
 [ext_resource type="PackedScene" uid="uid://d25yeq8xge6yd" path="res://assets/OWN/Prefabs/cube.tscn" id="1_ltoxr"]
@@ -11,7 +11,9 @@
 [ext_resource type="PackedScene" uid="uid://blpnfwjnb0kin" path="res://assets/OWN/Prefabs/cable.tscn" id="5_s0kvi"]
 [ext_resource type="PackedScene" uid="uid://c5avl3x8ogvyf" path="res://assets/OWN/Prefabs/wall_2.tscn" id="6_7oqgd"]
 [ext_resource type="PackedScene" uid="uid://bogppjxcn8okv" path="res://assets/OWN/Prefabs/door.tscn" id="8_yq823"]
-[ext_resource type="PackedScene" uid="uid://d0clh86bh612s" path="res://scenes/memmory_platform.tscn" id="12_o6w14"]
+[ext_resource type="PackedScene" uid="uid://credpk6ti8p2m" path="res://scenes/memory_puzle.tscn" id="12_50j1h"]
+[ext_resource type="PackedScene" uid="uid://d0clh86bh612s" path="res://scenes/memory_platform.tscn" id="13_hw2ob"]
+[ext_resource type="Script" path="res://scripts/Objects/MemoryPlatform.cs" id="14_t143a"]
 
 [sub_resource type="Environment" id="Environment_h4ijt"]
 ambient_light_sky_contribution = 0.0
@@ -290,5 +292,88 @@ transform = Transform3D(-2, 3.49691e-07, 0, -1.74846e-07, -4, 0, 0, 0, 2, 5.7951
 AssociatedDoorPath = NodePath("../Door")
 CableListPath = NodePath("../stage/Cable")
 
-[node name="MemmoryPlatform" parent="." instance=ExtResource("12_o6w14")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.2, 8.61753)
+[node name="MemmoryPuzle" parent="." instance=ExtResource("12_50j1h")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.148788, 0.0520869, 2.63507)
+
+[node name="24" type="Node3D" parent="MemmoryPuzle" instance=ExtResource("13_hw2ob")]
+script = ExtResource("14_t143a")
+AreaPath = NodePath("Area3D")
+NeonPath = NodePath("StaticBody3D/CollisionShape3D/Neon")
+IsActive = true
+
+[node name="25" type="Node3D" parent="MemmoryPuzle" instance=ExtResource("13_hw2ob")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, 0)
+script = ExtResource("14_t143a")
+AreaPath = NodePath("Area3D")
+NeonPath = NodePath("StaticBody3D/CollisionShape3D/Neon")
+IsActive = true
+
+[node name="26" type="Node3D" parent="MemmoryPuzle" instance=ExtResource("13_hw2ob")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 0)
+script = ExtResource("14_t143a")
+AreaPath = NodePath("Area3D")
+NeonPath = NodePath("StaticBody3D/CollisionShape3D/Neon")
+IsActive = true
+
+[node name="27" type="Node3D" parent="MemmoryPuzle" instance=ExtResource("13_hw2ob")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.5)
+script = ExtResource("14_t143a")
+AreaPath = NodePath("Area3D")
+NeonPath = NodePath("StaticBody3D/CollisionShape3D/Neon")
+IsActive = true
+
+[node name="28" type="Node3D" parent="MemmoryPuzle" instance=ExtResource("13_hw2ob")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, 2.5)
+script = ExtResource("14_t143a")
+AreaPath = NodePath("Area3D")
+NeonPath = NodePath("StaticBody3D/CollisionShape3D/Neon")
+IsActive = true
+
+[node name="29" type="Node3D" parent="MemmoryPuzle" instance=ExtResource("13_hw2ob")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 2.5)
+script = ExtResource("14_t143a")
+AreaPath = NodePath("Area3D")
+NeonPath = NodePath("StaticBody3D/CollisionShape3D/Neon")
+IsActive = true
+
+[node name="30" type="Node3D" parent="MemmoryPuzle" instance=ExtResource("13_hw2ob")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5)
+script = ExtResource("14_t143a")
+AreaPath = NodePath("Area3D")
+NeonPath = NodePath("StaticBody3D/CollisionShape3D/Neon")
+IsActive = true
+
+[node name="31" type="Node3D" parent="MemmoryPuzle" instance=ExtResource("13_hw2ob")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, 5)
+script = ExtResource("14_t143a")
+AreaPath = NodePath("Area3D")
+NeonPath = NodePath("StaticBody3D/CollisionShape3D/Neon")
+IsActive = true
+
+[node name="32" type="Node3D" parent="MemmoryPuzle" instance=ExtResource("13_hw2ob")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 5)
+script = ExtResource("14_t143a")
+AreaPath = NodePath("Area3D")
+NeonPath = NodePath("StaticBody3D/CollisionShape3D/Neon")
+IsActive = true
+
+[node name="33" type="Node3D" parent="MemmoryPuzle" instance=ExtResource("13_hw2ob")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 7.5)
+script = ExtResource("14_t143a")
+AreaPath = NodePath("Area3D")
+NeonPath = NodePath("StaticBody3D/CollisionShape3D/Neon")
+IsActive = true
+
+[node name="34" type="Node3D" parent="MemmoryPuzle" instance=ExtResource("13_hw2ob")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, 7.5)
+script = ExtResource("14_t143a")
+AreaPath = NodePath("Area3D")
+NeonPath = NodePath("StaticBody3D/CollisionShape3D/Neon")
+IsActive = true
+
+[node name="35" type="Node3D" parent="MemmoryPuzle" instance=ExtResource("13_hw2ob")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 7.5)
+script = ExtResource("14_t143a")
+AreaPath = NodePath("Area3D")
+NeonPath = NodePath("StaticBody3D/CollisionShape3D/Neon")
+IsActive = true
