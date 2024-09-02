@@ -4,7 +4,7 @@
 [ext_resource type="Shader" path="res://shaders/Material Shader/Neon.gdshader" id="2_v6yrg"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_cfgy2"]
-size = Vector3(1.89676, 0.0889893, 2.02283)
+size = Vector3(2, 0.09, 2)
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_nk3dq"]
 points = PackedVector3Array(1.95407, 0.152732, 1.86915, 1.90052, 0.226065, 1.94023, 1.95407, -0.100602, 1.86915, 1.95407, 0.152732, 1.55203, 1.79876, 0.254352, 1.83635, -1.9009, 0.226065, 1.94023, -1.83128, 0.152732, 1.99491, 1.83089, 0.152732, 1.99452, 1.90052, -0.173935, 1.94023, 1.90052, 0.226065, -1.94062, 1.95407, -0.100602, 1.55203, 1.95369, 0.152732, -1.86954, -1.79914, 0.254308, 1.83635, 1.79876, 0.254308, -1.83674, -1.79914, 0.254308, -1.83674, -1.95407, 0.152732, 1.86915, -1.9009, -0.173935, 1.94023, -1.9009, 0.226065, -1.94062, -1.83128, -0.100602, 1.99491, 1.83089, -0.100602, 1.99452, 1.79876, -0.202177, 1.83635, 1.90052, -0.173935, -1.94062, 1.83089, 0.152732, -1.99491, 1.95369, -0.100602, -1.86954, -1.95407, -0.100602, 1.86915, -1.95407, 0.152732, -1.86954, -1.79914, -0.202177, 1.83635, -1.9009, -0.173935, -1.94062, -1.83128, 0.152732, -1.99491, 1.79876, -0.202177, -1.83674, 1.83089, -0.100602, -1.99491, -1.95407, -0.100602, -1.86954, -1.79914, -0.202177, -1.83674, -1.83128, -0.100602, -1.99491)
@@ -127,12 +127,12 @@ shadow_mesh = SubResource("ArrayMesh_3so42")
 [node name="MemoryPlatform" type="Node3D"]
 script = ExtResource("1_60bw4")
 AreaPath = NodePath("Area3D")
-NeonPath = NodePath("StaticBody3D/CollisionShape3D/Neon")
+NeonPath = NodePath("StaticBody3D/CollisionShape3D/NeonMesh")
 
 [node name="Area3D" type="Area3D" parent="."]
 
 [node name="CollisionShape3D2" type="CollisionShape3D" parent="Area3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0429535, 0.0854824, 0.0427856)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00328707, 0.0854824, 0.0427856)
 shape = SubResource("BoxShape3D_cfgy2")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="."]
@@ -149,6 +149,6 @@ skeleton = NodePath("")
 transform = Transform3D(0.636943, 0, 0, 0, -0.0694317, 0, 0, 0, 0.623638, 0, 0, 0)
 shape = SubResource("ConvexPolygonShape3D_107i8")
 
-[node name="Neon" type="MeshInstance3D" parent="StaticBody3D/CollisionShape3D"]
+[node name="NeonMesh" type="MeshInstance3D" parent="StaticBody3D/CollisionShape3D"]
 mesh = SubResource("ArrayMesh_ypvcm")
 skeleton = NodePath("")

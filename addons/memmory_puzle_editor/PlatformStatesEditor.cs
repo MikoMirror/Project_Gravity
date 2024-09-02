@@ -50,25 +50,26 @@ public partial class PlatformStatesEditor : EditorProperty
 				int index = row * columns + col;
 				var checkBox = new CheckBox
 				{
-					ButtonPressed = index < currentStates.Count && currentStates[index], // Set initial state
+					ButtonPressed = index < currentStates.Count && currentStates[index],
 					SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter,
 					SizeFlagsVertical = Control.SizeFlags.ShrinkCenter,
 					CustomMinimumSize = new Vector2(20, 20),
 					FocusMode = Control.FocusModeEnum.None
 				};
 
-				checkBox.Toggled += OnCheckBoxToggled;
+				checkBox.Toggled += (bool toggled) => OnCheckBoxToggled(row, col, toggled);
 				grid.AddChild(checkBox);
 			}
 		}
 	}
 
-	private void OnCheckBoxToggled(bool toggled)
+	private void OnCheckBoxToggled(int row, int col, bool toggled)
 	{
-		GD.Print("PlatformStatesEditor OnCheckBoxToggled called");
-		EmitChanged(GetEditedProperty(), GetPlatformStates());
-		targetObject.PlatformStates = GetPlatformStates();
-		targetObject.UpdatePlatformStates(); // Call this instead of UpdatePuzzle
+		GD.Print($"PlatformStatesEditor OnCheckBoxToggled called: row {row}, col {col}, toggled {toggled}");
+		var newStates = GetPlatformStates();
+		EmitChanged(GetEditedProperty(), newStates);
+		targetObject.PlatformStates = newStates;
+		targetObject.UpdatePlatformState(row, col, toggled);
 	}
 
 	private Godot.Collections.Array<bool> GetPlatformStates()

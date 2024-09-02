@@ -52,6 +52,7 @@ public partial class MemoryPlatform : Node3D
 		if (area != null)
 		{
 			area.BodyEntered += OnBodyEntered;
+			area.BodyExited += OnBodyExited;  // Add this line
 		}
 
 		UpdateNeonColor();
@@ -63,31 +64,38 @@ public partial class MemoryPlatform : Node3D
 
 	private void OnBodyEntered(Node body)
 	{
-		if (body is CollisionObject3D && IsActive)
+		if (body is CollisionObject3D)
 		{
-			if (!hasBeenActivated)
-			{
-				hasBeenActivated = true;
-				UpdateNeonColor();
-			}
+			UpdateNeonColor(true);
 		}
 	}
 
-	private void UpdateNeonColor()
+	private void OnBodyExited(Node body)
+	{
+		if (body is CollisionObject3D)
+		{
+			UpdateNeonColor(false);
+		}
+	}
+
+	private void UpdateNeonColor(bool objectInside = false)
 	{
 		if (neonMaterial != null)
 		{
-			if (!hasBeenActivated)
+			if (objectInside)
 			{
-				neonMaterial.SetShaderParameter("emission_color", new Vector3(0.5f, 0.5f, 0.5f)); // Grey
-			}
-			else if (IsActive)
-			{
-				neonMaterial.SetShaderParameter("emission_color", new Vector3(0.0f, 1.0f, 0.0f)); // Green
+				if (IsActive)
+				{
+					neonMaterial.SetShaderParameter("emission_color", new Vector3(0.0f, 1.0f, 0.0f)); // Green
+				}
+				else
+				{
+					neonMaterial.SetShaderParameter("emission_color", new Vector3(1.0f, 0.0f, 0.0f)); // Red
+				}
 			}
 			else
 			{
-				neonMaterial.SetShaderParameter("emission_color", new Vector3(1.0f, 0.0f, 0.0f)); // Red
+				neonMaterial.SetShaderParameter("emission_color", new Vector3(1.0f, 1.0f, 1.0f)); // White (default)
 			}
 		}
 	}

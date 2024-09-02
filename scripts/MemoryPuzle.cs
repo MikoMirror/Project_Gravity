@@ -28,6 +28,7 @@ public partial class MemoryPuzle : Node3D
 				_rowCount = value;
 				UpdatePlatformStatesArray();
 				CallDeferred(nameof(UpdatePuzzle));
+				CallDeferred(nameof(UpdateTerminalPosition));
 			}
 		}
 	}
@@ -43,6 +44,7 @@ public partial class MemoryPuzle : Node3D
 				_columnCount = value;
 				UpdatePlatformStatesArray();
 				CallDeferred(nameof(UpdatePuzzle));
+				CallDeferred(nameof(UpdateTerminalPosition));
 			}
 		}
 	}
@@ -61,6 +63,7 @@ public partial class MemoryPuzle : Node3D
 				_spacing = value;
 				UpdatePlatformPositions();
 				UpdateTerminalPosition();
+				UpdateVisualRepresentation();
 			}
 		}
 	}
@@ -72,9 +75,13 @@ public partial class MemoryPuzle : Node3D
 
 	public override void _Ready()
 	{
-		if (!Engine.IsEditorHint())
+		if (Engine.IsEditorHint())
 		{
 			CallDeferred(nameof(UpdatePuzzle));
+		}
+		else
+		{
+			CallDeferred(nameof(CreatePlatformGrid));
 		}
 	}
 
@@ -97,18 +104,54 @@ public partial class MemoryPuzle : Node3D
 	{
 		if (!IsInsideTree()) return;
 
-		if (string.IsNullOrEmpty(PlatformScenePath))
+		GD.Print($"UpdatePuzzle called. Rows: {RowCount}, Columns: {ColumnCount}");
+		
+		if (Engine.IsEditorHint())
 		{
-			GD.PushError("PlatformScenePath is not set.");
-			return;
+			UpdateVisualRepresentation();
+		}
+		else
+		{
+			CreatePlatformGrid();
+		}
+		UpdateTerminalGridSize();
+		UpdateTerminalPosition();
+		EmitSignal(SignalName.SetupCompleted);
+	}
+
+	private void UpdateVisualRepresentation()
+	{
+		if (!Engine.IsEditorHint()) return;
+
+		foreach (Node child in GetChildren())
+		{
+			if (child is CsgBox3D)
+			{
+				child.QueueFree();
+			}
 		}
 
-		GD.Print($"UpdatePuzzle called. PlatformScenePath: {PlatformScenePath}");
-		ClearPlatforms();
-		CreatePlatformGrid();
-		UpdateTerminalGridSize();
+		// Create visual representation
+		for (int row = 0; row < RowCount; row++)
+		{
+			for (int col = 0; col < ColumnCount; col++)
+			{
+				var visualPlatform = new CsgBox3D();
+				visualPlatform.Name = $"VisualPlatform_{row}_{col}";
+				visualPlatform.Size = new Vector3(1, 0.1f, 1);
+				visualPlatform.Position = new Vector3(col * Spacing.X, 0, row * Spacing.Z);
 
-		EmitSignal(SignalName.SetupCompleted);
+				int index = row * ColumnCount + col;
+				bool isActive = index < PlatformStates.Count && PlatformStates[index];
+
+				visualPlatform.MaterialOverride = new StandardMaterial3D
+				{
+					AlbedoColor = isActive ? new Color(0, 1, 0, 0.5f) : new Color(0.5f, 0.5f, 0.5f, 0.5f),
+					Transparency = BaseMaterial3D.TransparencyEnum.Alpha
+				};
+				AddChild(visualPlatform);
+			}
+		}
 	}
 
 	private void ClearPlatforms()
@@ -123,11 +166,14 @@ public partial class MemoryPuzle : Node3D
 				}
 			}
 		}
+		platformInstances = null; // Ensure the array is reset
 	}
 
 	private void CreatePlatformGrid()
 	{
 		if (!IsInsideTree()) return;
+
+		ClearPlatforms();
 
 		if (string.IsNullOrEmpty(PlatformScenePath))
 		{
@@ -144,7 +190,6 @@ public partial class MemoryPuzle : Node3D
 		}
 
 		platformInstances = new Node3D[RowCount, ColumnCount];
-		int platformCount = 0;
 		for (int row = 0; row < RowCount; row++)
 		{
 			for (int col = 0; col < ColumnCount; col++)
@@ -156,22 +201,16 @@ public partial class MemoryPuzle : Node3D
 					continue;
 				}
 
-				GD.Print($"Instantiated node type: {instantiatedNode.GetType()}");
-
-				// Check if the node has the MemoryPlatform script attached
 				MemoryPlatform memoryPlatform = instantiatedNode.GetNodeOrNull<MemoryPlatform>(".");
 				if (memoryPlatform == null)
 				{
-					// If the script is not attached, add it dynamically
-					memoryPlatform = new MemoryPlatform();
-					instantiatedNode.AddChild(memoryPlatform);
-					memoryPlatform.Owner = instantiatedNode;
-					GD.Print("MemoryPlatform script added dynamically.");
+					GD.PushError("MemoryPlatform script not found on instantiated node.");
+					continue;
 				}
 
 				AddChild(instantiatedNode);
 				instantiatedNode.Owner = GetTree()?.EditedSceneRoot ?? this;
-				instantiatedNode.Name = platformCount.ToString();
+				instantiatedNode.Name = $"Platform_{row}_{col}";
 				instantiatedNode.Position = new Vector3(col * Spacing.X, 0, row * Spacing.Z);
 
 				int index = row * ColumnCount + col;
@@ -180,42 +219,7 @@ public partial class MemoryPuzle : Node3D
 				GD.Print($"Platform node instantiated at position: {instantiatedNode.Position}, Active: {memoryPlatform.IsActive}");
 
 				platformInstances[row, col] = instantiatedNode;
-				platformCount++;
 			}
-		}
-
-		// Add or move the Terminal scene at the very bottom of the right-hand platform
-		Node3D terminalNode = FindTerminalNode();
-		if (terminalNode == null)
-		{
-			if (!string.IsNullOrEmpty(TerminalScenePath))
-			{
-				GD.Print($"Loading terminal scene from: {TerminalScenePath}");
-				PackedScene terminalScene = GD.Load<PackedScene>(TerminalScenePath);
-				if (terminalScene == null)
-				{
-					GD.PushError($"Failed to load terminal scene from '{TerminalScenePath}'");
-					return;
-				}
-
-				terminalNode = terminalScene.Instantiate<Node3D>();
-				if (terminalNode == null)
-				{
-					GD.PushError("Failed to instantiate terminal node.");
-					return;
-				}
-
-				AddChild(terminalNode);
-				terminalNode.Owner = GetTree().EditedSceneRoot;
-				terminalNode.Name = "Terminal";
-			}
-		}
-
-		if (terminalNode != null)
-		{
-			terminalNode.Position = new Vector3((ColumnCount - 1) * Spacing.X, 0, RowCount * Spacing.Z);
-			GD.Print($"Terminal node moved to position: {terminalNode.Position}");
-			UpdateTerminalGridSize();
 		}
 	}
 
@@ -269,29 +273,50 @@ public partial class MemoryPuzle : Node3D
 		Node3D terminalNode = FindTerminalNode();
 		if (terminalNode != null)
 		{
-			terminalNode.Position = new Vector3((ColumnCount - 1) * Spacing.X, 0, RowCount * Spacing.Z);
+			terminalNode.Position = new Vector3((ColumnCount - 1) * Spacing.X / 2, 0, RowCount * Spacing.Z);
 			GD.Print($"Terminal node moved to position: {terminalNode.Position}");
 		}
 	}
 
-	public void UpdatePlatformStates()
+	public void UpdatePlatformState(int row, int col, bool isActive)
 	{
-		if (platformInstances == null) return;
-
-		for (int row = 0; row < RowCount; row++)
+		GD.Print($"UpdatePlatformState called: row={row}, col={col}, isActive={isActive}");
+		
+		int index = row * ColumnCount + col;
+		if (index < PlatformStates.Count)
 		{
-			for (int col = 0; col < ColumnCount; col++)
+			PlatformStates[index] = isActive;
+			
+			GD.Print($"Platform state updated: index={index}, isActive={isActive}");
+
+			if (Engine.IsEditorHint())
 			{
-				int index = row * ColumnCount + col;
-				if (platformInstances[row, col] != null && index < PlatformStates.Count)
+				UpdateVisualRepresentation();
+			}
+			else if (platformInstances != null && platformInstances[row, col] != null)
+			{
+				MemoryPlatform memoryPlatform = platformInstances[row, col].GetNodeOrNull<MemoryPlatform>(".");
+				if (memoryPlatform != null)
 				{
-					MemoryPlatform memoryPlatform = platformInstances[row, col].GetNodeOrNull<MemoryPlatform>(".");
-					if (memoryPlatform != null)
-					{
-						memoryPlatform.IsActive = PlatformStates[index];
-					}
+					memoryPlatform.IsActive = isActive;
+					GD.Print($"MemoryPlatform IsActive set to: {isActive}");
+				}
+				else
+				{
+					GD.PushError($"MemoryPlatform script not found on platform at row={row}, col={col}");
 				}
 			}
+			else
+			{
+				GD.PushError($"Platform instance not found at row={row}, col={col}");
+			}
+
+			// Emit signal to notify about the state change
+			EmitSignal(SignalName.PlatformStatesChanged);
+		}
+		else
+		{
+			GD.PushError($"Invalid platform index: {index}. RowCount={RowCount}, ColumnCount={ColumnCount}");
 		}
 	}
 }

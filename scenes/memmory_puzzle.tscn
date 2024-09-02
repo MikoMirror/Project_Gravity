@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://bbpcuvq045yhj"]
+
+[ext_resource type="Script" path="res://scripts/MemoryPuzle.cs" id="1_huamm"]
+[ext_resource type="PackedScene" uid="uid://bflfuelqq3gsi" path="res://scenes/terminal.tscn" id="2_y0n8p"]
+
+[node name="MemmoryPuzzle" type="Node3D"]
+script = ExtResource("1_huamm")
+PlatformStates = [false]
+
+[node name="Terminal" parent="." instance=ExtResource("2_y0n8p")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
