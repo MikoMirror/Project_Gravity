@@ -46,7 +46,10 @@ public partial class MemoryPlatform : Node3D
 
 		if (neonMesh != null)
 		{
-			neonMaterial = neonMesh.GetActiveMaterial(0) as ShaderMaterial;
+			// Create a unique instance of the shader material for this platform
+			ShaderMaterial originalMaterial = neonMesh.GetActiveMaterial(0) as ShaderMaterial;
+			neonMaterial = originalMaterial.Duplicate() as ShaderMaterial;
+			neonMesh.SetSurfaceOverrideMaterial(0, neonMaterial);
 		}
 
 		if (area != null)
