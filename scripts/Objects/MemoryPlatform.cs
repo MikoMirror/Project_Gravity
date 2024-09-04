@@ -26,6 +26,19 @@ public partial class MemoryPlatform : Node3D
 
 	private bool isActive = false;
 	private bool hasBeenActivated = false;
+	private bool _isInteractive = true;
+	private bool isInRedState = false;
+
+	public void SetInteractive(bool interactive)
+	{
+		_isInteractive = interactive;
+	}
+
+	public void ResetActivation()
+	{
+		hasBeenActivated = false;
+		UpdateNeonColor();
+	}
 
 	public override void _Ready()
 	{
@@ -65,18 +78,35 @@ public partial class MemoryPlatform : Node3D
 		GD.Print($"NeonPath: {NeonPath}, NeonMesh: {neonMesh}, NeonMaterial: {neonMaterial}");
 	}
 
+	public void SetRedState()
+	{
+		isInRedState = true;
+		UpdateNeonColor();
+	}
+
+	public void ResetColor()
+	{
+		isInRedState = false;
+		UpdateNeonColor();
+	}
+
 	private void OnBodyEntered(Node body)
 	{
+		if (!_isInteractive) return;
+
 		if (body is CollisionObject3D)
 		{
-			if (IsActive && !hasBeenActivated)
+			if (IsActive && !hasBeenActivated && !isInRedState)
 			{
 				PermanentlyActivate();
 			}
-			else
+			else if (!IsActive)
 			{
-				UpdateNeonColor(true);
+				// Reset the puzzle if stepping on an inactive platform
+				var memoryPuzzle = GetParent() as MemoryPuzle;
+				memoryPuzzle?.ResetPuzzle();
 			}
+			UpdateNeonColor(true);
 		}
 	}
 
@@ -98,9 +128,16 @@ public partial class MemoryPlatform : Node3D
 	{
 		if (neonMaterial != null)
 		{
+			if (isInRedState)
+			{
+				neonMaterial.SetShaderParameter("emission_color", new Vector3(1.0f, 0.0f, 0.0f)); // Red
+				return;
+			}
+
 			if (hasBeenActivated)
 			{
-				return; // Don't change color if permanently activated
+				neonMaterial.SetShaderParameter("emission_color", new Vector3(0.0f, 0.5f, 1.0f)); // Light Blue
+				return;
 			}
 
 			if (objectInside)

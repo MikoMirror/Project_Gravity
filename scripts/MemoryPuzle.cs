@@ -72,7 +72,7 @@ public partial class MemoryPuzle : Node3D
 	[Export]
 	public Godot.Collections.Array<bool> PlatformStates { get; set; } = new Godot.Collections.Array<bool>();
 
-	private Node3D[,] platformInstances;
+	private MemoryPlatform[,] platformInstances;
 
 	private Area3D _puzzleArea;
 	[Export]
@@ -96,6 +96,9 @@ public partial class MemoryPuzle : Node3D
 		set => _puzzleArea = value;
 	}
 
+	private bool _isPuzzleActive = true;
+	private bool _isInRedState = false;
+
 	public override void _Ready()
 	{
 		if (Engine.IsEditorHint())
@@ -107,6 +110,93 @@ public partial class MemoryPuzle : Node3D
 		{
 			CallDeferred(nameof(CreatePlatformGrid));
 			CallDeferred(nameof(UpdatePuzzleArea));
+		}
+
+		PuzzleArea.BodyEntered += OnBodyEnteredPuzzleArea;
+		PuzzleArea.BodyExited += OnBodyExitedPuzzleArea;
+	}
+
+	private void OnBodyEnteredPuzzleArea(Node3D body)
+	{
+		if (body is Player)
+		{
+			_isPuzzleActive = true;
+			if (!_isInRedState)
+			{
+				SetPlatformsActive(true);
+			}
+		}
+	}
+
+	private void OnBodyExitedPuzzleArea(Node3D body)
+	{
+		if (body is Player)
+		{
+			_isPuzzleActive = true;
+			_isInRedState = false;
+			SetPlatformsActive(true);
+		}
+	}
+
+	public void ResetPuzzle()
+	{
+		if (!_isPuzzleActive) return;
+
+		_isPuzzleActive = false;
+		_isInRedState = true;
+		SetPlatformsActive(false);
+		SetAllPlatformsRed();
+		UpdateAllPlatforms();
+	}
+
+	private void SetAllPlatformsRed()
+	{
+		if (platformInstances != null)
+		{
+			foreach (var platform in platformInstances)
+			{
+				if (platform is MemoryPlatform memoryPlatform)
+				{
+					memoryPlatform.SetRedState();
+				}
+			}
+		}
+	}
+
+	private void SetPlatformsActive(bool active)
+	{
+		if (platformInstances != null)
+		{
+			foreach (var platform in platformInstances)
+			{
+				if (platform is MemoryPlatform memoryPlatform)
+				{
+					memoryPlatform.SetInteractive(active);
+					if (active && !_isInRedState)
+					{
+						memoryPlatform.ResetColor(); // Reset color when reactivating and not in red state
+					}
+				}
+			}
+		}
+	}
+
+	private void UpdateAllPlatforms()
+	{
+		if (platformInstances != null)
+		{
+			for (int row = 0; row < RowCount; row++)
+			{
+				for (int col = 0; col < ColumnCount; col++)
+				{
+					int index = row * ColumnCount + col;
+					if (platformInstances[row, col] is MemoryPlatform memoryPlatform)
+					{
+						// We keep the IsActive state as it is
+						memoryPlatform.ResetActivation();
+					}
+				}
+			}
 		}
 	}
 
@@ -215,36 +305,29 @@ public partial class MemoryPuzle : Node3D
 			return;
 		}
 
-		platformInstances = new Node3D[RowCount, ColumnCount];
+		platformInstances = new MemoryPlatform[RowCount, ColumnCount];
 		for (int row = 0; row < RowCount; row++)
 		{
 			for (int col = 0; col < ColumnCount; col++)
 			{
-				Node3D instantiatedNode = platformScene.Instantiate<Node3D>();
-				if (instantiatedNode == null)
-				{
-					GD.PushError("Failed to instantiate platform scene as Node3D.");
-					continue;
-				}
-
-				MemoryPlatform memoryPlatform = instantiatedNode.GetNodeOrNull<MemoryPlatform>(".");
+				MemoryPlatform memoryPlatform = platformScene.Instantiate<MemoryPlatform>();
 				if (memoryPlatform == null)
 				{
-					GD.PushError("MemoryPlatform script not found on instantiated node.");
+					GD.PushError("Failed to instantiate platform scene as MemoryPlatform.");
 					continue;
 				}
 
-				AddChild(instantiatedNode);
-				instantiatedNode.Owner = GetTree()?.EditedSceneRoot ?? this;
-				instantiatedNode.Name = $"Platform_{row}_{col}";
-				instantiatedNode.Position = new Vector3(col * Spacing.X, 0, row * Spacing.Z);
+				AddChild(memoryPlatform);
+				memoryPlatform.Owner = GetTree()?.EditedSceneRoot ?? this;
+				memoryPlatform.Name = $"Platform_{row}_{col}";
+				memoryPlatform.Position = new Vector3(col * Spacing.X, 0, row * Spacing.Z);
 
 				int index = row * ColumnCount + col;
 				memoryPlatform.IsActive = index < PlatformStates.Count && PlatformStates[index];
 
-				GD.Print($"Platform node instantiated at position: {instantiatedNode.Position}, Active: {memoryPlatform.IsActive}");
+				GD.Print($"Platform node instantiated at position: {memoryPlatform.Position}, Active: {memoryPlatform.IsActive}");
 
-				platformInstances[row, col] = instantiatedNode;
+				platformInstances[row, col] = memoryPlatform;
 			}
 		}
 	}
