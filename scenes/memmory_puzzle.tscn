@@ -14,7 +14,7 @@ PlatformStates = [false, false, false, false, false, false, false, false, false]
 PuzzleArea = NodePath("PuzzleArea")
 
 [node name="Terminal" parent="." instance=ExtResource("2_y0n8p")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 6)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, -0.1, 6)
 
 [node name="PuzzleArea" type="Area3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1, 2)
