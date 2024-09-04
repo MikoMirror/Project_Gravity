@@ -28,7 +28,7 @@ public partial class MemoryPuzle : Node3D
 				_rowCount = value;
 				UpdatePlatformStatesArray();
 				CallDeferred(nameof(UpdatePuzzle));
-				CallDeferred(nameof(UpdateTerminalPosition));
+				CallDeferred(nameof(UpdatePuzzleArea));
 			}
 		}
 	}
@@ -44,7 +44,7 @@ public partial class MemoryPuzle : Node3D
 				_columnCount = value;
 				UpdatePlatformStatesArray();
 				CallDeferred(nameof(UpdatePuzzle));
-				CallDeferred(nameof(UpdateTerminalPosition));
+				CallDeferred(nameof(UpdatePuzzleArea));
 			}
 		}
 	}
@@ -64,6 +64,7 @@ public partial class MemoryPuzle : Node3D
 				UpdatePlatformPositions();
 				UpdateTerminalPosition();
 				UpdateVisualRepresentation();
+				CallDeferred(nameof(UpdatePuzzleArea));
 			}
 		}
 	}
@@ -73,15 +74,39 @@ public partial class MemoryPuzle : Node3D
 
 	private Node3D[,] platformInstances;
 
+	private Area3D _puzzleArea;
+	[Export]
+	public Area3D PuzzleArea
+	{
+		get
+		{
+			if (_puzzleArea == null)
+			{
+				_puzzleArea = GetNodeOrNull<Area3D>("PuzzleArea");
+				if (_puzzleArea == null)
+				{
+					_puzzleArea = new Area3D();
+					_puzzleArea.Name = "PuzzleArea";
+					AddChild(_puzzleArea);
+					_puzzleArea.Owner = GetTree().EditedSceneRoot ?? this;
+				}
+			}
+			return _puzzleArea;
+		}
+		set => _puzzleArea = value;
+	}
+
 	public override void _Ready()
 	{
 		if (Engine.IsEditorHint())
 		{
 			CallDeferred(nameof(UpdatePuzzle));
+			CallDeferred(nameof(UpdatePuzzleArea));
 		}
 		else
 		{
 			CallDeferred(nameof(CreatePlatformGrid));
+			CallDeferred(nameof(UpdatePuzzleArea));
 		}
 	}
 
@@ -89,15 +114,15 @@ public partial class MemoryPuzle : Node3D
 	{
 		int newSize = RowCount * ColumnCount;
 		if (PlatformStates.Count != newSize)
-		{
-			var newStates = new Godot.Collections.Array<bool>();
-			for (int i = 0; i < newSize; i++)
 			{
-				newStates.Add(i < PlatformStates.Count ? PlatformStates[i] : false);
+				var newStates = new Godot.Collections.Array<bool>();
+				for (int i = 0; i < newSize; i++)
+				{
+					newStates.Add(i < PlatformStates.Count ? PlatformStates[i] : false);
+				}
+				PlatformStates = newStates;
+				EmitSignal(SignalName.PlatformStatesChanged);
 			}
-			PlatformStates = newStates;
-			EmitSignal(SignalName.PlatformStatesChanged);
-		}
 	}
 
 	public void UpdatePuzzle()
@@ -116,6 +141,7 @@ public partial class MemoryPuzle : Node3D
 		}
 		UpdateTerminalGridSize();
 		UpdateTerminalPosition();
+		UpdatePuzzleArea();
 		EmitSignal(SignalName.SetupCompleted);
 	}
 
@@ -318,5 +344,42 @@ public partial class MemoryPuzle : Node3D
 		{
 			GD.PushError($"Invalid platform index: {index}. RowCount={RowCount}, ColumnCount={ColumnCount}");
 		}
+	}
+
+	private void UpdatePuzzleArea()
+	{
+		var puzzleArea = PuzzleArea; // This will create the Area3D if it doesn't exist
+
+		var collisionShape = puzzleArea.GetNodeOrNull<CollisionShape3D>("CollisionShape3D");
+		if (collisionShape == null)
+		{
+			collisionShape = new CollisionShape3D();
+			collisionShape.Name = "CollisionShape3D";
+			puzzleArea.AddChild(collisionShape);
+			collisionShape.Owner = GetTree().EditedSceneRoot ?? this;
+		}
+
+		var boxShape = collisionShape.Shape as BoxShape3D;
+		if (boxShape == null)
+		{
+			boxShape = new BoxShape3D();
+			collisionShape.Shape = boxShape;
+		}
+
+		// Calculate the size of the area based on the puzzle dimensions
+		float width = (ColumnCount - 1) * Spacing.X + 1;  // Add 1 to include the last platform
+		float depth = (RowCount - 1) * Spacing.Z + 1;
+		float height = 2;  // Adjust this value as needed for vertical clearance
+
+		boxShape.Size = new Vector3(width, height, depth);
+
+		// Update the position of the Area3D to center it on the puzzle
+		puzzleArea.Position = new Vector3(
+			(ColumnCount - 1) * Spacing.X / 2,
+			height / 2,
+			(RowCount - 1) * Spacing.Z / 2
+		);
+
+		GD.Print($"Updated PuzzleArea size to: {boxShape.Size}, position to: {puzzleArea.Position}");
 	}
 }

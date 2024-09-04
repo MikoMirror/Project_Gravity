@@ -69,8 +69,21 @@ public partial class MemoryPlatform : Node3D
 	{
 		if (body is CollisionObject3D)
 		{
-			UpdateNeonColor(true);
+			if (IsActive && !hasBeenActivated)
+			{
+				PermanentlyActivate();
+			}
+			else
+			{
+				UpdateNeonColor(true);
+			}
 		}
+	}
+
+	private void PermanentlyActivate()
+	{
+		hasBeenActivated = true;
+		neonMaterial.SetShaderParameter("emission_color", new Vector3(0.0f, 0.5f, 1.0f)); // Light Blue
 	}
 
 	private void OnBodyExited(Node body)
@@ -85,6 +98,11 @@ public partial class MemoryPlatform : Node3D
 	{
 		if (neonMaterial != null)
 		{
+			if (hasBeenActivated)
+			{
+				return; // Don't change color if permanently activated
+			}
+
 			if (objectInside)
 			{
 				if (IsActive)

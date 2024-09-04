@@ -292,11 +292,11 @@ AssociatedDoorPath = NodePath("../Door")
 CableListPath = NodePath("../stage/Cable")
 
 [node name="MemmoryPuzzle" parent="." instance=ExtResource("12_kivqh")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.06485, 0.223969, 4.91238)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.06485, 0.0917738, 4.91238)
 RowCount = 3
 ColumnCount = 3
 Spacing = Vector3(3, 0, 3)
-PlatformStates = [true, true, false, false, false, false, false, false, false]
+PlatformStates = [true, true, false, false, true, false, false, false, false]
 
 [node name="MemoryPlatform" parent="." instance=ExtResource("13_hw2ob")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.85439, 0.0520869, 14.5559)

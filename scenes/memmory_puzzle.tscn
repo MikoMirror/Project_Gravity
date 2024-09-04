@@ -1,11 +1,24 @@
-[gd_scene load_steps=3 format=3 uid="uid://bbpcuvq045yhj"]
+[gd_scene load_steps=4 format=3 uid="uid://bbpcuvq045yhj"]
 
 [ext_resource type="Script" path="res://scripts/MemoryPuzle.cs" id="1_huamm"]
 [ext_resource type="PackedScene" uid="uid://bflfuelqq3gsi" path="res://scenes/terminal.tscn" id="2_y0n8p"]
 
-[node name="MemmoryPuzzle" type="Node3D"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_daye6"]
+size = Vector3(5, 2, 5)
+
+[node name="MemmoryPuzzle" type="Node3D" node_paths=PackedStringArray("PuzzleArea")]
 script = ExtResource("1_huamm")
-PlatformStates = [false]
+RowCount = 3
+ColumnCount = 3
+PlatformStates = [false, false, false, false, false, false, false, false, false]
+PuzzleArea = NodePath("PuzzleArea")
 
 [node name="Terminal" parent="." instance=ExtResource("2_y0n8p")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 6)
+
+[node name="PuzzleArea" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1, 2)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PuzzleArea"]
+transform = Transform3D(1, 0, 0, 0, 0.229388, 0, 0, 0, 1, 0, 0.271991, 0)
+shape = SubResource("BoxShape3D_daye6")
