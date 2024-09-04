@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://dvm56dg3eeiy8"]
+[gd_scene load_steps=14 format=3 uid="uid://dvm56dg3eeiy8"]
 
 [ext_resource type="Script" path="res://scripts/LevelManager.cs" id="1_5nbne"]
 [ext_resource type="PackedScene" uid="uid://d25yeq8xge6yd" path="res://assets/OWN/Prefabs/cube.tscn" id="1_ltoxr"]
@@ -10,7 +10,6 @@
 [ext_resource type="PackedScene" uid="uid://blpnfwjnb0kin" path="res://assets/OWN/Prefabs/cable.tscn" id="5_s0kvi"]
 [ext_resource type="PackedScene" uid="uid://c5avl3x8ogvyf" path="res://assets/OWN/Prefabs/wall_2.tscn" id="6_7oqgd"]
 [ext_resource type="PackedScene" uid="uid://bogppjxcn8okv" path="res://assets/OWN/Prefabs/door.tscn" id="8_yq823"]
-[ext_resource type="PackedScene" uid="uid://bbpcuvq045yhj" path="res://scenes/memmory_puzzle.tscn" id="12_kivqh"]
 [ext_resource type="PackedScene" uid="uid://dfh4n8fdaqplp" path="res://assets/OWN/Prefabs/Light.tscn" id="13_moame"]
 
 [sub_resource type="Environment" id="Environment_h4ijt"]
@@ -279,12 +278,3 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 1, 14)
 transform = Transform3D(-2, 3.49691e-07, 0, -1.74846e-07, -4, 0, 0, 0, 2, 5.79512, 7.97389, 9.08636)
 AssociatedDoorPath = NodePath("../Door")
 CableListPath = NodePath("../stage/Cable")
-
-[node name="MemmoryPuzzle" parent="." instance=ExtResource("12_kivqh")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.06485, 0.0917738, 4.91238)
-Spacing = Vector3(3, 0, 3)
-PlatformStates = [true, true, false, false, true, false, false, false, false]
-
-[node name="MemmoryPuzzle2" parent="." instance=ExtResource("12_kivqh")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.1, 16)
-PlatformStates = [false, true, false, false, true, false, false, true, false]

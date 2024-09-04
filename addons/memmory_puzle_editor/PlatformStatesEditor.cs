@@ -6,6 +6,8 @@ public partial class PlatformStatesEditor : EditorProperty
 {
 	private GridContainer grid;
 	private MemoryPuzle targetObject;
+	private bool isUpdating = false;
+	private bool _needsUpdate = false;
 
 	public override void _Ready()
 	{
@@ -19,11 +21,18 @@ public partial class PlatformStatesEditor : EditorProperty
 
 	public override void _UpdateProperty()
 	{
-		GD.Print("PlatformStatesEditor _UpdateProperty called");
-		targetObject = GetEditedObject() as MemoryPuzle;
-		if (targetObject == null) return;
+		if (isUpdating) return;
+		isUpdating = true;
 
-		UpdateGrid();
+		targetObject = GetEditedObject() as MemoryPuzle;
+		if (targetObject == null)
+		{
+			isUpdating = false;
+			return;
+		}
+
+		_needsUpdate = true;
+		isUpdating = false;
 	}
 
 	public void UpdateGrid()
@@ -57,7 +66,9 @@ public partial class PlatformStatesEditor : EditorProperty
 					FocusMode = Control.FocusModeEnum.None
 				};
 
-				checkBox.Toggled += (bool toggled) => OnCheckBoxToggled(row, col, toggled);
+				int capturedRow = row;
+				int capturedCol = col;
+				checkBox.Toggled += (bool toggled) => OnCheckBoxToggled(capturedRow, capturedCol, toggled);
 				grid.AddChild(checkBox);
 			}
 		}
@@ -66,6 +77,8 @@ public partial class PlatformStatesEditor : EditorProperty
 	private void OnCheckBoxToggled(int row, int col, bool toggled)
 	{
 		GD.Print($"PlatformStatesEditor OnCheckBoxToggled called: row {row}, col {col}, toggled {toggled}");
+		if (targetObject == null) return;
+
 		var newStates = GetPlatformStates();
 		EmitChanged(GetEditedProperty(), newStates);
 		targetObject.PlatformStates = newStates;
@@ -83,5 +96,25 @@ public partial class PlatformStatesEditor : EditorProperty
 			}
 		}
 		return states;
+	}
+
+	public override void _ExitTree()
+	{
+		// Clean up resources when the editor is being removed
+		foreach (var child in grid.GetChildren())
+		{
+			child.QueueFree();
+		}
+		grid.QueueFree();
+		base._ExitTree();
+	}
+
+	public override void _Process(double delta)
+	{
+		if (_needsUpdate)
+		{
+			UpdateGrid();
+			_needsUpdate = false;
+		}
 	}
 }

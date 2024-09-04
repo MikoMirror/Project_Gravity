@@ -8,14 +8,15 @@ public partial class Terminal : Node3D
 
 	private MeshInstance3D screen;
 	private ShaderMaterial screenMaterial;
+	private ImageTexture stateTexture;
 
 	public override void _Ready()
 	{
 		var memoryPuzle = GetParent() as MemoryPuzle;
 		if (memoryPuzle != null)
 		{
-			// Connect to the SetupCompleted signal
 			memoryPuzle.Connect(MemoryPuzle.SignalName.SetupCompleted, new Callable(this, nameof(OnMemoryPuzleSetupCompleted)));
+			memoryPuzle.Connect(MemoryPuzle.SignalName.PlatformStatesChanged, new Callable(this, nameof(UpdatePlatformStates)));
 		}
 		else
 		{
@@ -28,21 +29,15 @@ public partial class Terminal : Node3D
 		screen = GetNodeOrNull<MeshInstance3D>(ScreenPath);
 		
 		if (screen == null)
-		{
 			GD.PushError($"Screen node not found at path: {ScreenPath}");
-			return;
-		}
-
-		// Initialize screenMaterial
-		screenMaterial = screen.GetActiveMaterial(0) as ShaderMaterial;
-		if (screenMaterial == null)
+		else
 		{
-			GD.PushError("Screen material is not a ShaderMaterial");
-			return;
+			screenMaterial = screen.GetActiveMaterial(0) as ShaderMaterial;
+			if (screenMaterial == null)
+				GD.PushError("Screen material is not a ShaderMaterial");
+			else
+				UpdatePlatformStates();
 		}
-
-		// Rest of your initialization code
-		// ...
 	}
 
 	public void UpdateGridSize(int rows, int columns)
@@ -51,5 +46,39 @@ public partial class Terminal : Node3D
 		{
 			screenMaterial.SetShaderParameter("grid_size", new Vector2(columns, rows));
 		}
+	}
+
+	private void UpdatePlatformStates()
+	{
+		var memoryPuzle = GetParent() as MemoryPuzle;
+		if (memoryPuzle == null) return;
+
+		int rows = memoryPuzle.RowCount;
+		int columns = memoryPuzle.ColumnCount;
+
+		UpdateGridSize(rows, columns);
+
+		// Create a new image to represent the platform states
+		var image = Image.CreateEmpty(columns, rows, false, Image.Format.R8);
+
+		for (int i = 0; i < memoryPuzle.PlatformStates.Count; i++)
+		{
+			int x = i % columns;
+			int y = i / columns;
+			image.SetPixel(x, y, memoryPuzle.PlatformStates[i] ? Colors.White : Colors.Black);
+		}
+
+		// Create or update the state texture
+		if (stateTexture == null)
+		{
+			stateTexture = ImageTexture.CreateFromImage(image);
+		}
+		else
+		{
+			stateTexture.Update(image);
+		}
+
+		// Set the state texture in the shader
+		screenMaterial.SetShaderParameter("state_texture", stateTexture);
 	}
 }

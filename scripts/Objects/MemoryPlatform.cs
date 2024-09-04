@@ -15,8 +15,11 @@ public partial class MemoryPlatform : Node3D
 		get => isActive;
 		set
 		{
-			isActive = value;
-			UpdateNeonColor();
+			if (isActive != value)
+			{
+				isActive = value;
+				_needsUpdate = true;
+			}
 		}
 	}
 
@@ -28,6 +31,7 @@ public partial class MemoryPlatform : Node3D
 	private bool hasBeenActivated = false;
 	private bool _isInteractive = true;
 	private bool isInRedState = false;
+	private bool _needsUpdate = false;
 
 	public void SetInteractive(bool interactive)
 	{
@@ -126,35 +130,32 @@ public partial class MemoryPlatform : Node3D
 
 	private void UpdateNeonColor(bool objectInside = false)
 	{
-		if (neonMaterial != null)
+		if (neonMaterial == null) return;
+
+		Vector3 color;
+		if (isInRedState)
+			color = new Vector3(1.0f, 0.0f, 0.0f); // Red
+		else if (hasBeenActivated)
+			color = new Vector3(0.0f, 0.5f, 1.0f); // Light Blue
+		else if (objectInside)
+			color = IsActive ? new Vector3(0.0f, 1.0f, 0.0f) : new Vector3(1.0f, 0.0f, 0.0f); // Green or Red
+		else
+			color = new Vector3(1.0f, 1.0f, 1.0f); // White (default)
+
+		neonMaterial.SetShaderParameter("emission_color", color);
+	}
+
+	public void UpdateVisuals()
+	{
+		UpdateNeonColor();
+	}
+
+	public override void _Process(double delta)
+	{
+		if (_needsUpdate)
 		{
-			if (isInRedState)
-			{
-				neonMaterial.SetShaderParameter("emission_color", new Vector3(1.0f, 0.0f, 0.0f)); // Red
-				return;
-			}
-
-			if (hasBeenActivated)
-			{
-				neonMaterial.SetShaderParameter("emission_color", new Vector3(0.0f, 0.5f, 1.0f)); // Light Blue
-				return;
-			}
-
-			if (objectInside)
-			{
-				if (IsActive)
-				{
-					neonMaterial.SetShaderParameter("emission_color", new Vector3(0.0f, 1.0f, 0.0f)); // Green
-				}
-				else
-				{
-					neonMaterial.SetShaderParameter("emission_color", new Vector3(1.0f, 0.0f, 0.0f)); // Red
-				}
-			}
-			else
-			{
-				neonMaterial.SetShaderParameter("emission_color", new Vector3(1.0f, 1.0f, 1.0f)); // White (default)
-			}
+			UpdateNeonColor();
+			_needsUpdate = false;
 		}
 	}
 }

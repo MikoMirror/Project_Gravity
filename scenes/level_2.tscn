@@ -1,8 +1,9 @@
-[gd_scene load_steps=14 format=3 uid="uid://bfgs4wvy0bhph"]
+[gd_scene load_steps=15 format=3 uid="uid://bfgs4wvy0bhph"]
 
 [ext_resource type="PackedScene" uid="uid://0g1bm5vx4bhw" path="res://assets/OWN/Prefabs/portal.tscn" id="1_3jvh8"]
 [ext_resource type="Script" path="res://scripts/LevelManager.cs" id="1_o1b4a"]
 [ext_resource type="PackedScene" uid="uid://egv34vmwijbn" path="res://assets/OWN/Prefabs/floor.tscn" id="2_rfx76"]
+[ext_resource type="PackedScene" uid="uid://bbpcuvq045yhj" path="res://scenes/memmory_puzzle.tscn" id="3_qnbaf"]
 [ext_resource type="PackedScene" uid="uid://c5avl3x8ogvyf" path="res://assets/OWN/Prefabs/wall_2.tscn" id="5_1woms"]
 [ext_resource type="PackedScene" uid="uid://dfh4n8fdaqplp" path="res://assets/OWN/Prefabs/Light.tscn" id="5_tcf2e"]
 [ext_resource type="PackedScene" uid="uid://teh2hnh1v6sb" path="res://assets/OWN/Prefabs/wall_with_glass.tscn" id="6_1i0se"]
@@ -1670,3 +1671,9 @@ _isTeleportActive = false
 
 [node name="Player" parent="." instance=ExtResource("12_nco5j")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2, -10)
+
+[node name="MemmoryPuzzle" parent="." instance=ExtResource("3_qnbaf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.2, -26.4)
+RowCount = 4
+ColumnCount = 4
+PlatformStates = [true, true, false, false, false, true, false, false, false, true, false, false, false, true, false, false]

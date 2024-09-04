@@ -18,15 +18,16 @@ public partial class MemoryPuzle : Node3D
 	private Vector3 _spacing = new Vector3(2, 0, 2);
 
 	[Export(PropertyHint.Range, "1,20,1")]
-	public int RowCount 
-	{ 
-		get => _rowCount; 
-		set 
+	public int RowCount
+	{
+		get => _rowCount;
+		set
 		{
 			if (_rowCount != value)
 			{
 				_rowCount = value;
 				UpdatePlatformStatesArray();
+				UpdateVisualRepresentation();
 				CallDeferred(nameof(UpdatePuzzle));
 				CallDeferred(nameof(UpdatePuzzleArea));
 			}
@@ -34,15 +35,16 @@ public partial class MemoryPuzle : Node3D
 	}
 
 	[Export(PropertyHint.Range, "1,20,1")]
-	public int ColumnCount 
-	{ 
-		get => _columnCount; 
-		set 
+	public int ColumnCount
+	{
+		get => _columnCount;
+		set
 		{
 			if (_columnCount != value)
 			{
 				_columnCount = value;
 				UpdatePlatformStatesArray();
+				UpdateVisualRepresentation();
 				CallDeferred(nameof(UpdatePuzzle));
 				CallDeferred(nameof(UpdatePuzzleArea));
 			}
@@ -53,10 +55,10 @@ public partial class MemoryPuzle : Node3D
 	public string PlatformScenePath = "res://scenes/memory_platform.tscn";
 
 	[Export]
-	public Vector3 Spacing 
-	{ 
-		get => _spacing; 
-		set 
+	public Vector3 Spacing
+	{
+		get => _spacing;
+		set
 		{
 			if (_spacing != value)
 			{
@@ -98,6 +100,8 @@ public partial class MemoryPuzle : Node3D
 
 	private bool _isPuzzleActive = true;
 	private bool _isInRedState = false;
+
+	private bool _needsUpdate = false;
 
 	public override void _Ready()
 	{
@@ -204,15 +208,15 @@ public partial class MemoryPuzle : Node3D
 	{
 		int newSize = RowCount * ColumnCount;
 		if (PlatformStates.Count != newSize)
+		{
+			var newStates = new Godot.Collections.Array<bool>();
+			for (int i = 0; i < newSize; i++)
 			{
-				var newStates = new Godot.Collections.Array<bool>();
-				for (int i = 0; i < newSize; i++)
-				{
-					newStates.Add(i < PlatformStates.Count ? PlatformStates[i] : false);
-				}
-				PlatformStates = newStates;
-				EmitSignal(SignalName.PlatformStatesChanged);
+				newStates.Add(i < PlatformStates.Count ? PlatformStates[i] : false);
 			}
+			PlatformStates = newStates;
+			EmitSignal(SignalName.PlatformStatesChanged);
+		}
 	}
 
 	public void UpdatePuzzle()
@@ -237,35 +241,51 @@ public partial class MemoryPuzle : Node3D
 
 	private void UpdateVisualRepresentation()
 	{
-		if (!Engine.IsEditorHint()) return;
-
-		foreach (Node child in GetChildren())
+		if (Engine.IsEditorHint())
 		{
-			if (child is CsgBox3D)
+			foreach (Node child in GetChildren())
 			{
-				child.QueueFree();
+				if (child is CsgBox3D)
+				{
+					child.QueueFree();
+				}
+			}
+
+			// Create visual representation
+			for (int row = 0; row < RowCount; row++)
+			{
+				for (int col = 0; col < ColumnCount; col++)
+				{
+					var visualPlatform = new CsgBox3D();
+					visualPlatform.Name = $"VisualPlatform_{row}_{col}";
+					visualPlatform.Size = new Vector3(1, 0.1f, 1);
+					visualPlatform.Position = new Vector3(col * Spacing.X, 0, row * Spacing.Z);
+
+					int index = row * ColumnCount + col;
+					bool isActive = index < PlatformStates.Count && PlatformStates[index];
+
+					visualPlatform.MaterialOverride = new StandardMaterial3D
+					{
+						AlbedoColor = isActive ? new Color(0, 1, 0, 0.5f) : new Color(0.5f, 0.5f, 0.5f, 0.5f),
+						Transparency = BaseMaterial3D.TransparencyEnum.Alpha
+					};
+					AddChild(visualPlatform);
+				}
 			}
 		}
-
-		// Create visual representation
-		for (int row = 0; row < RowCount; row++)
+		else
 		{
-			for (int col = 0; col < ColumnCount; col++)
+			// Update the visual appearance of each platform based on its current state in PlatformStates
+			for (int i = 0; i < PlatformStates.Count; i++)
 			{
-				var visualPlatform = new CsgBox3D();
-				visualPlatform.Name = $"VisualPlatform_{row}_{col}";
-				visualPlatform.Size = new Vector3(1, 0.1f, 1);
-				visualPlatform.Position = new Vector3(col * Spacing.X, 0, row * Spacing.Z);
-
-				int index = row * ColumnCount + col;
-				bool isActive = index < PlatformStates.Count && PlatformStates[index];
-
-				visualPlatform.MaterialOverride = new StandardMaterial3D
+				int row = i / ColumnCount;
+				int col = i % ColumnCount;
+				if (platformInstances != null && platformInstances[row, col] != null)
 				{
-					AlbedoColor = isActive ? new Color(0, 1, 0, 0.5f) : new Color(0.5f, 0.5f, 0.5f, 0.5f),
-					Transparency = BaseMaterial3D.TransparencyEnum.Alpha
-				};
-				AddChild(visualPlatform);
+					MemoryPlatform platform = platformInstances[row, col];
+					platform.IsActive = PlatformStates[i];
+					platform.UpdateVisuals();
+				}
 			}
 		}
 	}
@@ -404,10 +424,11 @@ public partial class MemoryPuzle : Node3D
 			}
 			else if (platformInstances != null && platformInstances[row, col] != null)
 			{
-				MemoryPlatform memoryPlatform = platformInstances[row, col].GetNodeOrNull<MemoryPlatform>(".");
+				MemoryPlatform memoryPlatform = platformInstances[row, col];
 				if (memoryPlatform != null)
 				{
 					memoryPlatform.IsActive = isActive;
+					memoryPlatform.UpdateVisuals();
 					GD.Print($"MemoryPlatform IsActive set to: {isActive}");
 				}
 				else
@@ -464,5 +485,14 @@ public partial class MemoryPuzle : Node3D
 		);
 
 		GD.Print($"Updated PuzzleArea size to: {boxShape.Size}, position to: {puzzleArea.Position}");
+	}
+
+	public override void _Process(double delta)
+	{
+		if (Engine.IsEditorHint() && _needsUpdate)
+		{
+			UpdateVisualRepresentation();
+			_needsUpdate = false;
+		}
 	}
 }

@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://bflfuelqq3gsi" path="res://scenes/terminal.tscn" id="2_y0n8p"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_daye6"]
-size = Vector3(5, 2, 5)
+size = Vector3(7, 2, 7)
 
 [node name="MemmoryPuzzle" type="Node3D" node_paths=PackedStringArray("PuzzleArea")]
 script = ExtResource("1_huamm")
@@ -14,7 +14,7 @@ PlatformStates = [false, false, false, false, false, false, false, false, false]
 PuzzleArea = NodePath("PuzzleArea")
 
 [node name="Terminal" parent="." instance=ExtResource("2_y0n8p")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, -0.1, 6)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 6)
 
 [node name="PuzzleArea" type="Area3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1, 2)
