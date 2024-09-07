@@ -2,7 +2,7 @@ using Godot;
 using System;
 
 [Tool]
-public partial class MemmoryPuzleEditorPlugin : EditorPlugin
+public partial class MemoryPuzzleEditorPlugin : EditorPlugin
 {
 	private PlatformStatesInspectorPlugin inspectorPlugin;
 

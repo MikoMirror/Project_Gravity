@@ -6,8 +6,9 @@ public partial class LevelManager : Node
 {
 	private List<Node3D> _initialSceneState;
 	private string _currentLevelScene;
-	private PackedScene _levelLoadingScene;
 	private Control _levelLoadingInstance;
+	private AnimationPlayer _fadeAnimation;
+	private ColorRect _fadeOverlay;
 
 	public override void _Ready()
 	{
@@ -16,21 +17,39 @@ public partial class LevelManager : Node
 		GD.Print($"LevelManager: Current scene path: {_currentLevelScene}");
 		SaveInitialSceneState();
 		
-		_levelLoadingScene = GD.Load<PackedScene>("res://scenes/lelev_loading.tscn");
+		// Hide the loading screen
+		CallDeferred(nameof(HideLevelLoading));
 		
-		var gameState = GetNode<GameState>("/root/GameState");
-		if (!string.IsNullOrEmpty(gameState.TargetPortalName))
+		// Find the Player node and trigger the fade out animation
+		var player = GetTree().CurrentScene.FindChild("Player", true, false) as Player;
+		if (player != null)
 		{
-			CallDeferred(nameof(PositionPlayerAtTargetPortal), gameState.TargetPortalName);
+			player.StartFadeOutAnimation();
+		}
+		else
+		{
+			GD.PrintErr("LevelManager: Player not found in the current scene");
 		}
 
-		if (gameState.IsComingFromPortal)
+		var gameState = GetNode<GameState>("/root/GameState");
+		if (gameState != null)
 		{
-			GetTree().CreateTimer(0.5f).Timeout += HideLevelLoadingAfterDelay;
-			gameState.IsComingFromPortal = false;
+			if (!string.IsNullOrEmpty(gameState.TargetPortalName))
+			{
+				CallDeferred(nameof(PositionPlayerAtTargetPortal), gameState.TargetPortalName);
+			}
+
+			if (gameState.IsComingFromPortal)
+			{
+				
+				gameState.IsComingFromPortal = false;
+			}
+		}
+		else
+		{
+			GD.PrintErr("LevelManager: GameState not found.");
 		}
 	}
-
 	private void PositionPlayerAtTargetPortal(string targetPortalName)
 	{
 		GD.Print($"LevelManager: Positioning player at target portal: {targetPortalName}");
@@ -55,6 +74,8 @@ public partial class LevelManager : Node
 			GD.PrintErr($"LevelManager: Target portal '{targetPortalName}' not found in the current scene");
 		}
 		
+		InitializeMemoryPuzzles();
+
 		var gameState = GetNode<GameState>("/root/GameState");
 		gameState.TargetPortalName = "";
 	}
@@ -123,21 +144,15 @@ public partial class LevelManager : Node
 			var tree = GetTree();
 			if (tree != null)
 			{
-				GD.Print("LevelManager: Pausing the game");
-				tree.Paused = true;
-
-				GD.Print("LevelManager: Saving current scene state");
-				SaveInitialSceneState();
-
 				GD.Print("LevelManager: Reloading the current scene");
-				var currentScene = tree.CurrentScene;
-				var currentScenePath = currentScene.SceneFilePath;
+				var currentScenePath = tree.CurrentScene.SceneFilePath;
 				GD.Print($"LevelManager: Current scene path: {currentScenePath}");
 
-				tree.ChangeSceneToFile(currentScenePath);
-				tree.Paused = false;
+				// Reload the current scene
+				tree.ReloadCurrentScene();
 
-				GD.Print("LevelManager: Scene reloaded");
+				// The scene will be reloaded, so we don't need to unpause here
+				// The new scene instance will handle initialization
 			}
 			else
 			{
@@ -256,16 +271,16 @@ public partial class LevelManager : Node
 
 	private void HideLevelLoading()
 	{
-		if (_levelLoadingInstance != null)
+		var levelLoading = GetTree().Root.GetNodeOrNull<Control>("LevelLoading");
+		if (levelLoading != null)
 		{
-			_levelLoadingInstance.Visible = false;
-			_levelLoadingInstance.QueueFree();
-			_levelLoadingInstance = null;
+			levelLoading.Visible = false;
+			levelLoading.QueueFree();
 			GD.Print("LevelManager: LevelLoading hidden and removed");
 		}
 		else
 		{
-			GD.PrintErr("LevelManager: LevelLoading instance is null when trying to hide");
+			GD.Print("LevelManager: LevelLoading not found (might have been already removed)");
 		}
 	}
 
@@ -277,6 +292,31 @@ public partial class LevelManager : Node
 		foreach (var child in node.GetChildren())
 		{
 			PrintSceneTree(child, depth + 1);
+		}
+	}
+
+	private void InitializeMemoryPuzzles()
+	{
+		var currentScene = GetTree().CurrentScene;
+		var memoryPuzzles = new List<MemoryPuzle>();
+		FindMemoryPuzzlesRecursive(currentScene, memoryPuzzles);
+
+		foreach (var memoryPuzle in memoryPuzzles)
+		{
+			memoryPuzle.ManualSetup();
+		}
+	}
+
+	private void FindMemoryPuzzlesRecursive(Node node, List<MemoryPuzle> memoryPuzzles)
+	{
+		if (node is MemoryPuzle memoryPuzle)
+		{
+			memoryPuzzles.Add(memoryPuzle);
+		}
+
+		foreach (var child in node.GetChildren())
+		{
+			FindMemoryPuzzlesRecursive(child, memoryPuzzles);
 		}
 	}
 }

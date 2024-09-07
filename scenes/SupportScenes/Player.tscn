@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://1cc1ehwwh0tr"]
+[gd_scene load_steps=19 format=3 uid="uid://1cc1ehwwh0tr"]
 
 [ext_resource type="Script" path="res://scripts/Player/Player.cs" id="1_lrqu3"]
 [ext_resource type="Shader" path="res://shaders/crosshair.gdshader" id="2_8ybvs"]
@@ -6,7 +6,7 @@
 [ext_resource type="Shader" path="res://shaders/EngeFlash.gdshader" id="3_vtsco"]
 [ext_resource type="Script" path="res://scripts/Player/GravityManager.cs" id="4_v6kp3"]
 [ext_resource type="Shader" path="res://shaders/deadShader.gdshader" id="5_qfeqb"]
-[ext_resource type="PackedScene" uid="uid://dygvnm43uahoa" path="res://scenes/PlayerUI.tscn" id="5_rhres"]
+[ext_resource type="PackedScene" uid="uid://dygvnm43uahoa" path="res://scenes/SupportScenes/PlayerUI.tscn" id="5_rhres"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_miooo"]
 
@@ -84,6 +84,18 @@ tracks/3/keys = {
 "update": 0,
 "values": [0.0]
 }
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Head/Camera3D/FadeOverlay:color")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0, 0, 0, 1)]
+}
 
 [sub_resource type="Animation" id="Animation_d1182"]
 resource_name = "dead_animation"
@@ -99,6 +111,21 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Color(0.768627, 0, 0, 0), Color(0.768627, 0, 0, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_ju3g7"]
+resource_name = "fade_out"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Head/Camera3D/FadeOverlay:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0, 0, 0, 1), Color(0, 0, 0, 0)]
 }
 
 [sub_resource type="Animation" id="Animation_on17f"]
@@ -148,6 +175,7 @@ tracks/1/keys = {
 _data = {
 "RESET": SubResource("Animation_dmrld"),
 "dead_animation": SubResource("Animation_d1182"),
+"fade_out": SubResource("Animation_ju3g7"),
 "flash_effect": SubResource("Animation_on17f"),
 "teleportation": SubResource("Animation_n5vwt")
 }
@@ -207,6 +235,15 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="FadeOverlay" type="ColorRect" parent="Head/Camera3D"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
 
 [node name="GravityManager" type="Node3D" parent="."]
 script = ExtResource("4_v6kp3")

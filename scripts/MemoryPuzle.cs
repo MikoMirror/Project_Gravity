@@ -11,7 +11,10 @@ public partial class MemoryPuzle : Node3D
 	public delegate void SetupCompletedEventHandler();
 
 	[Export]
-	public string TerminalScenePath = "res://scenes/terminal.tscn";
+	public string TerminalScenePath = "res://assets/OWN/Prefabs/terminal.tscn";
+	
+	[Export]
+	public string PlatformScenePath = "res://assets/OWN/Prefabs/memory_platform.tscn";
 
 	private int _rowCount = 1;
 	private int _columnCount = 1;
@@ -51,8 +54,7 @@ public partial class MemoryPuzle : Node3D
 		}
 	}
 
-	[Export]
-	public string PlatformScenePath = "res://scenes/memory_platform.tscn";
+	
 
 	[Export]
 	public Vector3 Spacing
@@ -311,14 +313,15 @@ public partial class MemoryPuzle : Node3D
 
 		ClearPlatforms();
 
+		GD.Print($"PlatformScenePath: {PlatformScenePath}");
 		if (string.IsNullOrEmpty(PlatformScenePath))
 		{
 			GD.PushError("PlatformScenePath is not set.");
 			return;
 		}
 
-		GD.Print($"Loading platform scene from: {PlatformScenePath}");
-		PackedScene platformScene = GD.Load<PackedScene>(PlatformScenePath);
+		GD.Print($"Attempting to load platform scene from: {PlatformScenePath}");
+		PackedScene platformScene = ResourceLoader.Load<PackedScene>(PlatformScenePath);
 		if (platformScene == null)
 		{
 			GD.PushError($"Failed to load platform scene from '{PlatformScenePath}'");
@@ -494,5 +497,12 @@ public partial class MemoryPuzle : Node3D
 			UpdateVisualRepresentation();
 			_needsUpdate = false;
 		}
+	}
+
+	public void ManualSetup()
+	{
+		UpdatePuzzle();
+		EmitSignal(SignalName.SetupCompleted);
+		EmitSignal(SignalName.PlatformStatesChanged);
 	}
 }

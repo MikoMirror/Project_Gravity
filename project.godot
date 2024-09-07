@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="The-photographer"
-run/main_scene="res://scenes/Level1.tscn"
+run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.3", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -32,7 +32,7 @@ project/assembly_name="The-photographer"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/JFA_driven_motion_blur_addon-master/addons/SphynxMotionBlurToolkit/plugin.cfg", "res://addons/memmory_puzle_editor/plugin.cfg")
+enabled=PackedStringArray("res://addons/JFA_driven_motion_blur_addon-master/addons/SphynxMotionBlurToolkit/plugin.cfg", "res://addons/memory_puzzle_editor/plugin.cfg")
 
 [input]
 

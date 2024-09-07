@@ -55,7 +55,7 @@ public partial class Portal : Node3D
 				GD.PrintErr("Portal: PortalArea child node not found!");
 			}
 
-		_levelLoadingScene = GD.Load<PackedScene>("res://scenes/lelev_loading.tscn");
+		_levelLoadingScene = GD.Load<PackedScene>("res://scenes/SupportScenes/lelev_loading.tscn");
 	}
 
 	public override void _Input(InputEvent @event)
@@ -106,7 +106,12 @@ public partial class Portal : Node3D
 		ShowLevelLoading();
 
 		gameState.IsComingFromPortal = true;
-		GetTree().ChangeSceneToFile(TargetLevelPath);
+		
+		// Use CallDeferred to change the scene after this frame
+		GetTree().CreateTimer(0.1f).Timeout += () =>
+		{
+			GetTree().ChangeSceneToFile(TargetLevelPath);
+		};
 	}
 
 	private void TeleportWithinLevel(Player player)
@@ -124,7 +129,7 @@ public partial class Portal : Node3D
 
 			player.TeleportTo(targetPortal.GlobalPosition, targetPortal.GlobalTransform.Basis.Z);
 
-			GetTree().CreateTimer(0.5f).Timeout += HideLevelLoading;
+			GetTree().CreateTimer(1f).Timeout += HideLevelLoading;
 		}
 		else
 		{

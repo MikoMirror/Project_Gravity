@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://0g1bm5vx4bhw" path="res://assets/OWN/Prefabs/portal.tscn" id="1_3jvh8"]
 [ext_resource type="Script" path="res://scripts/LevelManager.cs" id="1_o1b4a"]
 [ext_resource type="PackedScene" uid="uid://egv34vmwijbn" path="res://assets/OWN/Prefabs/floor.tscn" id="2_rfx76"]
-[ext_resource type="PackedScene" uid="uid://bbpcuvq045yhj" path="res://scenes/memmory_puzzle.tscn" id="3_qnbaf"]
+[ext_resource type="PackedScene" uid="uid://bbpcuvq045yhj" path="res://scenes/SupportScenes/memory_puzzle.tscn" id="3_qnbaf"]
 [ext_resource type="PackedScene" uid="uid://c5avl3x8ogvyf" path="res://assets/OWN/Prefabs/wall_2.tscn" id="5_1woms"]
 [ext_resource type="PackedScene" uid="uid://dfh4n8fdaqplp" path="res://assets/OWN/Prefabs/Light.tscn" id="5_tcf2e"]
 [ext_resource type="PackedScene" uid="uid://teh2hnh1v6sb" path="res://assets/OWN/Prefabs/wall_with_glass.tscn" id="6_1i0se"]
@@ -12,7 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://cnfv1agds8cd8" path="res://assets/OWN/Prefabs/ceiling_3.tscn" id="11_7p1ip"]
 [ext_resource type="PackedScene" uid="uid://qiprcs4r1lhu" path="res://assets/OWN/Prefabs/damage_platform.tscn" id="11_vo4ys"]
 [ext_resource type="PackedScene" uid="uid://bmoqkjcvpammp" path="res://assets/OWN/Prefabs/gravity_energy.tscn" id="12_g5l40"]
-[ext_resource type="PackedScene" uid="uid://1cc1ehwwh0tr" path="res://scenes/Player.tscn" id="12_nco5j"]
+[ext_resource type="PackedScene" uid="uid://1cc1ehwwh0tr" path="res://scenes/SupportScenes/Player.tscn" id="12_nco5j"]
 
 [sub_resource type="Environment" id="Environment_hnt66"]
 
@@ -1673,7 +1673,6 @@ _isTeleportActive = false
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2, -10)
 
 [node name="MemmoryPuzzle" parent="." instance=ExtResource("3_qnbaf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.2, -26.4)
-RowCount = 4
-ColumnCount = 4
-PlatformStates = [true, true, false, false, false, true, false, false, false, true, false, false, false, true, false, false]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.1, -22)
+Spacing = Vector3(2.5, 0, 2.5)
+PlatformStates = [false, true, false, false, true, false, false, true, false]

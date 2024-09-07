@@ -60,6 +60,8 @@ public partial class Player : CharacterBody3D
 	private Node3D _head;
 	private bool _isTeleporting = false;
 	private PlayerUI _playerUI;
+	private ColorRect _fadeOverlay;
+	
 
 	public override void _Ready()
 	{
@@ -68,15 +70,17 @@ public partial class Player : CharacterBody3D
 		_jumpsIndicator = GetNode<PlayerUI>("PlayerUI");
 		Head = GetNode<Node3D>("Head");
 		Camera = GetNode<Camera3D>("Head/Camera3D");
-		InteractionRay = Camera.GetNode<RayCast3D>("InteractionRay");
-		HandPosition = Camera.GetNode<Marker3D>("HandPosition");
-		CameraOverlay = GetNode<ColorRect>("Head/Camera3D/Flash");
-		_animation = GetNode<AnimationPlayer>("AnimationPlayer");
-		_teleportOverlay = GetNode<ColorRect>("Head/Camera3D/TeleportOverlay");
-		_animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
-		_camera = GetNode<Camera3D>("Head/Camera3D");
-		_head = GetNode<Node3D>("Head");
-		_playerUI = GetNode<PlayerUI>("PlayerUI");
+			InteractionRay = Camera.GetNode<RayCast3D>("InteractionRay");
+			HandPosition = Camera.GetNode<Marker3D>("HandPosition");
+			CameraOverlay = GetNode<ColorRect>("Head/Camera3D/Flash");
+			_animation = GetNode<AnimationPlayer>("AnimationPlayer");
+			_teleportOverlay = GetNode<ColorRect>("Head/Camera3D/TeleportOverlay");
+			_animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
+			_camera = GetNode<Camera3D>("Head/Camera3D");
+			_head = GetNode<Node3D>("Head");
+			_playerUI = GetNode<PlayerUI>("PlayerUI");
+			_fadeOverlay = GetNode<ColorRect>("Head/Camera3D/FadeOverlay");
+			_animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
 
 		if (_gravityManager == null)
 		{
@@ -196,6 +200,29 @@ public partial class Player : CharacterBody3D
 
 		// Set the camera back to its original global transform
 		_camera.GlobalTransform = originalCameraTransform;
+	}
+
+	public void StartFadeOutAnimation()
+	{
+		if (_fadeOverlay != null && _animationPlayer != null)
+		{
+			_fadeOverlay.Visible = true;
+			_animationPlayer.Play("fade_out");
+			_animationPlayer.AnimationFinished += OnFadeOutFinished;
+		}
+		else
+		{
+			GD.PrintErr("Player: Unable to start fade out animation. FadeOverlay or AnimationPlayer is null.");
+		}
+	}
+
+	private void OnFadeOutFinished(StringName animName)
+	{
+		if (animName == "fade_out")
+		{
+			_fadeOverlay.Visible = false;
+			_animationPlayer.AnimationFinished -= OnFadeOutFinished;
+		}
 	}
 
 	public override void _ExitTree()

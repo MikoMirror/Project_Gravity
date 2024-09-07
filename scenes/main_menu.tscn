@@ -1,0 +1,175 @@
+[gd_scene load_steps=17 format=3 uid="uid://c54t4shmh0tox"]
+
+[ext_resource type="Script" path="res://scripts/MainMenu/MainMenu.cs" id="1_pi6ty"]
+[ext_resource type="FontFile" uid="uid://7vf1snbtikvm" path="res://assets/OWN/UI/Fonts/RobotoSlab-Bold.ttf" id="2_euyx2"]
+[ext_resource type="Texture2D" uid="uid://c87ulhghg0xc1" path="res://assets/OWN/UI/Button.png" id="3_33ej3"]
+[ext_resource type="Texture2D" uid="uid://ccsb4h0n2qple" path="res://assets/OWN/UI/Button Hower.png" id="4_80fum"]
+[ext_resource type="FontFile" uid="uid://cdgj0biidegon" path="res://assets/OWN/UI/Fonts/RadioSpaceBoldItalic-13Ge.otf" id="4_ix1ao"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_gtk81"]
+load_path = "res://.godot/imported/Layer 0.png-a950b4b16132a826c05662b2e18d304c.ctex"
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_d5bbg"]
+texture = ExtResource("4_80fum")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_plni4"]
+texture = ExtResource("4_80fum")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_xqyw3"]
+texture = ExtResource("3_33ej3")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_2jasf"]
+texture = ExtResource("4_80fum")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_4vf13"]
+texture = ExtResource("4_80fum")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_0r7xg"]
+texture = ExtResource("4_80fum")
+
+[sub_resource type="Animation" id="Animation_6x0b1"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("FadeOverlay:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0, 0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_dkk05"]
+resource_name = "fade_in"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("FadeOverlay:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0, 0, 0, 0), Color(0, 0, 0, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_slxrp"]
+resource_name = "fade_out"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("FadeOverlay:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0, 0, 0, 1), Color(0, 0, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_gpyxv"]
+_data = {
+"RESET": SubResource("Animation_6x0b1"),
+"fade_in": SubResource("Animation_dkk05"),
+"fade_out": SubResource("Animation_slxrp")
+}
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_pi6ty")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("CompressedTexture2D_gtk81")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -458.0
+offset_top = 117.0
+offset_right = 458.0
+offset_bottom = 290.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("4_ix1ao")
+theme_override_font_sizes/font_size = 164
+text = "RE: Gravity"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -282.0
+offset_top = -580.0
+offset_right = 282.0
+offset_bottom = -84.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 40
+
+[node name="Start" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_fonts/font = ExtResource("2_euyx2")
+theme_override_font_sizes/font_size = 70
+theme_override_styles/hover = SubResource("StyleBoxTexture_d5bbg")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_plni4")
+theme_override_styles/normal = SubResource("StyleBoxTexture_xqyw3")
+text = "Start"
+
+[node name="Settings" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_fonts/font = ExtResource("2_euyx2")
+theme_override_font_sizes/font_size = 70
+theme_override_styles/hover = SubResource("StyleBoxTexture_2jasf")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_4vf13")
+theme_override_styles/normal = SubResource("StyleBoxTexture_xqyw3")
+text = "Settings"
+
+[node name="Exit" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_fonts/font = ExtResource("2_euyx2")
+theme_override_font_sizes/font_size = 70
+theme_override_styles/hover_pressed = SubResource("StyleBoxTexture_0r7xg")
+theme_override_styles/normal = SubResource("StyleBoxTexture_xqyw3")
+text = "Exit"
+
+[node name="FadeOverlay" type="ColorRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0)
+
+[node name="FadeAnimation" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_gpyxv")
+}
+
+[connection signal="pressed" from="VBoxContainer/Start" to="." method="OnStartPressed"]
+[connection signal="pressed" from="VBoxContainer/Exit" to="." method="OnExitPressed"]

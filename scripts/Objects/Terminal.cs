@@ -17,6 +17,9 @@ public partial class Terminal : Node3D
 		{
 			memoryPuzle.Connect(MemoryPuzle.SignalName.SetupCompleted, new Callable(this, nameof(OnMemoryPuzleSetupCompleted)));
 			memoryPuzle.Connect(MemoryPuzle.SignalName.PlatformStatesChanged, new Callable(this, nameof(UpdatePlatformStates)));
+			
+			// Try to update immediately, in case the MemoryPuzle is already set up
+			OnMemoryPuzleSetupCompleted();
 		}
 		else
 		{
