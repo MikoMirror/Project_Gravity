@@ -1,6 +1,6 @@
 [gd_scene load_steps=14 format=3 uid="uid://dvm56dg3eeiy8"]
 
-[ext_resource type="Script" path="res://scripts/LevelManager.cs" id="1_4ixrh"]
+[ext_resource type="Script" path="res://scripts/Services/LevelManager.cs" id="1_4ixrh"]
 [ext_resource type="PackedScene" uid="uid://egv34vmwijbn" path="res://assets/OWN/Prefabs/floor.tscn" id="2_2emjt"]
 [ext_resource type="PackedScene" uid="uid://dfh4n8fdaqplp" path="res://assets/OWN/Prefabs/Light.tscn" id="3_truqy"]
 [ext_resource type="PackedScene" uid="uid://bff2itbvjsgc5" path="res://assets/OWN/Prefabs/ceiling_1.tscn" id="4_msqmq"]

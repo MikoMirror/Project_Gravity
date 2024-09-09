@@ -3,151 +3,156 @@ using System;
 
 public partial class MainMenu : Control
 {
+	[Export] private NodePath startButtonPath = "VBoxContainer/Start";
+	[Export] private NodePath confirmationDialogPath = "NewGameConfirmationDialog";
 	private Button startButton;
-	private Button loadGameButton;
-	private Button settingsButton;
-	private Button exitButton;
-	private AnimationPlayer animationPlayer;
-	private ColorRect fadeOverlay;
-	private string nextScene = "";
+	private NewGameConfirmationDialog newGameConfirmationDialog;  // Changed to NewGameConfirmationDialog
+	private GameState gameState;
+	[Export] private Button settingsButton;
 
 	public override void _Ready()
 	{
-		GD.Print("MainMenu _Ready called");
-
-		// Get references to the buttons
-		startButton = GetNodeOrNull<Button>("VBoxContainer/Start");
-		loadGameButton = GetNodeOrNull<Button>("VBoxContainer/Load Game");
-		settingsButton = GetNodeOrNull<Button>("VBoxContainer/Settings");
-		exitButton = GetNodeOrNull<Button>("VBoxContainer/Exit");
-
-		GD.Print($"Start button found: {startButton != null}");
-		GD.Print($"Load Game button found: {loadGameButton != null}");
-		GD.Print($"Settings button found: {settingsButton != null}");
-		GD.Print($"Exit button found: {exitButton != null}");
-
-		// Get reference to the AnimationPlayer and FadeOverlay
-		animationPlayer = GetNodeOrNull<AnimationPlayer>("FadeAnimation");
-		fadeOverlay = GetNodeOrNull<ColorRect>("FadeOverlay");
-
-		GD.Print($"AnimationPlayer found: {animationPlayer != null}");
-		GD.Print($"FadeOverlay found: {fadeOverlay != null}");
-
-		// Connect button signals to methods
-		if (startButton != null) 
+		InitializeComponents();
+		ConnectDialogSignals();
+		if (settingsButton != null)
 		{
-			startButton.Pressed += OnStartNewGamePressed;
-			GD.Print("Start New Game button connected");
+			settingsButton.Pressed += OnSettingsButtonPressed;
 		}
-		if (loadGameButton != null) 
+		else
 		{
-			loadGameButton.Pressed += OnLoadGamePressed;
-			GD.Print("Load Game button connected");
+			GD.PrintErr("Settings button not assigned in the inspector.");
 		}
-		if (settingsButton != null) 
-		{
-			settingsButton.Pressed += OnSettingsPressed;
-			GD.Print("Settings button connected");
-		}
-		if (exitButton != null) 
-		{
-			exitButton.Pressed += OnExitPressed;
-			GD.Print("Exit button connected");
-		}
-
-		// Connect animation finished signal
-		if (animationPlayer != null)
-		{
-			animationPlayer.AnimationFinished += OnAnimationFinished;
-			GD.Print("AnimationPlayer connected");
-		}
-
-		GD.Print("MainMenu setup complete");
 	}
 
-	private void OnStartNewGamePressed()
+	private void InitializeComponents()
 	{
-		GD.Print("Start New Game button pressed");
-		var gameState = GetNode<GameState>("/root/GameState");
+		startButton = GetNodeOrNull<Button>(startButtonPath);
+		newGameConfirmationDialog = GetNode<NewGameConfirmationDialog>(confirmationDialogPath);  // Changed to NewGameConfirmationDialog
+		gameState = GetNode<GameState>("/root/GameState");
+
+		if (gameState == null)
+		{
+			GD.PrintErr("GameState not found. Make sure it's set up as an AutoLoad.");
+		}
+
+		if (newGameConfirmationDialog == null)
+		{
+			GD.PrintErr("NewGameConfirmationDialog not found. Check the node path in the inspector.");
+		}
+	}
+
+	private void ConnectDialogSignals()
+	{
+		if (newGameConfirmationDialog != null)
+		{
+			newGameConfirmationDialog.Confirmed += OnConfirmNewGame;
+			newGameConfirmationDialog.Canceled += OnCancelNewGame;
+		}
+	}
+
+	// This method will be called when the Start button is pressed
+	public void OnStartNewGamePressed()
+	{
+		if (SaveLoadManager.Instance.SaveFileExists())
+		{
+			newGameConfirmationDialog.ShowDialog();
+		}
+		else
+		{
+			StartNewGame();
+		}
+	}
+
+	// This method will be called when the Load Game button is pressed
+	public void OnLoadGamePressed()
+	{
+		if (SaveLoadManager.Instance.SaveFileExists())
+		{
+			LoadGame();
+		}
+		else
+		{
+			// Show a message that no save file exists
+			GD.Print("No save file found.");
+			// You might want to show this message to the player in the UI
+			// You might want to show this message to the player in the UI
+		}
+	}
+
+	// This method will be called when the Settings button is pressed
+	public void OnSettingsButtonPressed()
+	{
+		// Load and instance the settings scene
+		var settingsScene = GD.Load<PackedScene>("res://scenes/SupportScenes/settings.tscn");
+		if (settingsScene != null)
+		{
+			var settingsInstance = settingsScene.Instantiate<Control>();
+			
+			// Add the settings instance to the scene tree
+			GetTree().Root.AddChild(settingsInstance);
+			
+			// Optionally, you might want to pause the game or hide the main menu
+			// this.Hide();  // Hide the main menu
+			// GetTree().Paused = true;  // Pause the game
+		}
+		else
+		{
+			GD.PrintErr("Failed to load settings scene.");
+		}
+	}
+
+	// This method will be called when the Exit button is pressed
+	public void OnExitPressed()
+	{
+		// Quit the game
+		GetTree().Quit();
+	}
+
+	// This method will be called when the Confirm button in the dialog is pressed
+	public void OnConfirmNewGame()
+	{
+		GD.Print("Confirm new game");
+		StartNewGame();
+	}
+
+	// This method will be called when the Cancel button in the dialog is pressed
+	public void OnCancelNewGame()
+	{
+		GD.Print("Cancel new game");
+		// No action needed, dialog will close automatically
+	}
+
+	private void StartNewGame()
+	{
+		if (gameState == null)
+		{
+			GD.PrintErr("GameState not found. Check AutoLoad setup.");
+			return;
+		}
+
 		gameState.CurrentLevel = "res://scenes/Level_1.tscn";
+		SaveLoadManager.Instance.DeleteSaveFile();
 		gameState.SaveCurrentLevel();
-		nextScene = gameState.CurrentLevel;
-		ShowFadeOverlayAndAnimate();
+		GetTree().ChangeSceneToFile(gameState.CurrentLevel);
 	}
 
-	private void OnLoadGamePressed()
+	private void LoadGame()
 	{
-		GD.Print("Load Game button pressed");
-		nextScene = LoadLastLevel();
-		if (string.IsNullOrEmpty(nextScene))
+		if (gameState == null)
 		{
-			GD.Print("No saved game found. Starting from Level 1.");
-			nextScene = "res://scenes/Level_1.tscn";
+			GD.PrintErr("GameState not found. Check AutoLoad setup.");
+			return;
 		}
-		ShowFadeOverlayAndAnimate();
-	}
 
-	private void OnSettingsPressed()
-	{
-		// Implement settings functionality
-		GD.Print("Settings button pressed");
-	}
-
-	private void OnExitPressed()
-	{
-		GD.Print("Exit button pressed");
-		nextScene = "quit";  // This is now a special value, not a scene path
-		ShowFadeOverlayAndAnimate();
-	}
-
-	private void ShowFadeOverlayAndAnimate()
-	{
-		if (fadeOverlay != null)
+		if (SaveLoadManager.Instance.LoadGame(gameState))
 		{
-			fadeOverlay.Visible = true;
+			GetTree().ChangeSceneToFile(gameState.CurrentLevel);
+			// You might want to show this message to the player in the UI
 		}
-		if (animationPlayer != null)
+		else
 		{
-			animationPlayer.Play("fade_in");
-		}
-	}
-
-	private void OnAnimationFinished(StringName animName)
-	{
-		if (animName == "fade_in")
-		{
-			if (!string.IsNullOrEmpty(nextScene))
-			{
-				if (nextScene == "quit")
-				{
-					GD.Print("Quitting the game");
-					GetTree().Quit();
-				}
-				else
-				{
-					GD.Print($"Changing to scene: {nextScene}");
-					GetTree().ChangeSceneToFile(nextScene);
-				}
-			}
-			else
-			{
-				GD.PrintErr("Next scene is empty");
-			}
-		}
-	}
-
-	private string LoadLastLevel()
-	{
-		var gameState = GetNode<GameState>("/root/GameState");
-		gameState.LoadCurrentLevel();
-		return gameState.CurrentLevel;
-	}
-
-	public override void _Input(InputEvent @event)
-	{
-		if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed)
-		{
-			GD.Print($"Mouse click detected at: {mouseEvent.Position}");
+			GD.PrintErr("Failed to load game.");
+			// You might want to show this error to the player in the UI
 		}
 	}
 }

@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3 uid="uid://b71kvu7wicv6n"]
 
 [ext_resource type="Shader" path="res://shaders/blur.gdshader" id="1_kp7tx"]
-[ext_resource type="Script" path="res://scripts/PauseMenu.cs" id="1_yxcil"]
+[ext_resource type="Script" path="res://scripts/Services/PauseMenu.cs" id="1_yxcil"]
 [ext_resource type="FontFile" uid="uid://7vf1snbtikvm" path="res://assets/OWN/UI/Fonts/RobotoSlab-Bold.ttf" id="2_m46o0"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_dvvf7"]

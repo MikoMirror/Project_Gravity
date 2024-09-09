@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://dygvnm43uahoa"]
 
-[ext_resource type="Script" path="res://scripts/PlayerUI.cs" id="1_gj2n4"]
+[ext_resource type="Script" path="res://scripts/Services/PlayerUI.cs" id="1_gj2n4"]
 [ext_resource type="Script" path="res://scripts/fps.cs" id="2_dxse2"]
 [ext_resource type="Shader" path="res://shaders/GravityIndicator.gdshader" id="3_0vfoe"]
 [ext_resource type="FontFile" uid="uid://cdgj0biidegon" path="res://assets/OWN/UI/Fonts/RadioSpaceBoldItalic-13Ge.otf" id="4_jonfo"]

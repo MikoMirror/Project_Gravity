@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://c54t4shmh0tox"]
+[gd_scene load_steps=18 format=3 uid="uid://c54t4shmh0tox"]
 
 [ext_resource type="Script" path="res://scripts/MainMenu/MainMenu.cs" id="1_pi6ty"]
 [ext_resource type="FontFile" uid="uid://7vf1snbtikvm" path="res://assets/OWN/UI/Fonts/RobotoSlab-Bold.ttf" id="2_euyx2"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://ccsb4h0n2qple" path="res://assets/OWN/UI/Button Hower.png" id="4_80fum"]
 [ext_resource type="FontFile" uid="uid://cdgj0biidegon" path="res://assets/OWN/UI/Fonts/RadioSpaceBoldItalic-13Ge.otf" id="4_ix1ao"]
 [ext_resource type="VideoStream" path="res://assets/OWN/UI/0001-0300_prob4.ogv" id="6_gklpi"]
+[ext_resource type="PackedScene" uid="uid://cb4h1qwuntmae" path="res://scenes/ConfirmationDialog.tscn" id="7_0ruyr"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_d5bbg"]
 texture = ExtResource("4_80fum")
@@ -186,5 +187,11 @@ libraries = {
 "": SubResource("AnimationLibrary_gpyxv")
 }
 
-[connection signal="pressed" from="VBoxContainer/Start" to="." method="OnStartPressed"]
+[node name="NewGameConfirmationDialog" parent="." instance=ExtResource("7_0ruyr")]
+visible = false
+layout_mode = 1
+
+[connection signal="pressed" from="VBoxContainer/Start" to="." method="OnStartNewGamePressed"]
+[connection signal="pressed" from="VBoxContainer/Load Game" to="." method="OnLoadGamePressed"]
+[connection signal="pressed" from="VBoxContainer/Settings" to="." method="OnSettingsButtonPressed"]
 [connection signal="pressed" from="VBoxContainer/Exit" to="." method="OnExitPressed"]

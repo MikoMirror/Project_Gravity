@@ -80,7 +80,7 @@ points = PackedVector3Array(0.475821, 1.38853, 0.188249, 0.475821, 1.02498, -0.1
 
 [sub_resource type="QuadMesh" id="QuadMesh_mfmb6"]
 
-[sub_resource type="Image" id="Image_biomt"]
+[sub_resource type="Image" id="Image_nyjnm"]
 data = {
 "data": PackedByteArray("AAAAAA=="),
 "format": "Red8",
@@ -90,7 +90,7 @@ data = {
 }
 
 [sub_resource type="ImageTexture" id="ImageTexture_8yljs"]
-image = SubResource("Image_biomt")
+image = SubResource("Image_nyjnm")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_yq3w4"]
 render_priority = 0

@@ -359,12 +359,27 @@ public partial class LevelManager : Node
 		var gameState = GetNode<GameState>("/root/GameState");
 		if (gameState != null)
 		{
+			// Update gameState properties here
 			gameState.SaveCurrentLevel();
-			GD.Print("Game state saved");
 		}
 		else
 		{
-			GD.PrintErr("LevelManager: GameState not found, unable to save");
+			GD.PrintErr("GameState not found. Make sure it's set up as an AutoLoad.");
 		}
+	}
+
+	public void QuitToMainMenu()
+	{
+		// Close the pause menu
+		ClosePauseMenu();
+
+		// Ensure the game is unpaused
+		GetTree().Paused = false;
+
+		// Reset the mouse mode
+		Input.MouseMode = Input.MouseModeEnum.Visible;
+
+		// Change to the main menu scene
+		GetTree().CallDeferred(SceneTree.MethodName.ChangeSceneToFile, "res://scenes/main_menu.tscn");
 	}
 }

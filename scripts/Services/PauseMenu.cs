@@ -8,6 +8,7 @@ public partial class PauseMenu : Control
 	private Button _settingsButton;
 	private Button _quitButton;
 	private LevelManager _levelManager;
+	private GameState gameState;
 
 	public void Initialize(LevelManager levelManager)
 	{
@@ -58,6 +59,13 @@ public partial class PauseMenu : Control
 		{
 			GD.PrintErr("PauseMenu: QuitButton not found");
 		}
+
+		// Get the GameState singleton
+		gameState = GetNode<GameState>("/root/GameState");
+		if (gameState == null)
+		{
+			GD.PrintErr("GameState not found. Make sure it's set up as an AutoLoad.");
+		}
 	}
 
 	public override void _Input(InputEvent @event)
@@ -101,23 +109,26 @@ public partial class PauseMenu : Control
 
 	private void OnQuitPressed()
 	{
-		// Close the pause menu
-		if (_levelManager != null)
+		if (gameState != null)
 		{
-			_levelManager.ClosePauseMenu();
-		}
-
-		// We'll handle saving in the LevelManager instead
-		if (_levelManager != null)
-		{
-			_levelManager.SaveGameState();
+			gameState.SaveCurrentLevel();
 		}
 		else
 		{
-			GD.PrintErr("PauseMenu: LevelManager not set, unable to save game state");
+			GD.PrintErr("Cannot save game: GameState is not initialized.");
 		}
 
-		// Change to the main menu scene
-		GetTree().ChangeSceneToFile("res://scenes/main_menu.tscn");
+		if (_levelManager != null)
+		{
+			_levelManager.QuitToMainMenu();
+		}
+		else
+		{
+			GD.PrintErr("PauseMenu: LevelManager not set");
+			// Fallback to direct scene change if LevelManager is not available
+			GetTree().Paused = false;
+			Input.MouseMode = Input.MouseModeEnum.Visible;
+			GetTree().CallDeferred(SceneTree.MethodName.ChangeSceneToFile, "res://scenes/main_menu.tscn");
+		}
 	}
 }
