@@ -34,32 +34,32 @@ public partial class GravityOrb : Node3D
 	}
 
 	public bool TryActivate(Player player)
-{
-	GD.Print("TryActivate called"); // Debug log
-	if (_sphere == null || _sphere.Visible)
 	{
-		var jumpsIndicator = player.GetNode<PlayerUI>("PlayerUI");
-		if (jumpsIndicator != null)
+		GD.Print("TryActivate called"); // Debug log
+		if (_sphere == null || _sphere.Visible)
 		{
-			GD.Print("Replenishing jump"); // Debug log
-			jumpsIndicator.ReplenishOneJump();
-			if (_sphere != null) _sphere.Visible = false;
-			player.TriggerFlashEffect();
-			return true;
+			var gravityManager = player.GetNode<GravityManager>("GravityManager");
+			if (gravityManager != null)
+			{
+				GD.Print("Replenishing gravity jump"); // Debug log
+				gravityManager.ReplenishGravityJump();
+				if (_sphere != null) _sphere.Visible = false;
+				player.TriggerFlashEffect();
+				return true;
+			}
+			else
+			{
+				GD.PrintErr("GravityManager not found on Player"); // Debug log
+			}
 		}
-		else
-		{
-			GD.PrintErr("PlayerUI not found on Player"); // Debug log
-		}
+		return false;
 	}
-	return false;
-}
 
-public void Reset()
-{
-	if (_sphere != null)
+	public void Reset()
 	{
-		_sphere.Visible = true;
+		if (_sphere != null)
+		{
+			_sphere.Visible = true;
+		}
 	}
-}
 }

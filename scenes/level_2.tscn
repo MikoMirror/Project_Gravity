@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://bfgs4wvy0bhph"]
+[gd_scene load_steps=16 format=3 uid="uid://bfgs4wvy0bhph"]
 
 [ext_resource type="PackedScene" uid="uid://0g1bm5vx4bhw" path="res://assets/OWN/Prefabs/portal.tscn" id="1_3jvh8"]
 [ext_resource type="Script" path="res://scripts/LevelManager.cs" id="1_o1b4a"]
@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://qiprcs4r1lhu" path="res://assets/OWN/Prefabs/damage_platform.tscn" id="11_vo4ys"]
 [ext_resource type="PackedScene" uid="uid://bmoqkjcvpammp" path="res://assets/OWN/Prefabs/gravity_energy.tscn" id="12_g5l40"]
 [ext_resource type="PackedScene" uid="uid://1cc1ehwwh0tr" path="res://scenes/SupportScenes/Player.tscn" id="12_nco5j"]
+[ext_resource type="PackedScene" uid="uid://v6c7g1r8vhus" path="res://assets/OWN/Prefabs/border_glass.tscn" id="14_snxnt"]
 
 [sub_resource type="Environment" id="Environment_hnt66"]
 
@@ -1663,16 +1664,20 @@ transform = Transform3D(1.5, 0, 0, 0, 1, 0, 0, 0, 1.5, 90.2234, -11.9204, -24.60
 transform = Transform3D(1.5, 0, 0, 0, 1, 0, 0, 0, 1.5, 90.2234, -11.9204, -30.6026)
 
 [node name="GravityOrb" parent="." instance=ExtResource("12_g5l40")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.95403, 0, -14.0498)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.95403, 0, -12.3909)
 
 [node name="portal1" parent="." instance=ExtResource("1_3jvh8")]
 transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 6, 0.3, -2)
 _isTeleportActive = false
 
 [node name="Player" parent="." instance=ExtResource("12_nco5j")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2, -10)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.06163, 1.46979, -1.90662)
+
+[node name="BorderGlass" parent="." instance=ExtResource("14_snxnt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.91002, 0.0520873, -24.6917)
 
 [node name="MemmoryPuzzle" parent="." instance=ExtResource("3_qnbaf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.1, -22)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.53354, 0.0520869, -20.8718)
 Spacing = Vector3(2.5, 0, 2.5)
 PlatformStates = [false, true, false, false, true, false, false, true, false]
+BorderGlassPath = NodePath("../BorderGlass")

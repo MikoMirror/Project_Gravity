@@ -5,46 +5,22 @@ public partial class PlayerUI : Control
 {
 	private const int MAX_JUMPS = 3;
 	private int _remainingJumps = MAX_JUMPS;
-	private TextureRect[] _jumpIndicators;
+	private ColorRect _gravityIndicator;
 	private Label _restartLabel;
 	private Label _teleportLabel;
 	private bool _canTeleport = false;
-
-	[Export]
-	private Color InactiveColor = Colors.Gray;
-
-	[Export]
-	private Color ActiveColor = new Color(180 / 255f, 0f, 70 / 255f);
-	
-	[Export]
-	private Color ReplenishColor = new Color(180 / 255f, 0f, 70 / 255f);
 
 	[Signal]
 	public delegate void TeleportRequestedEventHandler();
 
 	public override void _Ready()
 	{
-		_jumpIndicators = new TextureRect[MAX_JUMPS];
-		for (int i = 0; i < MAX_JUMPS; i++)
-		{
-			_jumpIndicators[i] = GetNode<TextureRect>($"Jump{i + 1}");
-			_jumpIndicators[i].Modulate = ActiveColor; // Start with all jumps active
-		}
-
-		_restartLabel = new Label();
-		_restartLabel.Text = "Press 'G' to restart the level";
-		_restartLabel.Visible = false;
-		_restartLabel.AnchorBottom = 1;
-		_restartLabel.AnchorTop = 1;
-		_restartLabel.AnchorLeft = 0.5f;
-		_restartLabel.AnchorRight = 0.5f;
-		_restartLabel.GrowHorizontal = GrowDirection.Both;
-		_restartLabel.VerticalAlignment = VerticalAlignment.Bottom;
-		_restartLabel.HorizontalAlignment = HorizontalAlignment.Center;
-		AddChild(_restartLabel);
-
+		_gravityIndicator = GetNode<ColorRect>("ColorRect");
+		_restartLabel = GetNode<Label>("RestartLabel");
 		_teleportLabel = GetNode<Label>("teleportLabel");
 		_teleportLabel.Visible = false;
+
+		UpdateIndicator();
 	}
 
 	public override void _Input(InputEvent @event)
@@ -77,23 +53,21 @@ public partial class PlayerUI : Control
 
 	private void UpdateIndicator(bool isReplenishing = false)
 	{
-		for (int i = 0; i < MAX_JUMPS; i++)
+		if (_gravityIndicator != null)
 		{
-			if (i < _remainingJumps)
+			float value = _remainingJumps switch
 			{
-				if (isReplenishing && i == _remainingJumps - 1)
-				{
-					_jumpIndicators[i].Modulate = ReplenishColor;
-					CreateTween().TweenProperty(_jumpIndicators[i], "modulate", ActiveColor, 0.5f).SetDelay(0.5f);
-				}
-				else
-				{
-					_jumpIndicators[i].Modulate = ActiveColor;
-				}
-			}
-			else
+				1 => 0.3f,
+				2 => 0.7f,
+				3 => 1f,
+				_ => 0f
+			};
+			_gravityIndicator.Material.Set("shader_parameter/value", value);
+
+			if (isReplenishing)
 			{
-				_jumpIndicators[i].Modulate = InactiveColor;
+				// You can add a visual effect for replenishing here if needed
+				// For example, a quick flash or color change
 			}
 		}
 		

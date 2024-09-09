@@ -105,6 +105,13 @@ public partial class MemoryPuzle : Node3D
 
 	private bool _needsUpdate = false;
 
+	[Export]
+	public NodePath BorderGlassPath { get; set; }
+
+	private BorderGlass _associatedBorderGlass;
+
+	public bool AllActiveSteppedOn { get; private set; } = false;
+
 	public override void _Ready()
 	{
 		if (Engine.IsEditorHint())
@@ -120,6 +127,23 @@ public partial class MemoryPuzle : Node3D
 
 		PuzzleArea.BodyEntered += OnBodyEnteredPuzzleArea;
 		PuzzleArea.BodyExited += OnBodyExitedPuzzleArea;
+
+		if (BorderGlassPath != null && BorderGlassPath != new NodePath())
+		{
+			_associatedBorderGlass = GetNode<BorderGlass>(BorderGlassPath);
+			if (_associatedBorderGlass == null)
+			{
+				GD.PrintErr("MemoryPuzzle: Associated BorderGlass not found at the specified path.");
+			}
+			else
+			{
+				GD.Print("MemoryPuzzle: BorderGlass successfully connected.");
+			}
+		}
+		else
+		{
+			GD.PrintErr("MemoryPuzzle: BorderGlassPath is not set.");
+		}
 	}
 
 	private void OnBodyEnteredPuzzleArea(Node3D body)
@@ -150,7 +174,7 @@ public partial class MemoryPuzle : Node3D
 
 		_isPuzzleActive = false;
 		_isInRedState = true;
-		SetPlatformsActive(false);
+		AllActiveSteppedOn = false;
 		SetAllPlatformsRed();
 		UpdateAllPlatforms();
 	}
@@ -164,6 +188,7 @@ public partial class MemoryPuzle : Node3D
 				if (platform is MemoryPlatform memoryPlatform)
 				{
 					memoryPlatform.SetRedState();
+					memoryPlatform.SetNeutral(false);
 				}
 			}
 		}
@@ -446,6 +471,12 @@ public partial class MemoryPuzle : Node3D
 
 			// Emit signal to notify about the state change
 			EmitSignal(SignalName.PlatformStatesChanged);
+			CheckPuzzleCompletion();
+
+			if (isActive)
+			{
+				CheckAllActiveSteppedOn();
+			}
 		}
 		else
 		{
@@ -504,5 +535,115 @@ public partial class MemoryPuzle : Node3D
 		UpdatePuzzle();
 		EmitSignal(SignalName.SetupCompleted);
 		EmitSignal(SignalName.PlatformStatesChanged);
+	}
+
+	private void CheckPuzzleCompletion()
+	{
+		bool isPuzzleSolved = true;
+		foreach (bool state in PlatformStates)
+		{
+			if (!state)
+			{
+				isPuzzleSolved = false;
+				break;
+			}
+		}
+
+		GD.Print($"Puzzle solved: {isPuzzleSolved}");
+
+		if (isPuzzleSolved)
+		{
+			if (_associatedBorderGlass != null)
+			{
+				GD.Print("Attempting to open BorderGlass");
+				_associatedBorderGlass.Open();
+			}
+			else
+			{
+				GD.PrintErr("BorderGlass reference is null!");
+				// Print the current BorderGlassPath
+				GD.Print($"Current BorderGlassPath: {BorderGlassPath}");
+				// Attempt to find the BorderGlass node again
+				var borderGlass = GetNode<BorderGlass>(BorderGlassPath);
+				if (borderGlass != null)
+				{
+					GD.Print("BorderGlass found, but reference was null. Updating reference.");
+					_associatedBorderGlass = borderGlass;
+					_associatedBorderGlass.Open();
+				}
+				else
+				{
+					GD.PrintErr("BorderGlass still not found. Check the path and node setup.");
+				}
+			}
+		}
+	}
+
+	public void CheckAllActiveSteppedOn()
+	{
+		if (AllActiveSteppedOn) return; // Already checked and true
+
+		AllActiveSteppedOn = true;
+		for (int row = 0; row < RowCount; row++)
+		{
+			for (int col = 0; col < ColumnCount; col++)
+			{
+				int index = row * ColumnCount + col;
+				if (PlatformStates[index] && !platformInstances[row, col].HasBeenActivated)
+				{
+					AllActiveSteppedOn = false;
+					return;
+				}
+			}
+		}
+
+		if (AllActiveSteppedOn)
+		{
+			SetInactivePlatformsNeutral();
+			OpenBorderGlass();
+			GD.Print("All active platforms have been stepped on!");
+		}
+	}
+
+	private void SetInactivePlatformsNeutral()
+	{
+		for (int row = 0; row < RowCount; row++)
+		{
+			for (int col = 0; col < ColumnCount; col++)
+			{
+				int index = row * ColumnCount + col;
+				if (!PlatformStates[index])
+				{
+					platformInstances[row, col].SetNeutral(true);
+				}
+			}
+		}
+	}
+
+	private void OpenBorderGlass()
+	{
+		if (_associatedBorderGlass != null)
+		{
+			GD.Print("Attempting to open BorderGlass");
+			_associatedBorderGlass.Open();
+		}
+		else
+		{
+			GD.PrintErr("BorderGlass reference is null!");
+			// Print the current BorderGlassPath
+			GD.Print($"Current BorderGlassPath: {BorderGlassPath}");
+			// Attempt to find the BorderGlass node again
+			var borderGlass = GetNode<BorderGlass>(BorderGlassPath);
+			if (borderGlass != null)
+			{
+				GD.Print("BorderGlass found, but reference was null. Updating reference.");
+				_associatedBorderGlass = borderGlass;
+				_associatedBorderGlass.Open();
+			}
+			else
+			{
+				GD.PrintErr("BorderGlass still not found. Check the path and node setup.");
+			}
+		}
 	}
 }

@@ -6,14 +6,16 @@ public partial class GravityManager : Node
 	[Export] public float GravityStrength = 9.8f;
 	[Export] public float GravityFlipDuration = 0.5f;
 	[Export] public float RotationSpeed = 10.0f;
+	[Export] public int MaxGravityJumps = 3;
 	public bool IsGravityReversed { get; private set; } = false;
 	private float _flipTimer = 0f;
 	private bool _isFlipping = false;
 	private Player _player;
 	private Node3D _playerHead;
-	private PlayerUI _jumpsIndicator;
+	private ColorRect _gravityIndicator;
+	private int _currentGravityJumps;
 
-	 public override void _Ready()
+	public override void _Ready()
 	{
 		_player = GetParent<Player>();
 		if (_player == null)
@@ -23,12 +25,17 @@ public partial class GravityManager : Node
 		}
 		_playerHead = _player.GetNode<Node3D>("Head");
 
-		_jumpsIndicator = _player.GetNode<PlayerUI>("PlayerUI"); // Assuming "PlayerUI" is the node name in your player scene
-		if (_jumpsIndicator == null)
+		// Find the GravityIndicator (ColorRect) in the PlayerUI
+		_gravityIndicator = _player.GetNode<ColorRect>("PlayerUI/ColorRect");
+		if (_gravityIndicator == null)
 		{
-			GD.PrintErr("PlayerUI not found in Player!");
+			GD.PrintErr("ColorRect (GravityIndicator) not found in PlayerUI!");
 		}
-		}
+
+		_currentGravityJumps = MaxGravityJumps;
+		UpdateGravityIndicator();
+	}
+
 	public override void _PhysicsProcess(double delta)
 	{
 		if (_isFlipping)
@@ -39,28 +46,34 @@ public partial class GravityManager : Node
 
 	public void ToggleGravity()
 	{
-		if (_jumpsIndicator.CanJump())
+		if (TryToggleGravity())
 		{
-			IsGravityReversed = !IsGravityReversed;
-			_isFlipping = true;
-			_flipTimer = 0f;
-			UpdateHeldObjectGravity(IsGravityReversed);
-			_jumpsIndicator.UseJump();
+			// Additional logic if needed when gravity is successfully toggled
 		}
 	}
 
 	public bool TryToggleGravity()
 	{
-		if (_jumpsIndicator.CanJump() && !_isFlipping)
+		if (_currentGravityJumps > 0 && !_isFlipping)
 		{
 			IsGravityReversed = !IsGravityReversed;
 			_isFlipping = true;
 			_flipTimer = 0f;
 			UpdateHeldObjectGravity(IsGravityReversed);
-			_jumpsIndicator.UseJump();
+			_currentGravityJumps--;
+			UpdateGravityIndicator();
 			return true;
 		}
 		return false;
+	}
+
+	public void ReplenishGravityJump()
+	{
+		if (_currentGravityJumps < MaxGravityJumps)
+		{
+			_currentGravityJumps++;
+			UpdateGravityIndicator();
+		}
 	}
 
 	private void HandleGravityFlip(double delta)
@@ -109,5 +122,38 @@ public partial class GravityManager : Node
 		{
 			_player.HeldObject.GravityScale = isGravityReversed ? -1 : 1;
 		}
+	}
+
+	private void UpdateGravityIndicator()
+	{
+		if (_gravityIndicator != null)
+		{
+			float value = 0f;
+			switch (_currentGravityJumps)
+			{
+				case 1:
+					value = 0.3f;
+					break;
+				case 2:
+					value = 0.6f;
+					break;
+				case 3:
+					value = 1f;
+					break;
+				default:
+					value = 0f;
+					break;
+			}
+			_gravityIndicator.Material.Set("shader_parameter/value", value);
+		}
+	}
+
+	public void ResetGravityJumps()
+	{
+		_currentGravityJumps = MaxGravityJumps;
+		IsGravityReversed = false;
+		_isFlipping = false;
+		_flipTimer = 0f;
+		UpdateGravityIndicator();
 	}
 }

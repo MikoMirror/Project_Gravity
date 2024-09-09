@@ -203,5 +203,11 @@ public partial class Player
 		}
 	}
 
-	
+	public void DropLiftedObjectIfHolding()
+	{
+		if (IsLifting && HeldObject != null)
+		{
+			StopLifting();
+		}
+	}
 }

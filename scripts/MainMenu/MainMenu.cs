@@ -4,6 +4,7 @@ using System;
 public partial class MainMenu : Control
 {
 	private Button startButton;
+	private Button loadGameButton;
 	private Button settingsButton;
 	private Button exitButton;
 	private AnimationPlayer animationPlayer;
@@ -16,10 +17,12 @@ public partial class MainMenu : Control
 
 		// Get references to the buttons
 		startButton = GetNodeOrNull<Button>("VBoxContainer/Start");
+		loadGameButton = GetNodeOrNull<Button>("VBoxContainer/Load Game");
 		settingsButton = GetNodeOrNull<Button>("VBoxContainer/Settings");
 		exitButton = GetNodeOrNull<Button>("VBoxContainer/Exit");
 
 		GD.Print($"Start button found: {startButton != null}");
+		GD.Print($"Load Game button found: {loadGameButton != null}");
 		GD.Print($"Settings button found: {settingsButton != null}");
 		GD.Print($"Exit button found: {exitButton != null}");
 
@@ -33,8 +36,13 @@ public partial class MainMenu : Control
 		// Connect button signals to methods
 		if (startButton != null) 
 		{
-			startButton.Pressed += OnStartPressed;
-			GD.Print("Start button connected");
+			startButton.Pressed += OnStartNewGamePressed;
+			GD.Print("Start New Game button connected");
+		}
+		if (loadGameButton != null) 
+		{
+			loadGameButton.Pressed += OnLoadGamePressed;
+			GD.Print("Load Game button connected");
 		}
 		if (settingsButton != null) 
 		{
@@ -57,19 +65,25 @@ public partial class MainMenu : Control
 		GD.Print("MainMenu setup complete");
 	}
 
-	private void OnStartPressed()
+	private void OnStartNewGamePressed()
 	{
-		GD.Print("Start button pressed");
+		GD.Print("Start New Game button pressed");
+		var gameState = GetNode<GameState>("/root/GameState");
+		gameState.CurrentLevel = "res://scenes/Level_1.tscn";
+		gameState.SaveCurrentLevel();
+		nextScene = gameState.CurrentLevel;
+		ShowFadeOverlayAndAnimate();
+	}
 
+	private void OnLoadGamePressed()
+	{
+		GD.Print("Load Game button pressed");
 		nextScene = LoadLastLevel();
 		if (string.IsNullOrEmpty(nextScene))
 		{
+			GD.Print("No saved game found. Starting from Level 1.");
 			nextScene = "res://scenes/Level_1.tscn";
 		}
-		
-		GD.Print($"Next scene: {nextScene}");
-
-		// Start fade in animation
 		ShowFadeOverlayAndAnimate();
 	}
 
@@ -124,8 +138,9 @@ public partial class MainMenu : Control
 
 	private string LoadLastLevel()
 	{
-		// Implement your logic to load the last played level
-		return "";
+		var gameState = GetNode<GameState>("/root/GameState");
+		gameState.LoadCurrentLevel();
+		return gameState.CurrentLevel;
 	}
 
 	public override void _Input(InputEvent @event)

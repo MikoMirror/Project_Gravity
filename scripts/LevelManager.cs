@@ -9,47 +9,54 @@ public partial class LevelManager : Node
 	private Control _levelLoadingInstance;
 	private AnimationPlayer _fadeAnimation;
 	private ColorRect _fadeOverlay;
+	private PackedScene _pauseMenuScene;
+	private PauseMenu _pauseMenuInstance;
+	private Player _player;
 
 	public override void _Ready()
 	{
 		GD.Print("LevelManager: _Ready called");
-		_currentLevelScene = GetTree().CurrentScene.SceneFilePath;
-		GD.Print($"LevelManager: Current scene path: {_currentLevelScene}");
-		SaveInitialSceneState();
-		
-		// Hide the loading screen
-		CallDeferred(nameof(HideLevelLoading));
-		
-		// Find the Player node and trigger the fade out animation
-		var player = GetTree().CurrentScene.FindChild("Player", true, false) as Player;
-		if (player != null)
-		{
-			player.StartFadeOutAnimation();
-		}
-		else
-		{
-			GD.PrintErr("LevelManager: Player not found in the current scene");
-		}
-
-		var gameState = GetNode<GameState>("/root/GameState");
-		if (gameState != null)
-		{
-			if (!string.IsNullOrEmpty(gameState.TargetPortalName))
+			_currentLevelScene = GetTree().CurrentScene.SceneFilePath;
+			GD.Print($"LevelManager: Current scene path: {_currentLevelScene}");
+			SaveInitialSceneState();
+			
+			// Hide the loading screen
+			CallDeferred(nameof(HideLevelLoading));
+			
+			_pauseMenuScene = GD.Load<PackedScene>("res://scenes/pause_menu.tscn");
+			_player = GetNode<Player>("Player");  // Adjust the path if necessary
+			
+			var gameState = GetNode<GameState>("/root/GameState");
+			if (gameState != null)
 			{
-				CallDeferred(nameof(PositionPlayerAtTargetPortal), gameState.TargetPortalName);
-			}
+				if (!string.IsNullOrEmpty(gameState.TargetPortalName))
+				{
+					CallDeferred(nameof(PositionPlayerAtTargetPortal), gameState.TargetPortalName);
+				}
 
-			if (gameState.IsComingFromPortal)
-			{
-				
-				gameState.IsComingFromPortal = false;
+				if (gameState.IsComingFromPortal)
+				{
+					
+					gameState.IsComingFromPortal = false;
+				}
 			}
-		}
-		else
-		{
-			GD.PrintErr("LevelManager: GameState not found.");
-		}
+			else
+			{
+				GD.PrintErr("LevelManager: GameState not found.");
+			}
+			
+			// Find the Player node and trigger the fade out animation
+			var player = GetTree().CurrentScene.FindChild("Player", true, false) as Player;
+			if (player != null)
+			{
+				player.StartFadeOutAnimation();
+			}
+			else
+			{
+				GD.PrintErr("LevelManager: Player not found in the current scene");
+			}
 	}
+
 	private void PositionPlayerAtTargetPortal(string targetPortalName)
 	{
 		GD.Print($"LevelManager: Positioning player at target portal: {targetPortalName}");
@@ -82,9 +89,9 @@ public partial class LevelManager : Node
 
 	public override void _Input(InputEvent @event)
 	{
-		if (@event.IsActionPressed("restart_level"))
+		if (@event.IsActionPressed("ui_cancel")) // ESC key
 		{
-			RestartLevel();
+			TogglePauseMenu();
 		}
 	}
 
@@ -138,31 +145,10 @@ public partial class LevelManager : Node
 
 	public void RestartLevel()
 	{
-		try
-		{
-			GD.Print("LevelManager: Starting RestartLevel");
-			var tree = GetTree();
-			if (tree != null)
-			{
-				GD.Print("LevelManager: Reloading the current scene");
-				var currentScenePath = tree.CurrentScene.SceneFilePath;
-				GD.Print($"LevelManager: Current scene path: {currentScenePath}");
-
-				// Reload the current scene
-				tree.ReloadCurrentScene();
-
-				// The scene will be reloaded, so we don't need to unpause here
-				// The new scene instance will handle initialization
-			}
-			else
-			{
-				GD.PrintErr("LevelManager: Unable to restart level. SceneTree is null.");
-			}
-		}
-		catch (Exception e)
-		{
-			GD.PrintErr($"LevelManager: Error during RestartLevel - {e.Message}\n{e.StackTrace}");
-		}
+		ClosePauseMenu();
+		// Implement level restart logic here
+		// For example:
+		GetTree().ReloadCurrentScene();
 	}
 
 	private void DeferredRestoreInitialState()
@@ -317,6 +303,68 @@ public partial class LevelManager : Node
 		foreach (var child in node.GetChildren())
 		{
 			FindMemoryPuzzlesRecursive(child, memoryPuzzles);
+		}
+	}
+
+	public void TogglePauseMenu()
+	{
+		if (_pauseMenuInstance == null)
+		{
+			OpenPauseMenu();
+		}
+		else
+		{
+			ClosePauseMenu();
+		}
+	}
+
+	private void OpenPauseMenu()
+	{
+		_pauseMenuInstance = _pauseMenuScene.Instantiate<PauseMenu>();
+		AddChild(_pauseMenuInstance);
+		_pauseMenuInstance.ProcessMode = Node.ProcessModeEnum.Always;
+		_pauseMenuInstance.Initialize(this);
+		
+		// Drop the lifted object if the player is holding one
+		if (_player != null)
+		{
+			_player.DropLiftedObjectIfHolding();
+		}
+		
+		GetTree().Paused = true;
+		Input.MouseMode = Input.MouseModeEnum.Visible;
+	}
+
+	public void ClosePauseMenu()
+	{
+		if (_pauseMenuInstance != null)
+		{
+			_pauseMenuInstance.QueueFree();
+			_pauseMenuInstance = null;
+			GetTree().Paused = false;
+			Input.MouseMode = Input.MouseModeEnum.Captured;
+		}
+	}
+
+	public void ChangeLevel(string newLevelPath)
+	{
+		var gameState = GetNode<GameState>("/root/GameState");
+		gameState.CurrentLevel = newLevelPath;
+		gameState.SaveCurrentLevel(); // This will autosave the current level
+		GetTree().ChangeSceneToFile(newLevelPath);
+	}
+
+	public void SaveGameState()
+	{
+		var gameState = GetNode<GameState>("/root/GameState");
+		if (gameState != null)
+		{
+			gameState.SaveCurrentLevel();
+			GD.Print("Game state saved");
+		}
+		else
+		{
+			GD.PrintErr("LevelManager: GameState not found, unable to save");
 		}
 	}
 }

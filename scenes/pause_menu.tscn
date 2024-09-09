@@ -1,0 +1,98 @@
+[gd_scene load_steps=7 format=3 uid="uid://b71kvu7wicv6n"]
+
+[ext_resource type="Shader" path="res://shaders/blur.gdshader" id="1_kp7tx"]
+[ext_resource type="Script" path="res://scripts/PauseMenu.cs" id="1_yxcil"]
+[ext_resource type="FontFile" uid="uid://7vf1snbtikvm" path="res://assets/OWN/UI/Fonts/RobotoSlab-Bold.ttf" id="2_m46o0"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_dvvf7"]
+shader = ExtResource("1_kp7tx")
+shader_parameter/lod = 5.0
+shader_parameter/mix_percentage = 0.3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wodt3"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+skew = Vector2(0.5, 0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0.686926, 0.885214, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4gdn4"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+skew = Vector2(0.5, 0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
+
+[node name="PauseMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_yxcil")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_dvvf7")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -327.5
+offset_top = -248.0
+offset_right = 327.5
+offset_bottom = 248.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 40
+
+[node name="ResumeButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_m46o0")
+theme_override_font_sizes/font_size = 44
+theme_override_styles/hover = SubResource("StyleBoxFlat_wodt3")
+theme_override_styles/normal = SubResource("StyleBoxFlat_4gdn4")
+text = "Resume"
+
+[node name="Restart Level" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_m46o0")
+theme_override_font_sizes/font_size = 44
+theme_override_styles/hover = SubResource("StyleBoxFlat_wodt3")
+theme_override_styles/normal = SubResource("StyleBoxFlat_4gdn4")
+text = "Restart Level"
+
+[node name="Settings" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_m46o0")
+theme_override_font_sizes/font_size = 44
+theme_override_styles/hover = SubResource("StyleBoxFlat_wodt3")
+theme_override_styles/normal = SubResource("StyleBoxFlat_4gdn4")
+text = "Settings
+"
+
+[node name="QuitButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_m46o0")
+theme_override_font_sizes/font_size = 44
+theme_override_styles/hover = SubResource("StyleBoxFlat_wodt3")
+theme_override_styles/normal = SubResource("StyleBoxFlat_4gdn4")
+text = "Quit game
+"
+
+[connection signal="pressed" from="VBoxContainer/ResumeButton" to="." method="OnResumePressed"]
+[connection signal="pressed" from="VBoxContainer/QuitButton" to="." method="OnQuitPressed"]

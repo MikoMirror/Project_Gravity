@@ -3,7 +3,7 @@ using System;
 
 public partial class Player
 {
-	 public override void _Input(InputEvent @event)
+	public override void _Input(InputEvent @event)
 	{
 		if (@event is InputEventMouseMotion mouseMotion)
 		{
@@ -29,33 +29,34 @@ public partial class Player
 		{
 			IsSprinting = false;
 		}
-		else if (@event.IsActionPressed("restart_level"))
-{
-	GD.Print("Player: Restart level action pressed");
-	try
+		else if (@event.IsActionPressed("ui_cancel")) // ESC key
+		{
+			TogglePauseMenu();
+		}
+	}
+
+	private void TogglePauseMenu()
 	{
 		var currentScene = GetTree().CurrentScene;
-		GD.Print($"Player: Current scene is {currentScene.Name}");
-		var levelManager = currentScene.GetNode<LevelManager>(".");
-		if (levelManager != null)
+		if (currentScene.Name.ToString().StartsWith("Level"))
 		{
-			GD.Print("Player: LevelManager found, calling RestartLevel");
-			levelManager.RestartLevel();
+			var levelManager = currentScene.GetNode<LevelManager>(".");
+			if (levelManager != null)
+			{
+				levelManager.TogglePauseMenu();
+			}
+			else
+			{
+				GD.PrintErr("Player: LevelManager not found on the current scene");
+			}
 		}
 		else
 		{
-			GD.PrintErr("Player: LevelManager not found on the current scene");
+			GD.Print("Player: Pause menu not available in this scene");
 		}
 	}
-	catch (Exception e)
-	{
-		GD.PrintErr($"Player: Error during restart level - {e.Message}\n{e.StackTrace}");
-	}
-}
-}
-	
-	
-	 private void HandleMouseLook(InputEventMouseMotion mouseMotion)
+
+	private void HandleMouseLook(InputEventMouseMotion mouseMotion)
 	{
 		float xRotation = mouseMotion.Relative.X * MouseSensitivity;
 		float yRotation = mouseMotion.Relative.Y * MouseSensitivity;

@@ -3,6 +3,7 @@ using Godot;
 public partial class Cable : Node3D
 {
 	private AnimationPlayer _animationPlayer;
+	private bool _isActivated = false;
 
 	[Export]
 	public string ActivateAnimationName { get; set; } = "cable_enable";
@@ -14,11 +15,26 @@ public partial class Cable : Node3D
 
 	public void Activate()
 	{
-		_animationPlayer.Play(ActivateAnimationName);
+		if (!_isActivated)
+		{
+			_isActivated = true;
+			_animationPlayer.Play(ActivateAnimationName);
+		}
 	}
 
 	public void Deactivate()
 	{
-		_animationPlayer.PlayBackwards(ActivateAnimationName);
+		if (_isActivated)
+		{
+			_isActivated = false;
+			_animationPlayer.PlayBackwards(ActivateAnimationName);
+		}
+	}
+
+	public void ResetState()
+	{
+		_isActivated = false;
+		_animationPlayer.Stop();
+		_animationPlayer.Seek(0, true);
 	}
 }

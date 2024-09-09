@@ -32,6 +32,9 @@ public partial class MemoryPlatform : Node3D
 	private bool _isInteractive = true;
 	private bool isInRedState = false;
 	private bool _needsUpdate = false;
+	private bool isNeutral = false;
+
+	public bool HasBeenActivated => hasBeenActivated;
 
 	public void SetInteractive(bool interactive)
 	{
@@ -94,24 +97,32 @@ public partial class MemoryPlatform : Node3D
 		UpdateNeonColor();
 	}
 
+	public void SetNeutral(bool neutral)
+	{
+		isNeutral = neutral;
+		UpdateNeonColor();
+	}
+
 	private void OnBodyEntered(Node body)
 	{
-		if (!_isInteractive) return;
+		if (!_isInteractive || !(body is CollisionObject3D)) return;
 
-		if (body is CollisionObject3D)
+		var memoryPuzzle = GetParent() as MemoryPuzle;
+		if (memoryPuzzle == null) return;
+
+		if (IsActive && !hasBeenActivated && !isInRedState)
 		{
-			if (IsActive && !hasBeenActivated && !isInRedState)
-			{
-				PermanentlyActivate();
-			}
-			else if (!IsActive)
-			{
-				// Reset the puzzle if stepping on an inactive platform
-				var memoryPuzzle = GetParent() as MemoryPuzle;
-				memoryPuzzle?.ResetPuzzle();
-			}
-			UpdateNeonColor(true);
+			PermanentlyActivate();
+			memoryPuzzle.UpdatePlatformState((int)(Position.Z / memoryPuzzle.Spacing.Z), 
+											  (int)(Position.X / memoryPuzzle.Spacing.X), 
+											  true);
 		}
+		else if (!IsActive && !isNeutral && !memoryPuzzle.AllActiveSteppedOn)
+		{
+			memoryPuzzle.ResetPuzzle();
+		}
+
+		UpdateNeonColor(true);
 	}
 
 	private void PermanentlyActivate()
@@ -133,7 +144,9 @@ public partial class MemoryPlatform : Node3D
 		if (neonMaterial == null) return;
 
 		Vector3 color;
-		if (isInRedState)
+		if (!_isInteractive || isNeutral)
+			color = new Vector3(0.5f, 0.5f, 0.5f); // Gray (deactivated or neutral)
+		else if (isInRedState)
 			color = new Vector3(1.0f, 0.0f, 0.0f); // Red
 		else if (hasBeenActivated)
 			color = new Vector3(0.0f, 0.5f, 1.0f); // Light Blue

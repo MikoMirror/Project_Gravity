@@ -18,7 +18,6 @@ public partial class Terminal : Node3D
 			memoryPuzle.Connect(MemoryPuzle.SignalName.SetupCompleted, new Callable(this, nameof(OnMemoryPuzleSetupCompleted)));
 			memoryPuzle.Connect(MemoryPuzle.SignalName.PlatformStatesChanged, new Callable(this, nameof(UpdatePlatformStates)));
 			
-			// Try to update immediately, in case the MemoryPuzle is already set up
 			OnMemoryPuzleSetupCompleted();
 		}
 		else
@@ -35,11 +34,19 @@ public partial class Terminal : Node3D
 			GD.PushError($"Screen node not found at path: {ScreenPath}");
 		else
 		{
-			screenMaterial = screen.GetActiveMaterial(0) as ShaderMaterial;
-			if (screenMaterial == null)
-				GD.PushError("Screen material is not a ShaderMaterial");
+			// Create a unique instance of the shader material for this terminal
+			ShaderMaterial originalMaterial = screen.GetActiveMaterial(0) as ShaderMaterial;
+			if (originalMaterial != null)
+			{
+				screenMaterial = originalMaterial.Duplicate() as ShaderMaterial;
+				screen.SetSurfaceOverrideMaterial(0, screenMaterial);
+			}
 			else
-				UpdatePlatformStates();
+			{
+				GD.PushError("Screen material is not a ShaderMaterial");
+			}
+
+			UpdatePlatformStates();
 		}
 	}
 

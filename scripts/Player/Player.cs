@@ -233,4 +233,16 @@ public partial class Player : CharacterBody3D
 			_playerUI.QueueFree();
 		}
 	}
+
+	public void ResetGravityJumps()
+	{
+		if (_gravityManager != null)
+		{
+			_gravityManager.ResetGravityJumps();
+		}
+		if (_playerUI != null)
+		{
+			_playerUI.ResetJumps();
+		}
+	}
 }

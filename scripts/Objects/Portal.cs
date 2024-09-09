@@ -107,6 +107,10 @@ public partial class Portal : Node3D
 
 		gameState.IsComingFromPortal = true;
 		
+		// Autosave the current level before changing
+		gameState.CurrentLevel = TargetLevelPath;
+		gameState.SaveCurrentLevel();
+
 		// Use CallDeferred to change the scene after this frame
 		GetTree().CreateTimer(0.1f).Timeout += () =>
 		{
