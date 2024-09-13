@@ -18,7 +18,7 @@ public partial class Player
 		{
 			ShakeTime += (float)delta * WalkShakeSpeed;
 			float shakeOffset = Mathf.Sin(ShakeTime) * WalkShakeAmount;
-			Camera.Position = InitialCameraPosition + new Vector3(0, shakeOffset, 0);
+			_camera.Position = InitialCameraPosition + new Vector3(0, shakeOffset, 0);
 		}
 	}
 
@@ -28,11 +28,11 @@ public partial class Player
 		{
 			LandingShake = Mathf.MoveToward(LandingShake, 0, (float)delta * 4);
 			float landingOffset = Mathf.Sin(LandingShake * 20) * LandingShake;
-			Camera.Position = InitialCameraPosition + new Vector3(0, landingOffset, 0);
+			 _camera.Position = InitialCameraPosition + new Vector3(0, landingOffset, 0);
 		}
 		else if (IsOnFloor() && Velocity.X == 0 && Velocity.Z == 0)
 		{
-			Camera.Position = InitialCameraPosition;
+			_camera.Position = InitialCameraPosition;
 		}
 	}
 	 public void ResetCameraRotation()
@@ -43,6 +43,6 @@ public partial class Player
 	private void UpdateCameraRotation()
 	{
 		Quaternion cameraRotation = Quaternion.FromEuler(new Vector3(Mathf.DegToRad(VerticalRotation), 0, 0));
-		Camera.Transform = new Transform3D(new Basis(cameraRotation), Camera.Transform.Origin);
+		_camera.Transform = new Transform3D(new Basis(cameraRotation), _camera.Transform.Origin);
 	}
 	}

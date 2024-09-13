@@ -3,132 +3,73 @@ using System;
 
 public partial class MemoryPlatform : Node3D
 {
-	[Export]
-	public NodePath AreaPath;
+	[Export] public NodePath AreaPath { get; set; } = "Area3D";
+	[Export] public NodePath NeonPath { get; set; } = "NeonMesh";
+	[Export] public bool IsActive { get; set; }
 
-	[Export]
-	public NodePath NeonPath;
-
-	[Export]
-	public bool IsActive
-	{
-		get => isActive;
-		set
-		{
-			if (isActive != value)
-			{
-				isActive = value;
-				_needsUpdate = true;
-			}
-		}
-	}
-
-	private Area3D area;
-	private MeshInstance3D neonMesh;
-	private ShaderMaterial neonMaterial;
-
-	private bool isActive = false;
-	private bool hasBeenActivated = false;
+	private Area3D _area;
+	private MeshInstance3D _neonMesh;
+	private ShaderMaterial _neonMaterial;
+	private bool _hasBeenActivated;
 	private bool _isInteractive = true;
-	private bool isInRedState = false;
-	private bool _needsUpdate = false;
-	private bool isNeutral = false;
+	private bool _isInRedState;
+	private bool _isNeutral;
+	private MemoryPuzle _memoryPuzzle;
 
-	public bool HasBeenActivated => hasBeenActivated;
-
-	public void SetInteractive(bool interactive)
-	{
-		_isInteractive = interactive;
-	}
-
-	public void ResetActivation()
-	{
-		hasBeenActivated = false;
-		UpdateNeonColor();
-	}
+	public bool HasBeenActivated => _hasBeenActivated;
 
 	public override void _Ready()
 	{
-		GD.Print("MemoryPlatform _Ready called");
-
-		// Initialize paths if they're not set
-		if (AreaPath == null || AreaPath.IsEmpty)
-		{
-			AreaPath = "./Area3D";
-		}
-		if (NeonPath == null || NeonPath.IsEmpty)
-		{
-			NeonPath = "./NeonMesh";
-		}
-
-		area = GetNode<Area3D>(AreaPath);
-		neonMesh = GetNode<MeshInstance3D>(NeonPath);
-
-		if (neonMesh != null)
-		{
-			// Create a unique instance of the shader material for this platform
-			ShaderMaterial originalMaterial = neonMesh.GetActiveMaterial(0) as ShaderMaterial;
-			neonMaterial = originalMaterial.Duplicate() as ShaderMaterial;
-			neonMesh.SetSurfaceOverrideMaterial(0, neonMaterial);
-		}
-
-		if (area != null)
-		{
-			area.BodyEntered += OnBodyEntered;
-			area.BodyExited += OnBodyExited;  // Add this line
-		}
-
+		InitializeComponents();
+		ConnectSignals();
 		UpdateNeonColor();
-
-		// Debug prints
-		GD.Print($"AreaPath: {AreaPath}, Area: {area}");
-		GD.Print($"NeonPath: {NeonPath}, NeonMesh: {neonMesh}, NeonMaterial: {neonMaterial}");
 	}
 
-	public void SetRedState()
+	private void InitializeComponents()
 	{
-		isInRedState = true;
-		UpdateNeonColor();
+		_area = GetNode<Area3D>(AreaPath);
+		_neonMesh = GetNode<MeshInstance3D>(NeonPath);
+		_memoryPuzzle = GetParent() as MemoryPuzle;
+
+		if (_neonMesh != null)
+		{
+			_neonMaterial = (_neonMesh.GetActiveMaterial(0) as ShaderMaterial).Duplicate() as ShaderMaterial;
+			_neonMesh.SetSurfaceOverrideMaterial(0, _neonMaterial);
+		}
 	}
 
-	public void ResetColor()
+	private void ConnectSignals()
 	{
-		isInRedState = false;
-		UpdateNeonColor();
+		if (_area != null)
+		{
+			_area.BodyEntered += OnBodyEntered;
+			_area.BodyExited += OnBodyExited;
+		}
 	}
 
-	public void SetNeutral(bool neutral)
-	{
-		isNeutral = neutral;
-		UpdateNeonColor();
-	}
+	public void SetInteractive(bool interactive) => _isInteractive = interactive;
+	public void ResetActivation() { _hasBeenActivated = false; UpdateNeonColor(); }
+	public void SetRedState() { _isInRedState = true; UpdateNeonColor(); }
+	public void ResetColor() { _isInRedState = false; UpdateNeonColor(); }
+	public void SetNeutral(bool neutral) { _isNeutral = neutral; UpdateNeonColor(); }
 
 	private void OnBodyEntered(Node body)
 	{
-		if (!_isInteractive || !(body is CollisionObject3D)) return;
+		if (!_isInteractive || !(body is CollisionObject3D) || _memoryPuzzle == null) return;
 
-		var memoryPuzzle = GetParent() as MemoryPuzle;
-		if (memoryPuzzle == null) return;
-
-		if (IsActive && !hasBeenActivated && !isInRedState)
+		if (IsActive && !_hasBeenActivated && !_isInRedState)
 		{
 			PermanentlyActivate();
-			memoryPuzzle.UpdatePlatformState((int)(Position.Z / memoryPuzzle.Spacing.Z), 
-											  (int)(Position.X / memoryPuzzle.Spacing.X), 
+			_memoryPuzzle.UpdatePlatformState((int)(Position.Z / _memoryPuzzle.Spacing.Z), 
+											  (int)(Position.X / _memoryPuzzle.Spacing.X), 
 											  true);
 		}
-		else if (!IsActive && !isNeutral && !memoryPuzzle.AllActiveSteppedOn)
+		else if (!IsActive && !_isNeutral && !_memoryPuzzle.AllActiveSteppedOn)
 		{
-			memoryPuzzle.ResetPuzzle();
+			_memoryPuzzle.ResetPuzzle();
 		}
 
 		UpdateNeonColor(true);
-	}
-
-	private void PermanentlyActivate()
-	{
-		hasBeenActivated = true;
-		neonMaterial.SetShaderParameter("emission_color", new Vector3(0.0f, 0.5f, 1.0f)); // Light Blue
 	}
 
 	private void OnBodyExited(Node body)
@@ -139,36 +80,28 @@ public partial class MemoryPlatform : Node3D
 		}
 	}
 
-	private void UpdateNeonColor(bool objectInside = false)
+	private void PermanentlyActivate()
 	{
-		if (neonMaterial == null) return;
-
-		Vector3 color;
-		if (!_isInteractive || isNeutral)
-			color = new Vector3(0.5f, 0.5f, 0.5f); // Gray (deactivated or neutral)
-		else if (isInRedState)
-			color = new Vector3(1.0f, 0.0f, 0.0f); // Red
-		else if (hasBeenActivated)
-			color = new Vector3(0.0f, 0.5f, 1.0f); // Light Blue
-		else if (objectInside)
-			color = IsActive ? new Vector3(0.0f, 1.0f, 0.0f) : new Vector3(1.0f, 0.0f, 0.0f); // Green or Red
-		else
-			color = new Vector3(1.0f, 1.0f, 1.0f); // White (default)
-
-		neonMaterial.SetShaderParameter("emission_color", color);
-	}
-
-	public void UpdateVisuals()
-	{
+		_hasBeenActivated = true;
 		UpdateNeonColor();
 	}
 
-	public override void _Process(double delta)
+	private void UpdateNeonColor(bool objectInside = false)
 	{
-		if (_needsUpdate)
-		{
-			UpdateNeonColor();
-			_needsUpdate = false;
-		}
+		if (_neonMaterial == null) return;
+
+		Vector3 color = GetColorForState(objectInside);
+		_neonMaterial.SetShaderParameter("emission_color", color);
 	}
+
+	private Vector3 GetColorForState(bool objectInside)
+	{
+		if (!_isInteractive || _isNeutral) return new Vector3(0.5f, 0.5f, 0.5f);
+		if (_isInRedState) return new Vector3(1.0f, 0.0f, 0.0f);
+		if (_hasBeenActivated) return new Vector3(0.0f, 0.5f, 1.0f);
+		if (objectInside) return IsActive ? new Vector3(0.0f, 1.0f, 0.0f) : new Vector3(1.0f, 0.0f, 0.0f);
+		return new Vector3(1.0f, 1.0f, 1.0f);
+	}
+
+	public void UpdateVisuals() => UpdateNeonColor();
 }

@@ -61,7 +61,7 @@ public partial class Player : CharacterBody3D
 	private bool _isTeleporting = false;
 	private PlayerUI _playerUI;
 	private ColorRect _fadeOverlay;
-	
+	private PlayerTeleporter _playerTeleporter;
 
 	public override void _Ready()
 	{
@@ -102,6 +102,15 @@ public partial class Player : CharacterBody3D
 		// Configure nodes
 		ConfigureInteractionRay();
 		ConfigureInputMode();
+
+		// Initialize PlayerTeleporter
+		_playerTeleporter = new PlayerTeleporter(
+			this,
+			GetNode<AnimationPlayer>("AnimationPlayer"),
+			GetNode<ColorRect>("Head/Camera3D/TeleportOverlay"),
+			GetNode<Camera3D>("Head/Camera3D"),
+			GetNode<Node3D>("Head")
+		);
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -158,48 +167,9 @@ public partial class Player : CharacterBody3D
 		return false;
 	}
 
-	public void StartTeleportAnimation(Action onTeleportComplete)
+	public void Teleport(Vector3 targetPosition, Vector3? forwardDirection = null)
 	{
-		if (_isTeleporting) return; 
-
-		_isTeleporting = true;
-		_teleportOverlay.Visible = true;
-		_animationPlayer.Play("teleportation");
-
-		// Schedule the teleportation to occur after 1.4 seconds
-		GetTree().CreateTimer(1.4f).Timeout += () =>
-		{
-			onTeleportComplete?.Invoke();
-		};
-
-		// Schedule hiding the overlay after the animation completes
-		float animationLength = _animationPlayer.GetAnimation("teleportation").Length;
-		GetTree().CreateTimer(animationLength).Timeout += () =>
-		{
-			if (IsInstanceValid(_teleportOverlay) && !IsQueuedForDeletion())
-			{
-				_teleportOverlay.Visible = false;
-			}
-			_isTeleporting = false;
-		};
-	}
-
-	public void TeleportTo(Vector3 position, Vector3 forwardDirection)
-	{
-		if (!_isTeleporting) return; 
-
-		GlobalPosition = position;
-		_head.LookAt(GlobalPosition + forwardDirection);
-
-		// Save the camera's original global transform
-		Transform3D originalCameraTransform = _camera.GlobalTransform;
-
-		// Update the player's position and rotation
-		GlobalPosition = position;
-		_head.LookAt(GlobalPosition + forwardDirection);
-
-		// Set the camera back to its original global transform
-		_camera.GlobalTransform = originalCameraTransform;
+		_playerTeleporter.StartTeleportAnimation(targetPosition, forwardDirection);
 	}
 
 	public void StartFadeOutAnimation()

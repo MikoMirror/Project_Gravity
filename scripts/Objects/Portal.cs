@@ -99,23 +99,65 @@ public partial class Portal : Node3D
 			return;
 		}
 
-		var gameState = GetNode<GameState>("/root/GameState");
-		gameState.StorePlayerData(player, TargetPortalName);
-		GD.Print($"Portal: Stored player data. Target portal: {TargetPortalName}");
-
+		_gameState.StorePlayerData(player, TargetPortalName);
 		ShowLevelLoading();
 
-		gameState.IsComingFromPortal = true;
-		
-		// Autosave the current level before changing
-		gameState.CurrentLevel = TargetLevelPath;
-		gameState.SaveCurrentLevel();
+		_gameState.IsComingFromPortal = true;
+		_gameState.CurrentLevel = TargetLevelPath;
+		_gameState.SaveCurrentLevel();
 
-		// Use CallDeferred to change the scene after this frame
-		GetTree().CreateTimer(0.1f).Timeout += () =>
+		// Start the teleport animation
+		player.Teleport(GlobalPosition, -GlobalTransform.Basis.Z);
+
+		// Find LevelManager as the root of the current scene
+		var levelManager = GetTree().CurrentScene as LevelManager;
+		if (levelManager != null)
 		{
-			GetTree().ChangeSceneToFile(TargetLevelPath);
-		};
+			levelManager.ChangeLevel(TargetLevelPath);
+		}
+		else
+		{
+			GD.PrintErr("Portal: LevelManager not found. Unable to change level.");
+			HideLevelLoading();
+		}
+	}
+
+	private void PositionPlayerAtTargetPortal(string targetPortalName)
+	{
+		GD.Print($"Portal: Positioning player at target portal: {targetPortalName}");
+		var currentScene = GetTree().CurrentScene;
+		var levelManager = currentScene.GetNode<LevelManager>(".");  // Assuming LevelManager is attached to the root of the scene
+
+		if (levelManager != null)
+		{
+			levelManager.PositionPlayerAtPortal(targetPortalName);
+		}
+		else
+		{
+			GD.PrintErr("Portal: LevelManager not found in the new scene. Unable to position player.");
+			PositionPlayerManually(targetPortalName);
+		}
+
+		// Hide loading screen
+		HideLevelLoading();
+	}
+
+	private void PositionPlayerManually(string targetPortalName)
+	{
+		var currentScene = GetTree().CurrentScene;
+		var targetPortal = currentScene.FindChild(targetPortalName, true, false) as Portal;
+		var player = currentScene.FindChild("Player", true, false) as Player;
+
+		if (targetPortal != null && player != null)
+		{
+			player.GlobalPosition = targetPortal.GlobalPosition;
+			player.GetNode<Node3D>("Head").LookAt(player.GlobalPosition + targetPortal.GlobalTransform.Basis.Z);
+			GD.Print($"Portal: Positioned player at: {player.GlobalPosition}");
+		}
+		else
+		{
+			GD.PrintErr($"Portal: Failed to position player. Target portal: {targetPortal}, Player: {player}");
+		}
 	}
 
 	private void TeleportWithinLevel(Player player)
@@ -130,9 +172,7 @@ public partial class Portal : Node3D
 		if (targetPortal != null)
 		{
 			ShowLevelLoading();
-
-			player.TeleportTo(targetPortal.GlobalPosition, targetPortal.GlobalTransform.Basis.Z);
-
+			player.Teleport(targetPortal.GlobalPosition, targetPortal.GlobalTransform.Basis.Z);
 			GetTree().CreateTimer(1f).Timeout += HideLevelLoading;
 		}
 		else

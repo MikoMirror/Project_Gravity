@@ -12,6 +12,7 @@ public partial class LevelManager : Node
 	private PackedScene _pauseMenuScene;
 	private PauseMenu _pauseMenuInstance;
 	private Player _player;
+	private string _pendingTargetPortalName;
 
 	public override void _Ready()
 	{
@@ -31,7 +32,7 @@ public partial class LevelManager : Node
 			{
 				if (!string.IsNullOrEmpty(gameState.TargetPortalName))
 				{
-					CallDeferred(nameof(PositionPlayerAtTargetPortal), gameState.TargetPortalName);
+					CallDeferred(nameof(PositionPlayerAtPortal), gameState.TargetPortalName);
 				}
 
 				if (gameState.IsComingFromPortal)
@@ -55,36 +56,66 @@ public partial class LevelManager : Node
 			{
 				GD.PrintErr("LevelManager: Player not found in the current scene");
 			}
+
+			// Check if we have a pending portal positioning
+			if (!string.IsNullOrEmpty(_pendingTargetPortalName))
+			{
+				CallDeferred(nameof(DeferredPositionPlayerAtPortal), _pendingTargetPortalName);
+				_pendingTargetPortalName = null;
+			}
 	}
 
-	private void PositionPlayerAtTargetPortal(string targetPortalName)
+	public void PositionPlayerAtPortal(string targetPortalName)
 	{
-		GD.Print($"LevelManager: Positioning player at target portal: {targetPortalName}");
-		var targetPortal = GetTree().CurrentScene.FindChild(targetPortalName, true, false) as Portal;
-		if (targetPortal != null)
+		GD.Print($"LevelManager: PositionPlayerAtPortal called with targetPortalName: {targetPortalName}");
+		_pendingTargetPortalName = targetPortalName;
+		if (IsInsideTree())
 		{
-			GD.Print($"LevelManager: Found target portal at position: {targetPortal.GlobalPosition}");
-			var player = GetTree().CurrentScene.FindChild("Player", true, false) as Player;
-			if (player != null)
-			{
-				player.GlobalPosition = targetPortal.GlobalPosition;
-				player.GetNode<Node3D>("Head").LookAt(targetPortal.GlobalTransform.Origin + targetPortal.GlobalTransform.Basis.Z);
-				GD.Print($"LevelManager: Positioned player at: {player.GlobalPosition}");
-			}
-			else
-			{
-				GD.PrintErr("LevelManager: Player not found in the current scene");
-			}
+			CallDeferred(nameof(DeferredPositionPlayerAtPortal), targetPortalName);
+		}
+	}
+
+	private void DeferredPositionPlayerAtPortal(string targetPortalName)
+	{
+		GD.Print($"LevelManager: DeferredPositionPlayerAtPortal called with targetPortalName: {targetPortalName}");
+
+		if (!IsInsideTree())
+		{
+			GD.PrintErr("LevelManager: Not inside tree. Unable to position player.");
+			return;
+		}
+
+		var currentScene = GetTree()?.CurrentScene;
+		if (currentScene == null)
+		{
+			GD.PrintErr("LevelManager: Current scene is null. Unable to position player.");
+			return;
+		}
+
+		var targetPortal = currentScene.FindChild(targetPortalName, true, false) as Portal;
+		var player = currentScene.FindChild("Player", true, false) as Player;
+
+		if (targetPortal != null && player != null)
+		{
+			player.GlobalPosition = targetPortal.GlobalPosition;
+			GD.Print($"LevelManager: Positioned player at: {player.GlobalPosition}");
 		}
 		else
 		{
-			GD.PrintErr($"LevelManager: Target portal '{targetPortalName}' not found in the current scene");
+			GD.PrintErr($"LevelManager: Failed to position player. Target portal: {targetPortal}, Player: {player}");
 		}
-		
-		InitializeMemoryPuzzles();
 
+		// Reset GameState
 		var gameState = GetNode<GameState>("/root/GameState");
-		gameState.TargetPortalName = "";
+		if (gameState != null)
+		{
+			gameState.TargetPortalName = "";
+			gameState.IsComingFromPortal = false;
+		}
+		else
+		{
+			GD.PrintErr("LevelManager: GameState not found.");
+		}
 	}
 
 	public override void _Input(InputEvent @event)
@@ -348,9 +379,20 @@ public partial class LevelManager : Node
 
 	public void ChangeLevel(string newLevelPath)
 	{
+		GD.Print($"LevelManager: Changing level to {newLevelPath}");
 		var gameState = GetNode<GameState>("/root/GameState");
-		gameState.CurrentLevel = newLevelPath;
-		gameState.SaveCurrentLevel(); // This will autosave the current level
+		if (gameState != null)
+		{
+			gameState.CurrentLevel = newLevelPath;
+			gameState.SaveCurrentLevel();
+			_pendingTargetPortalName = gameState.TargetPortalName;
+			GD.Print($"LevelManager: Target portal name: {_pendingTargetPortalName}");
+		}
+		else
+		{
+			GD.PrintErr("LevelManager: GameState not found. Unable to change level.");
+		}
+
 		GetTree().ChangeSceneToFile(newLevelPath);
 	}
 

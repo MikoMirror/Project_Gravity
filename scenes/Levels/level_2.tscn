@@ -1,7 +1,7 @@
 [gd_scene load_steps=16 format=3 uid="uid://bfgs4wvy0bhph"]
 
 [ext_resource type="PackedScene" uid="uid://0g1bm5vx4bhw" path="res://assets/OWN/Prefabs/portal.tscn" id="1_3jvh8"]
-[ext_resource type="Script" path="res://scripts/Services/LevelManager.cs" id="1_o1b4a"]
+[ext_resource type="Script" path="res://scripts/Autoload/LevelManager.cs" id="1_o1b4a"]
 [ext_resource type="PackedScene" uid="uid://egv34vmwijbn" path="res://assets/OWN/Prefabs/floor.tscn" id="2_rfx76"]
 [ext_resource type="PackedScene" uid="uid://bbpcuvq045yhj" path="res://scenes/SupportScenes/memory_puzzle.tscn" id="3_qnbaf"]
 [ext_resource type="PackedScene" uid="uid://c5avl3x8ogvyf" path="res://assets/OWN/Prefabs/wall_2.tscn" id="5_1woms"]
