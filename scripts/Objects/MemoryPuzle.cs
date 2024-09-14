@@ -473,7 +473,11 @@ public partial class MemoryPuzle : Node3D
 			EmitSignal(SignalName.PlatformStatesChanged);
 			CheckPuzzleCompletion();
 
-			if (isActive)
+			if (!isActive)
+			{
+				ResetPuzzle(); // Reset the puzzle when stepping on an inactive platform
+			}
+			else
 			{
 				CheckAllActiveSteppedOn();
 			}

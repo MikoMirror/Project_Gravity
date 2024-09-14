@@ -66,7 +66,7 @@ public partial class MemoryPlatform : Node3D
 		}
 		else if (!IsActive && !_isNeutral && !_memoryPuzzle.AllActiveSteppedOn)
 		{
-			_memoryPuzzle.ResetPuzzle();
+			_memoryPuzzle.ResetPuzzle(); // Call ResetPuzzle instead of ResetActivePlatforms
 		}
 
 		UpdateNeonColor(true);

@@ -291,7 +291,7 @@ compositor = SubResource("Compositor_tl5p6")
 transform = Transform3D(1.5, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.005, -0.415)
 
 [node name="cube" parent="." instance=ExtResource("9_76axy")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.6957, 0.620953, 10.6603)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.6957, 0.620953, 7.6603)
 
 [node name="portal2" parent="." instance=ExtResource("10_ejclo")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.101049, 0.112798, -3.90994)
@@ -318,4 +318,3 @@ transform = Transform3D(1, 0, 0, 0, -1, -5.96046e-08, 0, 5.96046e-08, -1, 5.8391
 
 [node name="MusicManager" type="Node3D" parent="."]
 script = ExtResource("16_udmh5")
-musicTrackPath = "res://assets/Music/Level1.ogg"

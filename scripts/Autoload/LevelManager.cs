@@ -4,11 +4,8 @@ using System.Collections.Generic;
 
 public partial class LevelManager : Node
 {
-	private List<Node3D> _initialSceneState;
+	private List<Node3D> _initialSceneState = new();
 	private string _currentLevelScene;
-	private Control _levelLoadingInstance;
-	private AnimationPlayer _fadeAnimation;
-	private ColorRect _fadeOverlay;
 	private PackedScene _pauseMenuScene;
 	private PauseMenu _pauseMenuInstance;
 	private Player _player;
@@ -16,121 +13,42 @@ public partial class LevelManager : Node
 
 	public override void _Ready()
 	{
-		GD.Print("LevelManager: _Ready called");
-			_currentLevelScene = GetTree().CurrentScene.SceneFilePath;
-			GD.Print($"LevelManager: Current scene path: {_currentLevelScene}");
-			SaveInitialSceneState();
-			
-			// Hide the loading screen
-			CallDeferred(nameof(HideLevelLoading));
-			
-			_pauseMenuScene = GD.Load<PackedScene>("res://scenes/pause_menu.tscn");
-			_player = GetNode<Player>("Player");  // Adjust the path if necessary
-			
-			var gameState = GetNode<GameState>("/root/GameState");
-			if (gameState != null)
-			{
-				if (!string.IsNullOrEmpty(gameState.TargetPortalName))
-				{
-					CallDeferred(nameof(PositionPlayerAtPortal), gameState.TargetPortalName);
-				}
-
-				if (gameState.IsComingFromPortal)
-				{
-					
-					gameState.IsComingFromPortal = false;
-				}
-			}
-			else
-			{
-				GD.PrintErr("LevelManager: GameState not found.");
-			}
-			
-			// Find the Player node and trigger the fade out animation
-			var player = GetTree().CurrentScene.FindChild("Player", true, false) as Player;
-			if (player != null)
-			{
-				player.StartFadeOutAnimation();
-			}
-			else
-			{
-				GD.PrintErr("LevelManager: Player not found in the current scene");
-			}
-
-			// Check if we have a pending portal positioning
-			if (!string.IsNullOrEmpty(_pendingTargetPortalName))
-			{
-				CallDeferred(nameof(DeferredPositionPlayerAtPortal), _pendingTargetPortalName);
-				_pendingTargetPortalName = null;
-			}
-	}
-
-	public void PositionPlayerAtPortal(string targetPortalName)
-	{
-		GD.Print($"LevelManager: PositionPlayerAtPortal called with targetPortalName: {targetPortalName}");
-		_pendingTargetPortalName = targetPortalName;
-		if (IsInsideTree())
-		{
-			CallDeferred(nameof(DeferredPositionPlayerAtPortal), targetPortalName);
-		}
-	}
-
-	private void DeferredPositionPlayerAtPortal(string targetPortalName)
-	{
-		GD.Print($"LevelManager: DeferredPositionPlayerAtPortal called with targetPortalName: {targetPortalName}");
-
-		if (!IsInsideTree())
-		{
-			GD.PrintErr("LevelManager: Not inside tree. Unable to position player.");
-			return;
-		}
-
-		var currentScene = GetTree()?.CurrentScene;
-		if (currentScene == null)
-		{
-			GD.PrintErr("LevelManager: Current scene is null. Unable to position player.");
-			return;
-		}
-
-		var targetPortal = currentScene.FindChild(targetPortalName, true, false) as Portal;
-		var player = currentScene.FindChild("Player", true, false) as Player;
-
-		if (targetPortal != null && player != null)
-		{
-			player.GlobalPosition = targetPortal.GlobalPosition;
-			GD.Print($"LevelManager: Positioned player at: {player.GlobalPosition}");
-		}
-		else
-		{
-			GD.PrintErr($"LevelManager: Failed to position player. Target portal: {targetPortal}, Player: {player}");
-		}
-
-		// Reset GameState
+		_currentLevelScene = GetTree().CurrentScene.SceneFilePath;
+		SaveInitialSceneState();
+		CallDeferred(nameof(HideLevelLoading));
+		_pauseMenuScene = GD.Load<PackedScene>("res://scenes/pause_menu.tscn");
+		_player = GetTree().CurrentScene.FindChild("Player", true, false) as Player;
+		
 		var gameState = GetNode<GameState>("/root/GameState");
 		if (gameState != null)
 		{
-			gameState.TargetPortalName = "";
+			if (!string.IsNullOrEmpty(gameState.TargetPortalName))
+			{
+				CallDeferred(nameof(PositionPlayerAtPortal), gameState.TargetPortalName);
+			}
 			gameState.IsComingFromPortal = false;
 		}
-		else
+
+		_player?.StartFadeOutAnimation();
+
+		if (!string.IsNullOrEmpty(_pendingTargetPortalName))
 		{
-			GD.PrintErr("LevelManager: GameState not found.");
+			CallDeferred(nameof(DeferredPositionPlayerAtPortal), _pendingTargetPortalName);
+			_pendingTargetPortalName = null;
 		}
+
+		InitializeMemoryPuzzles();
 	}
 
 	public override void _Input(InputEvent @event)
 	{
-		if (@event.IsActionPressed("ui_cancel")) // ESC key
+		if (@event.IsActionPressed("ui_cancel"))
 		{
 			TogglePauseMenu();
 		}
 	}
 
-	private void SaveInitialSceneState()
-	{
-		_initialSceneState = new List<Node3D>();
-		SaveNodeState(GetTree().CurrentScene);
-	}
+	private void SaveInitialSceneState() => SaveNodeState(GetTree().CurrentScene);
 
 	private void SaveNodeState(Node node)
 	{
@@ -138,21 +56,20 @@ public partial class LevelManager : Node
 		{
 			try
 			{
-				var duplicatedNode = node3D.Duplicate(0);
+				var duplicatedNode = node3D.Duplicate(0) as Node3D;
 				if (duplicatedNode != null)
 				{
-					_initialSceneState.Add(duplicatedNode as Node3D);
+					_initialSceneState.Add(duplicatedNode);
 				}
 			}
 			catch (Exception e)
 			{
-				GD.PrintErr($"LevelManager: Error duplicating node {node.Name}: {e.Message}");
+				GD.PrintErr($"Error duplicating node {node.Name}: {e.Message}");
 			}
 		}
 
-		for (int i = 0; i < node.GetChildCount(); i++)
+		foreach (var child in node.GetChildren())
 		{
-			var child = node.GetChild(i);
 			if (child != null && !child.IsQueuedForDeletion())
 			{
 				SaveNodeState(child);
@@ -168,58 +85,16 @@ public partial class LevelManager : Node
 			animPlayer.Seek(0, true);
 		}
 
-		for (int i = 0; i < node.GetChildCount(); i++)
+		foreach (var child in node.GetChildren())
 		{
-			ResetNodeAnimations(node.GetChild(i));
+			ResetNodeAnimations(child);
 		}
 	}
 
 	public void RestartLevel()
 	{
 		ClosePauseMenu();
-		// Implement level restart logic here
-		// For example:
 		GetTree().ReloadCurrentScene();
-	}
-
-	private void DeferredRestoreInitialState()
-	{
-		try
-		{
-			GD.Print("LevelManager: Starting DeferredRestoreInitialState");
-			if (IsInsideTree())
-			{
-				var tree = GetTree();
-				if (tree != null)
-				{
-					GD.Print("LevelManager: SceneTree is not null");
-					if (tree.CurrentScene != null)
-					{
-						GD.Print("LevelManager: CurrentScene is not null, calling RestoreInitialState");
-						RestoreInitialState();
-					}
-					else
-					{
-						GD.Print("LevelManager: CurrentScene is null, deferring RestoreInitialState");
-						CallDeferred(nameof(DeferredRestoreInitialState));
-					}
-				}
-				else
-				{
-					GD.PrintErr("LevelManager: SceneTree is null, deferring RestoreInitialState");
-					CallDeferred(nameof(DeferredRestoreInitialState));
-				}
-			}
-			else
-			{
-				GD.PrintErr("LevelManager: Not inside tree, deferring RestoreInitialState");
-				CallDeferred(nameof(DeferredRestoreInitialState));
-			}
-		}
-		catch (Exception e)
-		{
-			GD.PrintErr($"LevelManager: Error during DeferredRestoreInitialState - {e.Message}\n{e.StackTrace}");
-		}
 	}
 
 	private void RestoreInitialState()
@@ -227,8 +102,7 @@ public partial class LevelManager : Node
 		var currentScene = GetTree().CurrentScene;
 		foreach (Node3D savedNode in _initialSceneState)
 		{
-			Node3D currentNode = currentScene.FindChild(savedNode.Name, true, false) as Node3D;
-			if (currentNode != null)
+			if (currentScene.FindChild(savedNode.Name, true, false) is Node3D currentNode)
 			{
 				currentNode.GlobalTransform = savedNode.GlobalTransform;
 				if (currentNode is RigidBody3D rigidBody)
@@ -237,53 +111,25 @@ public partial class LevelManager : Node
 					rigidBody.AngularVelocity = Vector3.Zero;
 				}
 				
-				// Reset specific object types
-				if (currentNode is activatePlatform platform)
+				switch (currentNode)
 				{
-					platform.ResetState();
-				}
-				else if (currentNode is Door door)
-				{
-					door.Close();
-				}
-				else if (currentNode is Cable cable)
-				{
-					cable.Deactivate();
-				}
-				else if (currentNode is GravityOrb gravityOrb)
-				{
-					gravityOrb.Reset();  
+					case activatePlatform platform:
+						platform.ResetState();
+						break;
+					case Door door:
+						door.Close();
+						break;
+					case Cable cable:
+						cable.Deactivate();
+						break;
+					case GravityOrb gravityOrb:
+						gravityOrb.Reset();
+						break;
 				}
 			}
 		}
 		ResetNodeAnimations(currentScene);
-
 		GetTree().Paused = false;
-	}
-
-	private void HideLevelLoadingAfterDelay()
-	{
-		FindAndHideLevelLoading();
-	}
-
-	private void FindAndHideLevelLoading()
-	{
-		// Try to find the loading screen with different possible names
-		_levelLoadingInstance = GetTree().Root.GetNodeOrNull<Control>("Level_loading") 
-			?? GetTree().Root.GetNodeOrNull<Control>("LevelLoading")
-			?? GetTree().Root.GetNodeOrNull<Control>("lelev_loading");
-
-		if (_levelLoadingInstance != null)
-		{
-			GD.Print("LevelManager: LevelLoading node found");
-			HideLevelLoading();
-		}
-		else
-		{
-			GD.PrintErr("LevelManager: LevelLoading node not found!");
-			// Print the entire scene tree for debugging
-			PrintSceneTree(GetTree().Root, 0);
-		}
 	}
 
 	private void HideLevelLoading()
@@ -293,31 +139,13 @@ public partial class LevelManager : Node
 		{
 			levelLoading.Visible = false;
 			levelLoading.QueueFree();
-			GD.Print("LevelManager: LevelLoading hidden and removed");
-		}
-		else
-		{
-			GD.Print("LevelManager: LevelLoading not found (might have been already removed)");
-		}
-	}
-
-	// Helper method to print the entire scene tree for debugging
-	private void PrintSceneTree(Node node, int depth)
-	{
-		string indent = new string(' ', depth * 2);
-		GD.Print($"{indent}{node.Name} ({node.GetType()})");
-		foreach (var child in node.GetChildren())
-		{
-			PrintSceneTree(child, depth + 1);
 		}
 	}
 
 	private void InitializeMemoryPuzzles()
 	{
-		var currentScene = GetTree().CurrentScene;
 		var memoryPuzzles = new List<MemoryPuzle>();
-		FindMemoryPuzzlesRecursive(currentScene, memoryPuzzles);
-
+		FindMemoryPuzzlesRecursive(GetTree().CurrentScene, memoryPuzzles);
 		foreach (var memoryPuzle in memoryPuzzles)
 		{
 			memoryPuzle.ManualSetup();
@@ -353,15 +181,9 @@ public partial class LevelManager : Node
 	{
 		_pauseMenuInstance = _pauseMenuScene.Instantiate<PauseMenu>();
 		AddChild(_pauseMenuInstance);
-		_pauseMenuInstance.ProcessMode = Node.ProcessModeEnum.Always;
+		_pauseMenuInstance.ProcessMode = ProcessModeEnum.Always;
 		_pauseMenuInstance.Initialize(this);
-		
-		// Drop the lifted object if the player is holding one
-		if (_player != null)
-		{
-			_player.DropLiftedObjectIfHolding();
-		}
-		
+		_player?.DropLiftedObjectIfHolding();
 		GetTree().Paused = true;
 		Input.MouseMode = Input.MouseModeEnum.Visible;
 	}
@@ -379,49 +201,71 @@ public partial class LevelManager : Node
 
 	public void ChangeLevel(string newLevelPath)
 	{
-		GD.Print($"LevelManager: Changing level to {newLevelPath}");
 		var gameState = GetNode<GameState>("/root/GameState");
 		if (gameState != null)
 		{
 			gameState.CurrentLevel = newLevelPath;
 			gameState.SaveCurrentLevel();
 			_pendingTargetPortalName = gameState.TargetPortalName;
-			GD.Print($"LevelManager: Target portal name: {_pendingTargetPortalName}");
 		}
-		else
-		{
-			GD.PrintErr("LevelManager: GameState not found. Unable to change level.");
-		}
-
 		GetTree().ChangeSceneToFile(newLevelPath);
 	}
 
 	public void SaveGameState()
 	{
 		var gameState = GetNode<GameState>("/root/GameState");
-		if (gameState != null)
-		{
-			// Update gameState properties here
-			gameState.SaveCurrentLevel();
-		}
-		else
-		{
-			GD.PrintErr("GameState not found. Make sure it's set up as an AutoLoad.");
-		}
+		gameState?.SaveCurrentLevel();
 	}
 
 	public void QuitToMainMenu()
 	{
-		// Close the pause menu
 		ClosePauseMenu();
-
-		// Ensure the game is unpaused
 		GetTree().Paused = false;
-
-		// Reset the mouse mode
 		Input.MouseMode = Input.MouseModeEnum.Visible;
-
-		// Change to the main menu scene
 		GetTree().CallDeferred(SceneTree.MethodName.ChangeSceneToFile, "res://scenes/main_menu.tscn");
+	}
+
+	public void PositionPlayerAtPortal(string targetPortalName)
+	{
+		_pendingTargetPortalName = targetPortalName;
+		if (IsInsideTree())
+		{
+			CallDeferred(nameof(DeferredPositionPlayerAtPortal), targetPortalName);
+		}
+	}
+
+	private void DeferredPositionPlayerAtPortal(string targetPortalName)
+	{
+		if (!IsInsideTree())
+		{
+			GD.PrintErr("LevelManager: Not inside tree. Unable to position player.");
+			return;
+		}
+
+		var currentScene = GetTree().CurrentScene;
+		if (currentScene == null)
+		{
+			GD.PrintErr("LevelManager: Current scene is null. Unable to position player.");
+			return;
+		}
+
+		var targetPortal = currentScene.FindChild(targetPortalName, true, false) as Portal;
+		var player = currentScene.FindChild("Player", true, false) as Player;
+
+		if (targetPortal != null && player != null)
+		{
+			player.GlobalPosition = targetPortal.GlobalPosition;
+		}
+		else
+		{
+			GD.PrintErr($"LevelManager: Failed to position player. Target portal: {targetPortal}, Player: {player}");
+		}
+
+		var gameState = GetNode<GameState>("/root/GameState");
+		if (gameState != null)
+		{
+			gameState.TargetPortalName = "";
+			gameState.IsComingFromPortal = false;
+		}
 	}
 }

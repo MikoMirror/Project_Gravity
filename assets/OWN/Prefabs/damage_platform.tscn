@@ -1,4 +1,6 @@
-[gd_scene load_steps=7 format=4 uid="uid://qiprcs4r1lhu"]
+[gd_scene load_steps=8 format=4 uid="uid://qiprcs4r1lhu"]
+
+[ext_resource type="Script" path="res://scripts/Objects/DamagePlatform.cs" id="1_yybav"]
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_6fse1"]
 points = PackedVector3Array(2, 4, 0.298637, 2, 0, 0.298637, 2, 4, -1.50996e-07, -1.56656, 4, 0.298666, 2, 0, -1.50996e-07, -1.56656, 0, 0.298666, -2, 4, -1.50996e-07, -2, 4, 0.298637, -2, 0, -1.50996e-07, -2, 0, 0.298637)
@@ -75,8 +77,9 @@ shadow_mesh = SubResource("ArrayMesh_tdwam")
 [sub_resource type="BoxShape3D" id="BoxShape3D_r4l35"]
 size = Vector3(3.80591, 0.0664063, 4.03851)
 
-[node name="DamagePlatform" type="Node3D"]
+[node name="DamagePlatform" type="Node3D" groups=["DamagePlatform"]]
 transform = Transform3D(1.5, 0, 0, 0, 1, 0, 0, 0, 1.5, 0, 0, 0)
+script = ExtResource("1_yybav")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="."]
 

@@ -17,6 +17,7 @@ public partial class MemoryPuzzleEditorPlugin : EditorPlugin
 	{
 		GD.Print("MemmoryPuzleEditorPlugin _ExitTree called");
 		RemoveInspectorPlugin(inspectorPlugin);
+		inspectorPlugin.Cleanup(); // Call cleanup method
 		inspectorPlugin = null;
 	}
 }
@@ -24,6 +25,16 @@ public partial class MemoryPuzzleEditorPlugin : EditorPlugin
 public partial class PlatformStatesInspectorPlugin : EditorInspectorPlugin
 {
 	private PlatformStatesEditor platformStatesEditor;
+
+	// Add this method for cleanup
+	public void Cleanup()
+	{
+		if (platformStatesEditor != null && IsInstanceValid(platformStatesEditor))
+		{
+			platformStatesEditor.SafeDispose();
+			platformStatesEditor = null;
+		}
+	}
 
 	public override bool _CanHandle(GodotObject @object)
 	{
@@ -41,6 +52,10 @@ public partial class PlatformStatesInspectorPlugin : EditorInspectorPlugin
 
 		if (name == "PlatformStates" && type == Variant.Type.Array)
 		{
+			if (platformStatesEditor != null && IsInstanceValid(platformStatesEditor))
+			{
+				platformStatesEditor.SafeDispose();
+			}
 			platformStatesEditor = new PlatformStatesEditor();
 			AddPropertyEditor(name, platformStatesEditor);
 			return true;
@@ -59,39 +74,53 @@ public partial class PlatformStatesInspectorPlugin : EditorInspectorPlugin
 
 	private EditorProperty GetEditorForProperty(string name, Variant.Type type, PropertyHint hintType, string hintString, PropertyUsageFlags usageFlags, GodotObject @object)
 	{
-		GD.Print("PlatformStatesInspectorPlugin GetEditorForProperty called for property: ", name);
-		if (type == Variant.Type.Int)
+		try
 		{
-			var container = new VBoxContainer();
-			var spinBox = new SpinBox
+			GD.Print("PlatformStatesInspectorPlugin GetEditorForProperty called for property: ", name);
+			if (type == Variant.Type.Int)
 			{
-					MinValue = 1,
-					MaxValue = 20,
-					Step = 1,
-					Value = 1
-			};
-			container.AddChild(spinBox);
-
-			var editor = new EditorProperty();
-			editor.Label = name;
-			editor.AddChild(container);
-			editor.AddFocusable(spinBox);
-
-			spinBox.ValueChanged += (double value) =>
-			{
-				editor.EmitChanged(name, (int)value);
-				if (platformStatesEditor != null)
+				var container = new VBoxContainer();
+				var spinBox = new SpinBox
 				{
-					platformStatesEditor.UpdateGrid();
-				}
-				var memoryPuzle = @object as MemoryPuzle;
-				if (memoryPuzle != null)
-				{
-					memoryPuzle.UpdatePuzzle();
-				}
-			};
+						MinValue = 1,
+						MaxValue = 20,
+						Step = 1,
+						Value = 1
+				};
+				container.AddChild(spinBox);
 
-			return editor;
+				var editor = new EditorProperty();
+				editor.Label = name;
+				editor.AddChild(container);
+				editor.AddFocusable(spinBox);
+
+				spinBox.ValueChanged += (double value) =>
+				{
+					try
+					{
+						editor.EmitChanged(name, (int)value);
+						if (platformStatesEditor != null && IsInstanceValid(platformStatesEditor))
+						{
+							platformStatesEditor.UpdateGrid();
+						}
+						var memoryPuzle = @object as MemoryPuzle;
+						if (memoryPuzle != null)
+						{
+							memoryPuzle.UpdatePuzzle();
+						}
+					}
+					catch (Exception e)
+					{
+						GD.PrintErr($"Error in spinBox.ValueChanged: {e.Message}");
+					}
+				};
+
+				return editor;
+			}
+		}
+		catch (Exception e)
+		{
+			GD.PrintErr($"Error in GetEditorForProperty: {e.Message}");
 		}
 		return null;
 	}

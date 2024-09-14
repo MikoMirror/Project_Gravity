@@ -8,6 +8,7 @@ public partial class PlatformStatesEditor : EditorProperty
 	private MemoryPuzle targetObject;
 	private bool isUpdating = false;
 	private bool _needsUpdate = false;
+	private bool _isDisposed = false;
 
 	public override void _Ready()
 	{
@@ -21,7 +22,7 @@ public partial class PlatformStatesEditor : EditorProperty
 
 	public override void _UpdateProperty()
 	{
-		if (isUpdating) return;
+		if (_isDisposed || isUpdating) return;
 		isUpdating = true;
 
 		targetObject = GetEditedObject() as MemoryPuzle;
@@ -38,7 +39,7 @@ public partial class PlatformStatesEditor : EditorProperty
 	public void UpdateGrid()
 	{
 		GD.Print("PlatformStatesEditor UpdateGrid called");
-		if (targetObject == null) return;
+		if (_isDisposed) return;
 
 		int rows = targetObject.RowCount;
 		int columns = targetObject.ColumnCount;
@@ -77,7 +78,7 @@ public partial class PlatformStatesEditor : EditorProperty
 	private void OnCheckBoxToggled(int row, int col, bool toggled)
 	{
 		GD.Print($"PlatformStatesEditor OnCheckBoxToggled called: row {row}, col {col}, toggled {toggled}");
-		if (targetObject == null) return;
+		if (_isDisposed) return;
 
 		var newStates = GetPlatformStates();
 		EmitChanged(GetEditedProperty(), newStates);
@@ -100,21 +101,38 @@ public partial class PlatformStatesEditor : EditorProperty
 
 	public override void _ExitTree()
 	{
-		// Clean up resources when the editor is being removed
-		foreach (var child in grid.GetChildren())
-		{
-			child.QueueFree();
-		}
-		grid.QueueFree();
+		SafeDispose();
 		base._ExitTree();
 	}
 
 	public override void _Process(double delta)
 	{
+		if (_isDisposed) return;
+
 		if (_needsUpdate)
 		{
 			UpdateGrid();
-			_needsUpdate = false;
+			 _needsUpdate = false;
+		}
+	}
+
+	public bool IsDisposed()
+	{
+		return _isDisposed;
+	}
+
+	public void SafeDispose()
+	{
+		if (!_isDisposed)
+		{
+			_isDisposed = true;
+			// Clean up resources
+			foreach (var child in grid.GetChildren())
+			{
+				child.QueueFree();
+			}
+			grid.QueueFree();
+			QueueFree(); // Queue the editor itself for deletion
 		}
 	}
 }

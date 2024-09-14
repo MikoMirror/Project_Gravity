@@ -8,6 +8,7 @@ public partial class activatePlatform : Node3D
 	private bool _isActivated = false;
 	private int _objectsOnPlatform = 0;
 	private Door _associatedDoor;
+	private AudioStreamPlayer3D _audioPlayer;
 
 	[Export]
 	public string ActivateAnimationName { get; set; } = "activate_platform";
@@ -68,6 +69,13 @@ public partial class activatePlatform : Node3D
 				GD.PrintErr("ActivatePlatform: Cable list node not found at the specified path.");
 			}
 		}
+
+		// Get the AudioStreamPlayer3D node
+		_audioPlayer = GetNode<AudioStreamPlayer3D>("AudioStreamPlayer3D");
+
+		// Load and set the audio stream
+		var stream = GD.Load<AudioStream>("res://assets/Sounds/Platform_Activate.mp3");
+		_audioPlayer.Stream = stream;
 	}
 
 	private void OnBodyEntered(Node3D body)
@@ -99,6 +107,9 @@ public partial class activatePlatform : Node3D
 		{
 			cableAnimPlayer.Play("cable_enable");
 		}
+
+		// Play the activation sound
+		_audioPlayer.Play();
 	}
 
 	private void DeactivatePlatformAndDoor()
@@ -112,6 +123,9 @@ public partial class activatePlatform : Node3D
 		{
 			cableAnimPlayer.PlayBackwards("cable_enable");
 		}
+
+		// Optionally, play a deactivation sound if you have one
+		// _audioPlayer.Play();
 	}
 
 	public void ResetState()

@@ -4,41 +4,42 @@ using System;
 public partial class Player
 {
 	private void HandleMovement(double delta)
-{
-	Vector3 velocity = Velocity;
-	ApplyGravity(ref velocity, delta);
-
-	if (IsOnFloor() || IsOnCeiling())
 	{
-		HandleGroundedState(ref velocity);
-	}
-	else
-	{
-		WasInAir = true;
-	}
-	Vector2 inputDir = Input.GetVector("move_left", "move_right", "move_forward", "move_back");
-	Vector3 direction = Vector3.Zero;
-	Vector3 cameraForward = -Camera.GlobalTransform.Basis.Z; 
-	Vector3 cameraRight = Camera.GlobalTransform.Basis.X;
+		Vector3 velocity = Velocity;
+		ApplyGravity(ref velocity, delta);
 
-	cameraForward.Y = 0;
-	cameraRight.Y = 0;
-	cameraForward = cameraForward.Normalized();
-	cameraRight = cameraRight.Normalized();
-	direction = (cameraForward * -inputDir.Y + cameraRight * inputDir.X).Normalized();
+		if (IsOnFloor() || IsOnCeiling())
+		{
+			HandleGroundedState(ref velocity);
+		}
+		else
+		{
+			WasInAir = true;
+		}
+		Vector2 inputDir = Input.GetVector("move_left", "move_right", "move_forward", "move_back");
+		IsSprinting = Input.IsActionPressed("sprint"); // Add this line to set IsSprinting
+		Vector3 direction = Vector3.Zero;
+		Vector3 cameraForward = -Camera.GlobalTransform.Basis.Z; 
+		Vector3 cameraRight = Camera.GlobalTransform.Basis.X;
 
-	if (direction != Vector3.Zero)
-	{
-		MovePlayer(ref velocity, direction, delta);
-	}
-	else if (IsOnFloor() || IsOnCeiling())
-	{
-		Decelerate(ref velocity);
-	}
+		cameraForward.Y = 0;
+		cameraRight.Y = 0;
+		cameraForward = cameraForward.Normalized();
+		cameraRight = cameraRight.Normalized();
+		direction = (cameraForward * -inputDir.Y + cameraRight * inputDir.X).Normalized();
 
-	Velocity = velocity;
-	MoveAndSlide();
-}
+		if (direction != Vector3.Zero)
+		{
+			MovePlayer(ref velocity, direction, delta);
+		}
+		else if (IsOnFloor() || IsOnCeiling())
+		{
+			Decelerate(ref velocity);
+		}
+
+		Velocity = velocity;
+		MoveAndSlide();
+	}
 
 	private void HandleGroundedState(ref Vector3 velocity)
 	{
@@ -46,6 +47,7 @@ public partial class Player
 		{
 			LandingShake = LandingShakeAmount;
 			WasInAir = false;
+			_currentStepInterval = WALK_STEP_INTERVAL;
 		}
 		if (Input.IsActionJustPressed("jump"))
 		{
@@ -60,20 +62,20 @@ public partial class Player
 	}
 
 	private void MovePlayer(ref Vector3 velocity, Vector3 direction, double delta)
-{
-	float currentSpeed = IsSprinting ? SprintSpeed : Speed;
-	if (IsOnFloor())
 	{
-		velocity.X = direction.X * currentSpeed;
-		velocity.Z = direction.Z * currentSpeed;
+		float currentSpeed = IsSprinting ? SprintSpeed : Speed;
+		if (IsOnFloor())
+		{
+			velocity.X = direction.X * currentSpeed;
+			velocity.Z = direction.Z * currentSpeed;
+		}
+		else
+		{
+			velocity.X += direction.X * currentSpeed * AirControl * (float)delta;
+			velocity.Z += direction.Z * currentSpeed * AirControl * (float)delta;
+			LimitAirSpeed(ref velocity, currentSpeed);
+		}
 	}
-	else
-	{
-		velocity.X += direction.X * currentSpeed * AirControl * (float)delta;
-		velocity.Z += direction.Z * currentSpeed * AirControl * (float)delta;
-		LimitAirSpeed(ref velocity, currentSpeed);
-	}
-}
 
 	private void LimitAirSpeed(ref Vector3 velocity, float currentSpeed)
 	{
