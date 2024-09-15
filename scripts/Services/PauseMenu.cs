@@ -76,13 +76,29 @@ public partial class PauseMenu : Control
 	{
 		if (@event.IsActionPressed("ui_cancel")) // ESC key
 		{
-			OnResumePressed();
+			HandleEscapePress();
 			GetViewport().SetInputAsHandled(); // Prevent the event from propagating
+		}
+	}
+
+	private void HandleEscapePress()
+	{
+		if (_settingsInstance != null && IsInstanceValid(_settingsInstance))
+		{
+			if (_settingsInstance.HandleEscapePress())
+			{
+				OnSettingsBackButtonPressed();
+			}
+		}
+		else
+		{
+			OnResumePressed();
 		}
 	}
 
 	private void OnResumePressed()
 	{
+		GD.Print("Resume button pressed"); // Add this line for debugging
 		if (_levelManager != null)
 		{
 			_levelManager.ClosePauseMenu();
@@ -148,6 +164,9 @@ public partial class PauseMenu : Control
 		
 		// Clear the reference to the settings instance
 		_settingsInstance = null;
+		
+		// Set focus back to the resume button
+		_resumeButton?.GrabFocus();
 	}
 
 	private void OnQuitPressed()

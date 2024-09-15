@@ -44,6 +44,7 @@ public class PlayerTeleporter
 			if (Godot.GodotObject.IsInstanceValid(_teleportOverlay) && !_teleportOverlay.IsQueuedForDeletion())
 				_teleportOverlay.Visible = false;
 			_isTeleporting = false;
+			TeleportCompleted?.Invoke();
 		};
 	}
 
@@ -70,4 +71,6 @@ public class PlayerTeleporter
 	}
 
 	public bool IsTeleporting => _isTeleporting;
+
+	public event Action TeleportCompleted;
 }

@@ -210,4 +210,10 @@ public partial class Player
 			StopLifting();
 		}
 	}
+
+	 private void ChangeObjectGravity(RigidBody3D rigidBody)
+    {
+        rigidBody.GravityScale = -rigidBody.GravityScale;
+        // Optional: Add visual or sound effect to indicate gravity change
+    }
 }

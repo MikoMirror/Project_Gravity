@@ -30,6 +30,7 @@ public partial class Settings : Control
 		_backButton.Pressed += OnBackPressed;
 
 		ProcessMode = ProcessModeEnum.Always;
+		SetProcessUnhandledInput(true);
 	}
 
 	private void ConfigureSlider(HSlider slider)
@@ -59,5 +60,20 @@ public partial class Settings : Control
 		_soundManager.SaveSoundVolume();
 		EmitSignal(SignalName.BackButtonPressed);
 		QueueFree(); // Remove the settings scene
+	}
+
+	public override void _UnhandledInput(InputEvent @event)
+	{
+		if (@event.IsActionPressed("ui_cancel"))
+		{
+			GetViewport().SetInputAsHandled();
+			OnBackPressed();
+		}
+	}
+
+	public bool HandleEscapePress()
+	{
+		OnBackPressed();
+		return true;
 	}
 }

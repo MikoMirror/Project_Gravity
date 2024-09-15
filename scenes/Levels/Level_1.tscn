@@ -298,7 +298,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3379, 1.66463, 8.6603)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.101049, 0.112798, -3.90994)
 _type = 0
 _targetLevelPath = "res://scenes/Levels/level_2.tscn"
-_targetPortalName = "portal1"
+_targetPortalName = "Portals/portal_lvl2"
 
 [node name="platform" parent="." instance=ExtResource("11_7sagp")]
 transform = Transform3D(-2, 3.49691e-07, 0, -1.74846e-07, -4, 0, 0, 0, 2, 5.79512, 7.97389, 9.08636)

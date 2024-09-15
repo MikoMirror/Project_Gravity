@@ -16,6 +16,7 @@ public partial class MainMenu : Control
 		PlayBackgroundMusic();
 		InitializeComponents();
 		ConnectSignals();
+		SetProcessUnhandledInput(true);
 	}
 
 	private void PlayBackgroundMusic()
@@ -129,4 +130,14 @@ public partial class MainMenu : Control
 		else
 			GD.PrintErr("Failed to load game.");
 	}
+
+	public override void _UnhandledInput(InputEvent @event)
+{
+	if (@event.IsActionPressed("ui_cancel"))
+	{
+		GetViewport().SetInputAsHandled();
+		// Optionally, you can add any specific behavior for ESC in the main menu here
+		GD.Print("ESC pressed in Main Menu");
+	}
+}
 }

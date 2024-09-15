@@ -37,25 +37,21 @@ public partial class Portal : Node3D
 	private Area3D _portalArea;
 	private GameState _gameState;
 	private Player _playerInRange;
-	private PackedScene _levelLoadingScene;
-	private Control _levelLoadingInstance;
 
 	public override void _Ready()
 	{
-		_portalArea = GetNode<Area3D>("PortalArea");
+		_portalArea = GetNodeOrNull<Area3D>("PortalArea");
 		_gameState = GetNode<GameState>("/root/GameState");
 
 		if (_portalArea != null)
-			{
-				_portalArea.BodyEntered += OnBodyEntered;
-				_portalArea.BodyExited += OnBodyExited;
-			}
+		{
+			_portalArea.BodyEntered += OnBodyEntered;
+			_portalArea.BodyExited += OnBodyExited;
+		}
 		else
-			{
-				GD.PrintErr("Portal: PortalArea child node not found!");
-			}
-
-		_levelLoadingScene = GD.Load<PackedScene>("res://scenes/SupportScenes/lelev_loading.tscn");
+		{
+			GD.PrintErr("Portal: PortalArea child node not found!");
+		}
 	}
 
 	public override void _Input(InputEvent @event)
@@ -87,7 +83,7 @@ public partial class Portal : Node3D
 		if (_isTeleportActive && body is Player player && player == _playerInRange)
 		{
 			player.GetNode<PlayerUI>("PlayerUI").ShowTeleportLabel(false);
-				_playerInRange = null;
+			_playerInRange = null;
 		}
 	}
 
@@ -100,63 +96,42 @@ public partial class Portal : Node3D
 		}
 
 		_gameState.StorePlayerData(player, TargetPortalName);
-		ShowLevelLoading();
-
 		_gameState.IsComingFromPortal = true;
 		_gameState.CurrentLevel = TargetLevelPath;
 		_gameState.SaveCurrentLevel();
 
-		// Start the teleport animation
+		// Start the teleport animation on the player
 		player.Teleport(GlobalPosition, -GlobalTransform.Basis.Z);
 
-		// Find LevelManager as the root of the current scene
-		var levelManager = GetTree().CurrentScene as LevelManager;
+		// Use CallDeferred to change the level after the animation completes
+		var animationPlayer = player.GetNode<AnimationPlayer>("AnimationPlayer");
+		if (animationPlayer != null)
+		{
+			animationPlayer.AnimationFinished += (animName) =>
+			{
+				if (animName == "teleportation")
+				{
+					ChangeLevelDeferred();
+				}
+			};
+		}
+		else
+		{
+			GD.PrintErr("Portal: AnimationPlayer not found in Player. Changing level immediately.");
+			ChangeLevelDeferred();
+		}
+	}
+
+	private void ChangeLevelDeferred()
+	{
+		var levelManager = GetNode<LevelManager>("/root/LevelManager");
 		if (levelManager != null)
 		{
-			levelManager.ChangeLevel(TargetLevelPath);
+			levelManager.CallDeferred(nameof(LevelManager.ChangeLevel), TargetLevelPath);
 		}
 		else
 		{
 			GD.PrintErr("Portal: LevelManager not found. Unable to change level.");
-			HideLevelLoading();
-		}
-	}
-
-	private void PositionPlayerAtTargetPortal(string targetPortalName)
-	{
-		GD.Print($"Portal: Positioning player at target portal: {targetPortalName}");
-		var currentScene = GetTree().CurrentScene;
-		var levelManager = currentScene.GetNode<LevelManager>(".");  // Assuming LevelManager is attached to the root of the scene
-
-		if (levelManager != null)
-		{
-			levelManager.PositionPlayerAtPortal(targetPortalName);
-		}
-		else
-		{
-			GD.PrintErr("Portal: LevelManager not found in the new scene. Unable to position player.");
-			PositionPlayerManually(targetPortalName);
-		}
-
-		// Hide loading screen
-		HideLevelLoading();
-	}
-
-	private void PositionPlayerManually(string targetPortalName)
-	{
-		var currentScene = GetTree().CurrentScene;
-		var targetPortal = currentScene.FindChild(targetPortalName, true, false) as Portal;
-		var player = currentScene.FindChild("Player", true, false) as Player;
-
-		if (targetPortal != null && player != null)
-		{
-			player.GlobalPosition = targetPortal.GlobalPosition;
-			player.GetNode<Node3D>("Head").LookAt(player.GlobalPosition + targetPortal.GlobalTransform.Basis.Z);
-			GD.Print($"Portal: Positioned player at: {player.GlobalPosition}");
-		}
-		else
-		{
-			GD.PrintErr($"Portal: Failed to position player. Target portal: {targetPortal}, Player: {player}");
 		}
 	}
 
@@ -176,28 +151,6 @@ public partial class Portal : Node3D
 		else
 		{
 			GD.PrintErr($"Portal: Target portal '{TargetPortalName}' not found in the current scene!");
-		}
-	}
-
-	private void ShowLevelLoading()
-	{
-		if (_levelLoadingInstance == null)
-		{
-			_levelLoadingInstance = _levelLoadingScene.Instantiate<Control>();
-			GetTree().Root.AddChild(_levelLoadingInstance);
-			_levelLoadingInstance.Name = "LevelLoading"; 
-		}
-		_levelLoadingInstance.Visible = true;
-		GD.Print("Portal: LevelLoading shown and added to the scene");
-	}
-
-	private void HideLevelLoading()
-	{
-		if (_levelLoadingInstance != null)
-		{
-			_levelLoadingInstance.Visible = false;
-			_levelLoadingInstance.QueueFree();
-			_levelLoadingInstance = null;
 		}
 	}
 }

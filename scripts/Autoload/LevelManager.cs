@@ -41,12 +41,13 @@ public partial class LevelManager : Node
 	}
 
 	public override void _Input(InputEvent @event)
+{
+	if (@event.IsActionPressed("ui_cancel") && GetTree().CurrentScene.Name != "MainMenu")
 	{
-		if (@event.IsActionPressed("ui_cancel"))
-		{
-			TogglePauseMenu();
-		}
+		TogglePauseMenu();
+		GetViewport().SetInputAsHandled();
 	}
+}
 
 	private void SaveInitialSceneState() => SaveNodeState(GetTree().CurrentScene);
 
@@ -79,6 +80,11 @@ public partial class LevelManager : Node
 
 	private void ResetNodeAnimations(Node node)
 	{
+		if (node == null)
+		{
+			return;
+		}
+
 		if (node is AnimationPlayer animPlayer)
 		{
 			animPlayer.Stop();
@@ -87,7 +93,10 @@ public partial class LevelManager : Node
 
 		foreach (var child in node.GetChildren())
 		{
-			ResetNodeAnimations(child);
+			if (child != null)
+			{
+				ResetNodeAnimations(child);
+			}
 		}
 	}
 
@@ -208,7 +217,86 @@ public partial class LevelManager : Node
 			gameState.SaveCurrentLevel();
 			_pendingTargetPortalName = gameState.TargetPortalName;
 		}
+
+		// Show a loading screen or transition effect here if needed
+
 		GetTree().ChangeSceneToFile(newLevelPath);
+		CallDeferred(nameof(SetupNewLevel));
+	}
+
+	private void SetupNewLevel()
+	{
+		if (IsInsideTree())
+		{
+			GD.Print("LevelManager: Setting up new level");
+			var currentScene = GetTree().CurrentScene;
+			GD.Print($"LevelManager: Current scene: {currentScene?.Name ?? "null"}");
+			ResetLevelObjects();
+			
+			// Delay positioning the player to ensure the scene is fully loaded
+			GetTree().CreateTimer(0.1f).Timeout += () =>
+			{
+				PositionPlayerAtPortal(_pendingTargetPortalName);
+				_pendingTargetPortalName = null;
+				
+				// Play the teleportation animation in reverse for fade-in effect
+				var player = GetTree().CurrentScene.FindChild("Player", true, false) as Player;
+				if (player != null)
+				{
+					var animationPlayer = player.GetNode<AnimationPlayer>("AnimationPlayer");
+					if (animationPlayer != null)
+					{
+						animationPlayer.PlayBackwards("teleportation");
+					}
+					else
+					{
+						GD.PrintErr("LevelManager: AnimationPlayer not found in Player node");
+					}
+				}
+				else
+				{
+					GD.PrintErr("LevelManager: Player not found in the current scene");
+				}
+			};
+
+			// Hide loading screen or transition effect here if used
+			GD.Print("LevelManager: New level setup complete");
+		}
+		else
+		{
+			GD.PrintErr("LevelManager: Not inside tree when setting up new level");
+		}
+	}
+
+	private void ResetLevelObjects()
+	{
+		var currentScene = GetTree().CurrentScene;
+			ResetNodeAnimations(currentScene);
+			ResetObjectStates(currentScene);
+	}
+
+	private void ResetObjectStates(Node node)
+	{
+		switch (node)
+		{
+			case activatePlatform platform:
+				platform.ResetState();
+				break;
+			case Door door:
+				door.Close();
+				break;
+			case Cable cable:
+				cable.Deactivate();
+				break;
+			case GravityOrb gravityOrb:
+				gravityOrb.Reset();
+				break;
+		}
+
+		foreach (var child in node.GetChildren())
+		{
+			ResetObjectStates(child);
+		}
 	}
 
 	public void SaveGameState()

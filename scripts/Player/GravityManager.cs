@@ -156,4 +156,18 @@ public partial class GravityManager : Node
 		_flipTimer = 0f;
 		UpdateGravityIndicator();
 	}
+
+	public bool CanUseGravityJump()
+	{
+		return _currentGravityJumps > 0;
+	}
+
+	public void UseGravityJump()
+	{
+		if (_currentGravityJumps > 0)
+		{
+			_currentGravityJumps--;
+			UpdateGravityIndicator();
+		}
+	}
 }

@@ -29,10 +29,6 @@ public partial class Player
 		{
 			IsSprinting = false;
 		}
-		else if (@event.IsActionPressed("ui_cancel")) // ESC key
-		{
-			TogglePauseMenu();
-		}
 		else if (@event.IsActionPressed(InteractionAction))
 		{
 			TryInteractWithDoor();
@@ -152,6 +148,10 @@ public partial class Player
 				StopLifting();
 			}
 		}
+		else if (mouseButton.ButtonIndex == MouseButton.Right && mouseButton.Pressed)
+		{
+			TryChangeObjectGravity();
+		}
 	}
 
 	private const string InteractionAction = "ui_interaction";
@@ -212,5 +212,24 @@ public partial class Player
 			animationPlayer.Play("door_open");
 		}
 	}
+
+	  private void TryChangeObjectGravity()
+	{
+		if (_gravityManager.CanUseGravityJump())
+		{
+			InteractionRay.ForceRaycastUpdate();
+			if (InteractionRay.IsColliding())
+			{
+				var collider = InteractionRay.GetCollider();
+				if (collider is RigidBody3D rigidBody)
+				{
+					ChangeObjectGravity(rigidBody);
+					_gravityManager.UseGravityJump();
+				}
+			}
+		}
+	}
+
+	
 
 }
