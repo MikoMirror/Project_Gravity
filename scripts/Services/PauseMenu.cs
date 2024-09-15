@@ -9,6 +9,7 @@ public partial class PauseMenu : Control
 	private Button _quitButton;
 	private LevelManager _levelManager;
 	private GameState gameState;
+	private Settings _settingsInstance;
 
 	public void Initialize(LevelManager levelManager)
 	{
@@ -66,6 +67,9 @@ public partial class PauseMenu : Control
 		{
 			GD.PrintErr("GameState not found. Make sure it's set up as an AutoLoad.");
 		}
+
+		// Set the pause menu to process even when the game is paused
+		ProcessMode = ProcessModeEnum.Always;
 	}
 
 	public override void _Input(InputEvent @event)
@@ -103,8 +107,47 @@ public partial class PauseMenu : Control
 
 	private void OnSettingsPressed()
 	{
-		// Implement settings functionality here
-		GD.Print("Settings button pressed");
+		// Check if settings are already open
+		if (_settingsInstance != null && IsInstanceValid(_settingsInstance))
+		{
+			GD.Print("Settings are already open");
+			return;
+		}
+
+		var settingsScene = ResourceLoader.Load<PackedScene>("res://scenes/SupportScenes/settings.tscn");
+		if (settingsScene != null)
+		{
+			_settingsInstance = settingsScene.Instantiate<Settings>();
+			
+			// Set the settings menu to process even when the game is paused
+			_settingsInstance.ProcessMode = ProcessModeEnum.Always;
+			
+			// Add the settings scene as a child of the current scene
+			GetTree().Root.AddChild(_settingsInstance);
+			
+			// Optionally, you can position the settings menu to appear centered
+			_settingsInstance.AnchorRight = 1;
+			_settingsInstance.AnchorBottom = 1;
+			
+			// Hide the pause menu
+			this.Hide();
+			
+			// Connect to the back button pressed signal of the settings menu
+			_settingsInstance.BackButtonPressed += OnSettingsBackButtonPressed;
+		}
+		else
+		{
+			GD.PrintErr("Failed to load settings scene.");
+		}
+	}
+
+	private void OnSettingsBackButtonPressed()
+	{
+		// Show the pause menu again
+		this.Show();
+		
+		// Clear the reference to the settings instance
+		_settingsInstance = null;
 	}
 
 	private void OnQuitPressed()

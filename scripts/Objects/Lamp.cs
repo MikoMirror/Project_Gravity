@@ -1,30 +1,39 @@
 using Godot;
-using System;
 
 public partial class Lamp : Node3D
 {
-	private AudioStreamPlayer3D audioPlayer;
+	private AudioStreamPlayer3D _audioPlayer;
+	private SoundManager _soundManager;
 
 	public override void _Ready()
 	{
-		// Get the AudioStreamPlayer3D node
-		audioPlayer = GetNode<AudioStreamPlayer3D>("AudioStreamPlayer3D");
+		_audioPlayer = GetNode<AudioStreamPlayer3D>("AudioStreamPlayer3D");
+		_soundManager = GetNode<SoundManager>("/root/SoundManager");
 
-		// Load and set the audio stream
 		var stream = GD.Load<AudioStream>("res://assets/Sounds/ambient/lamp.mp3");
-		audioPlayer.Stream = stream;
+		_audioPlayer.Stream = stream;
 
-		// Set to play looping (if it's an MP3)
 		if (stream is AudioStreamMP3 mp3Stream)
 		{
 			mp3Stream.Loop = true;
 		}
 
-		// Start playing the sound
-		audioPlayer.Play();
+		_audioPlayer.Play();
+		_audioPlayer.UnitSize = 10;
+		_audioPlayer.MaxDistance = 20;
 
-		// Optionally, you can adjust these properties:
-		audioPlayer.UnitSize = 10; // Adjust this to change how quickly the sound attenuates with distance
-		audioPlayer.MaxDistance = 20; // Maximum distance at which the sound can be heard
+		// Set initial volume
+		UpdateVolume();
+	}
+
+	public override void _Process(double delta)
+	{
+		// Update volume each frame to reflect any changes
+		UpdateVolume();
+	}
+
+	private void UpdateVolume()
+	{
+		_audioPlayer.VolumeDb = Mathf.LinearToDb(_soundManager.SoundVolume);
 	}
 }

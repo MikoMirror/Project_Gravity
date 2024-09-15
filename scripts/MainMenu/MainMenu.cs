@@ -78,7 +78,7 @@ public partial class MainMenu : Control
 		if (settingsScene != null)
 		{
 			var settingsInstance = settingsScene.Instantiate<Control>();
-			GetTree().Root.AddChild(settingsInstance);
+			AddChild(settingsInstance);
 		}
 		else
 		{

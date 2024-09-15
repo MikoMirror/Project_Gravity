@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://bjc75lfsdvytu"
-path="res://.godot/imported/pipe_turn.glb-0babff90e38e31e6258c3927c5ef52b2.scn"
+uid="uid://cdt5y67q6x72f"
+path="res://.godot/imported/Pillar.glb-f66b825592a6afd2bf5c67445f5f344c.scn"
 
 [deps]
 
-source_file="res://assets/OWN/Models/pipe_turn.glb"
-dest_files=["res://.godot/imported/pipe_turn.glb-0babff90e38e31e6258c3927c5ef52b2.scn"]
+source_file="res://assets/OWN/Models/Pillar.glb"
+dest_files=["res://.godot/imported/Pillar.glb-f66b825592a6afd2bf5c67445f5f344c.scn"]
 
 [params]
 

@@ -95,4 +95,5 @@ text = "Quit game
 "
 
 [connection signal="pressed" from="VBoxContainer/ResumeButton" to="." method="OnResumePressed"]
+[connection signal="pressed" from="VBoxContainer/Settings" to="." method="OnSettingsPressed"]
 [connection signal="pressed" from="VBoxContainer/QuitButton" to="." method="OnQuitPressed"]

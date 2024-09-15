@@ -8,7 +8,8 @@ public partial class activatePlatform : Node3D
 	private bool _isActivated = false;
 	private int _objectsOnPlatform = 0;
 	private Door _associatedDoor;
-	private AudioStreamPlayer3D _audioPlayer;
+	private SoundManager _soundManager;
+	private string _activationSoundPath = "res://assets/Sounds/Platform_Activate.mp3";
 
 	[Export]
 	public string ActivateAnimationName { get; set; } = "activate_platform";
@@ -70,12 +71,12 @@ public partial class activatePlatform : Node3D
 			}
 		}
 
-		// Get the AudioStreamPlayer3D node
-		_audioPlayer = GetNode<AudioStreamPlayer3D>("AudioStreamPlayer3D");
+		// Get the SoundManager node
+		_soundManager = GetNode<SoundManager>("/root/SoundManager");
 
 		// Load and set the audio stream
-		var stream = GD.Load<AudioStream>("res://assets/Sounds/Platform_Activate.mp3");
-		_audioPlayer.Stream = stream;
+		// var stream = GD.Load<AudioStream>("res://assets/Sounds/Platform_Activate.mp3");
+		// _audioPlayer.Stream = stream;
 	}
 
 	private void OnBodyEntered(Node3D body)
@@ -109,7 +110,7 @@ public partial class activatePlatform : Node3D
 		}
 
 		// Play the activation sound
-		_audioPlayer.Play();
+		_soundManager.PlaySound(_activationSoundPath);
 	}
 
 	private void DeactivatePlatformAndDoor()

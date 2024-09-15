@@ -106,7 +106,7 @@ public partial class MemoryPuzle : Node3D
 	private bool _needsUpdate = false;
 
 	[Export]
-	public NodePath BorderGlassPath { get; set; }
+	public Node3D BorderGlass { get; set; }
 
 	private BorderGlass _associatedBorderGlass;
 
@@ -128,21 +128,21 @@ public partial class MemoryPuzle : Node3D
 		PuzzleArea.BodyEntered += OnBodyEnteredPuzzleArea;
 		PuzzleArea.BodyExited += OnBodyExitedPuzzleArea;
 
-		if (BorderGlassPath != null && BorderGlassPath != new NodePath())
+		if (BorderGlass != null)
 		{
-			_associatedBorderGlass = GetNode<BorderGlass>(BorderGlassPath);
-			if (_associatedBorderGlass == null)
+			if (BorderGlass is BorderGlass borderGlass)
 			{
-				GD.PrintErr("MemoryPuzzle: Associated BorderGlass not found at the specified path.");
+				_associatedBorderGlass = borderGlass;
+				GD.Print("MemoryPuzzle: BorderGlass successfully connected.");
 			}
 			else
 			{
-				GD.Print("MemoryPuzzle: BorderGlass successfully connected.");
+				GD.PrintErr($"MemoryPuzzle: Assigned BorderGlass is not of type BorderGlass. Found: {BorderGlass.GetType()}");
 			}
 		}
 		else
 		{
-			GD.PrintErr("MemoryPuzzle: BorderGlassPath is not set.");
+			GD.PrintErr("MemoryPuzzle: BorderGlass is not set in the Inspector.");
 		}
 	}
 
@@ -557,29 +557,7 @@ public partial class MemoryPuzle : Node3D
 
 		if (isPuzzleSolved)
 		{
-			if (_associatedBorderGlass != null)
-			{
-				GD.Print("Attempting to open BorderGlass");
-				_associatedBorderGlass.Open();
-			}
-			else
-			{
-				GD.PrintErr("BorderGlass reference is null!");
-				// Print the current BorderGlassPath
-				GD.Print($"Current BorderGlassPath: {BorderGlassPath}");
-				// Attempt to find the BorderGlass node again
-				var borderGlass = GetNode<BorderGlass>(BorderGlassPath);
-				if (borderGlass != null)
-				{
-					GD.Print("BorderGlass found, but reference was null. Updating reference.");
-					_associatedBorderGlass = borderGlass;
-					_associatedBorderGlass.Open();
-				}
-				else
-				{
-					GD.PrintErr("BorderGlass still not found. Check the path and node setup.");
-				}
-			}
+			OpenBorderGlass();
 		}
 	}
 
@@ -634,11 +612,8 @@ public partial class MemoryPuzle : Node3D
 		else
 		{
 			GD.PrintErr("BorderGlass reference is null!");
-			// Print the current BorderGlassPath
-			GD.Print($"Current BorderGlassPath: {BorderGlassPath}");
 			// Attempt to find the BorderGlass node again
-			var borderGlass = GetNode<BorderGlass>(BorderGlassPath);
-			if (borderGlass != null)
+			if (BorderGlass != null && BorderGlass is BorderGlass borderGlass)
 			{
 				GD.Print("BorderGlass found, but reference was null. Updating reference.");
 				_associatedBorderGlass = borderGlass;
@@ -646,7 +621,7 @@ public partial class MemoryPuzle : Node3D
 			}
 			else
 			{
-				GD.PrintErr("BorderGlass still not found. Check the path and node setup.");
+				GD.PrintErr("BorderGlass still not found or is not of type BorderGlass. Check the Inspector setup.");
 			}
 		}
 	}

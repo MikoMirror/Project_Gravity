@@ -16,14 +16,31 @@ public partial class NewGameConfirmationDialog : Control
 
 	public override void _Ready()
 	{
-		titleLabel = GetNode<Label>("TitleLabel");
-		messageLabel = GetNode<Label>("MessageLabel");
-		noButton = GetNode<Button>("NoButton");
-		yesButton = GetNode<Button>("YesButton");
-		noButton.Pressed += OnNoPressed;
-		yesButton.Pressed += OnYesPressed;
+		// Initialize the fields by getting the nodes from the scene
+		titleLabel = GetNode<Label>("VBoxContainer/TitleLabel");
+		messageLabel = GetNode<Label>("VBoxContainer/MessageLabel");
+		noButton = GetNode<Button>("VBoxContainer/HBoxContainer/NoButton");
+		yesButton = GetNode<Button>("VBoxContainer/HBoxContainer/YesButton");
 
-		// Hide the dialog initially
+		// Check if the buttons were found before connecting signals
+		if (noButton != null)
+		{
+			noButton.Pressed += OnNoPressed;
+		}
+		else
+		{
+			GD.PrintErr("NoButton not found in the scene.");
+		}
+
+		if (yesButton != null)
+		{
+			yesButton.Pressed += OnYesPressed;
+		}
+		else
+		{
+			GD.PrintErr("YesButton not found in the scene.");
+		}
+
 		Hide();
 	}
 

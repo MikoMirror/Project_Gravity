@@ -1674,10 +1674,10 @@ _isTeleportActive = false
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.06163, 1.46979, -1.90662)
 
 [node name="BorderGlass" parent="." instance=ExtResource("14_snxnt")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.91002, 0.0520873, -24.6917)
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 1, 8.91002, 0.0520873, -24.6917)
 
-[node name="MemmoryPuzzle" parent="." instance=ExtResource("3_qnbaf")]
+[node name="MemmoryPuzzle" parent="." node_paths=PackedStringArray("BorderGlass") instance=ExtResource("3_qnbaf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.53354, 0.0520869, -20.8718)
 Spacing = Vector3(2.5, 0, 2.5)
 PlatformStates = [false, true, false, false, true, false, false, true, false]
-BorderGlassPath = NodePath("../BorderGlass")
+BorderGlass = NodePath("../BorderGlass")

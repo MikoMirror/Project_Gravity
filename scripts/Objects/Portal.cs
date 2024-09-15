@@ -171,9 +171,7 @@ public partial class Portal : Node3D
 		var targetPortal = GetTree().CurrentScene.FindChild(TargetPortalName, true, false) as Portal;
 		if (targetPortal != null)
 		{
-			ShowLevelLoading();
 			player.Teleport(targetPortal.GlobalPosition, targetPortal.GlobalTransform.Basis.Z);
-			GetTree().CreateTimer(1f).Timeout += HideLevelLoading;
 		}
 		else
 		{

@@ -54,59 +54,50 @@ grow_vertical = 2
 theme = SubResource("Theme_odbku")
 color = Color(0.205117, 0.205117, 0.205117, 1)
 
-[node name="TitleLabel" type="Label" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -148.0
-offset_top = -215.0
-offset_right = 148.0
-offset_bottom = -169.0
+offset_left = -400.0
+offset_top = -225.0
+offset_right = 400.0
+offset_bottom = 225.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/separation = 100
+
+[node name="TitleLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
 theme_override_fonts/font = ExtResource("2_7lbg1")
 theme_override_font_sizes/font_size = 44
 text = "Remove last save?"
+horizontal_alignment = 1
 
-[node name="MessageLabel" type="Label" parent="."]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -328.0
-offset_top = -47.5
-offset_right = 328.0
-offset_bottom = 47.5
-grow_horizontal = 2
-grow_vertical = 2
+[node name="MessageLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
 theme_override_fonts/font = ExtResource("2_7lbg1")
 theme_override_font_sizes/font_size = 34
 text = "Starting a new game will overwrite your 
 existing save. Are you sure?"
 horizontal_alignment = 1
 
-[node name="YesButton" type="Button" parent="."]
-layout_mode = 0
-offset_left = 1140.0
-offset_top = 670.0
-offset_right = 1290.0
-offset_bottom = 737.0
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 225
+
+[node name="YesButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
 theme_override_fonts/font = ExtResource("2_7lbg1")
 theme_override_font_sizes/font_size = 44
 theme_override_styles/normal = SubResource("StyleBoxFlat_etop4")
 text = "Yes"
 
-[node name="NoButton" type="Button" parent="."]
-layout_mode = 0
-offset_left = 640.0
-offset_top = 670.0
-offset_right = 790.0
-offset_bottom = 737.0
+[node name="NoButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
 theme_override_fonts/font = ExtResource("2_7lbg1")
 theme_override_font_sizes/font_size = 44
 theme_override_styles/normal = SubResource("StyleBoxFlat_rq3yj")

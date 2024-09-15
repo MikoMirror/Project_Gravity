@@ -64,6 +64,9 @@ public partial class Player : CharacterBody3D
 	private ColorRect _fadeOverlay;
 	private PlayerTeleporter _playerTeleporter;
 
+	private SoundManager _soundManager;
+	private List<string> _footstepSoundPaths = new List<string>();
+
 	private AudioStreamPlayer3D _footstepPlayer;
 	private List<AudioStream> _footstepSounds = new List<AudioStream>();
 	private RandomNumberGenerator _rng = new RandomNumberGenerator();
@@ -122,6 +125,14 @@ public partial class Player : CharacterBody3D
 			GetNode<Camera3D>("Head/Camera3D"),
 			GetNode<Node3D>("Head")
 		);
+
+		_soundManager = GetNode<SoundManager>("/root/SoundManager");
+
+		// Load all footstep sound paths
+		for (int i = 1; i <= 10; i++)
+		{
+			_footstepSoundPaths.Add($"res://assets/Sounds/footsteps/{i}.mp3");
+		}
 
 		_footstepPlayer = GetNode<AudioStreamPlayer3D>("AudioStreamPlayer3D");
 
@@ -280,9 +291,8 @@ public partial class Player : CharacterBody3D
 
 	private void PlayRandomFootstep()
 	{
-		int randomIndex = _rng.RandiRange(0, _footstepSounds.Count - 1);
-		_footstepPlayer.Stream = _footstepSounds[randomIndex];
-		_footstepPlayer.Play();
+		int randomIndex = _rng.RandiRange(0, _footstepSoundPaths.Count - 1);
+		_soundManager.PlaySound(_footstepSoundPaths[randomIndex]);
 	}
 
 	private const float WALK_STEP_INTERVAL = 0.45f;
