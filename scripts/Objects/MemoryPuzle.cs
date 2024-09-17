@@ -106,9 +106,7 @@ public partial class MemoryPuzle : Node3D
 	private bool _needsUpdate = false;
 
 	[Export]
-	public Node3D BorderGlass { get; set; }
-
-	private BorderGlass _associatedBorderGlass;
+	public Node3D[] GlassGates { get; set; } = new Node3D[0];
 
 	public bool AllActiveSteppedOn { get; private set; } = false;
 
@@ -128,21 +126,23 @@ public partial class MemoryPuzle : Node3D
 		PuzzleArea.BodyEntered += OnBodyEnteredPuzzleArea;
 		PuzzleArea.BodyExited += OnBodyExitedPuzzleArea;
 
-		if (BorderGlass != null)
+		if (GlassGates.Length > 0)
 		{
-			if (BorderGlass is BorderGlass borderGlass)
+			for (int i = 0; i < GlassGates.Length; i++)
 			{
-				_associatedBorderGlass = borderGlass;
-				GD.Print("MemoryPuzzle: BorderGlass successfully connected.");
-			}
-			else
-			{
-				GD.PrintErr($"MemoryPuzzle: Assigned BorderGlass is not of type BorderGlass. Found: {BorderGlass.GetType()}");
+				if (GlassGates[i] != null)
+				{
+					GD.Print($"MemoryPuzzle: GlassGate {i + 1} successfully connected.");
+				}
+				else
+				{
+					GD.PrintErr($"MemoryPuzzle: GlassGate {i + 1} is null in the Inspector.");
+				}
 			}
 		}
 		else
 		{
-			GD.PrintErr("MemoryPuzzle: BorderGlass is not set in the Inspector.");
+			GD.Print("MemoryPuzzle: No GlassGates set in the Inspector.");
 		}
 	}
 
@@ -508,14 +508,11 @@ public partial class MemoryPuzle : Node3D
 			collisionShape.Shape = boxShape;
 		}
 
-		// Calculate the size of the area based on the puzzle dimensions
-		float width = (ColumnCount - 1) * Spacing.X + 1;  // Add 1 to include the last platform
+		float width = (ColumnCount - 1) * Spacing.X + 1;  
 		float depth = (RowCount - 1) * Spacing.Z + 1;
-		float height = 2;  // Adjust this value as needed for vertical clearance
+		float height = 2;  
 
 		boxShape.Size = new Vector3(width, height, depth);
-
-		// Update the position of the Area3D to center it on the puzzle
 		puzzleArea.Position = new Vector3(
 			(ColumnCount - 1) * Spacing.X / 2,
 			height / 2,
@@ -557,13 +554,19 @@ public partial class MemoryPuzle : Node3D
 
 		if (isPuzzleSolved)
 		{
-			OpenBorderGlass();
+			OpenGlassGates();
 		}
 	}
 
 	public void CheckAllActiveSteppedOn()
 	{
-		if (AllActiveSteppedOn) return; // Already checked and true
+		if (AllActiveSteppedOn) return; 
+
+		if (platformInstances == null)
+		{
+			GD.PrintErr("platformInstances is null in CheckAllActiveSteppedOn");
+			return;
+		}
 
 		AllActiveSteppedOn = true;
 		for (int row = 0; row < RowCount; row++)
@@ -571,10 +574,27 @@ public partial class MemoryPuzle : Node3D
 			for (int col = 0; col < ColumnCount; col++)
 			{
 				int index = row * ColumnCount + col;
-				if (PlatformStates[index] && !platformInstances[row, col].HasBeenActivated)
+				if (index >= PlatformStates.Count)
 				{
+					GD.PrintErr($"Index {index} is out of range for PlatformStates in CheckAllActiveSteppedOn");
 					AllActiveSteppedOn = false;
 					return;
+				}
+
+				if (PlatformStates[index])
+				{
+					if (platformInstances[row, col] == null)
+					{
+						GD.PrintErr($"Platform instance at [{row}, {col}] is null in CheckAllActiveSteppedOn");
+						AllActiveSteppedOn = false;
+						return;
+					}
+
+					if (!platformInstances[row, col].HasBeenActivated)
+					{
+						AllActiveSteppedOn = false;
+						return;
+					}
 				}
 			}
 		}
@@ -582,7 +602,7 @@ public partial class MemoryPuzle : Node3D
 		if (AllActiveSteppedOn)
 		{
 			SetInactivePlatformsNeutral();
-			OpenBorderGlass();
+			OpenGlassGates();
 			GD.Print("All active platforms have been stepped on!");
 		}
 	}
@@ -602,27 +622,31 @@ public partial class MemoryPuzle : Node3D
 		}
 	}
 
-	private void OpenBorderGlass()
+	private void OpenGlassGates()
 	{
-		if (_associatedBorderGlass != null)
+		foreach (var glassGate in GlassGates)
 		{
-			GD.Print("Attempting to open BorderGlass");
-			_associatedBorderGlass.Open();
+			OpenGlassGateInstance(glassGate);
 		}
-		else
+	}
+
+	private void OpenGlassGateInstance(Node3D glassGate)
+	{
+		if (glassGate != null)
 		{
-			GD.PrintErr("BorderGlass reference is null!");
-			// Attempt to find the BorderGlass node again
-			if (BorderGlass != null && BorderGlass is BorderGlass borderGlass)
+			GD.Print($"Attempting to open GlassGate: {glassGate.Name}");
+			if (glassGate.HasMethod("Open"))
 			{
-				GD.Print("BorderGlass found, but reference was null. Updating reference.");
-				_associatedBorderGlass = borderGlass;
-				_associatedBorderGlass.Open();
+				glassGate.Call("Open");
 			}
 			else
 			{
-				GD.PrintErr("BorderGlass still not found or is not of type BorderGlass. Check the Inspector setup.");
+				GD.PrintErr($"GlassGate {glassGate.Name} does not have an Open method. Check the implementation.");
 			}
+		}
+		else
+		{
+			GD.PrintErr("A GlassGate instance is null. Check the Inspector setup.");
 		}
 	}
 }

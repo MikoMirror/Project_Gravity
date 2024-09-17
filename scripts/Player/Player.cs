@@ -78,6 +78,8 @@ public partial class Player : CharacterBody3D
 	private const float DEATH_ANIMATION_DURATION = 0.2f;
 	private const float DEATH_FREEZE_DURATION = 2.0f;
 
+	private PlayerTeleporter _teleporter;
+
 	public override void _Ready()
 	{
 		// Get nodes and initialize
@@ -118,13 +120,7 @@ public partial class Player : CharacterBody3D
 		ConfigureInputMode();
 
 		// Initialize PlayerTeleporter
-		_playerTeleporter = new PlayerTeleporter(
-			this,
-			GetNode<AnimationPlayer>("AnimationPlayer"),
-			GetNode<ColorRect>("Head/Camera3D/TeleportOverlay"),
-			GetNode<Camera3D>("Head/Camera3D"),
-			GetNode<Node3D>("Head")
-		);
+		InitializeTeleporter();
 
 		_soundManager = GetNode<SoundManager>("/root/SoundManager");
 
@@ -165,6 +161,33 @@ public partial class Player : CharacterBody3D
 		}
 
 		ResetState(); // Reset the player state when the scene loads
+	}
+
+	private void InitializeTeleporter()
+	{
+		if (_animationPlayer == null)
+		{
+			GD.PrintErr("Player: AnimationPlayer not found!");
+			return;
+		}
+		if (_teleportOverlay == null)
+		{
+			GD.PrintErr("Player: TeleportOverlay not found!");
+			return;
+		}
+		if (_camera == null)
+		{
+			GD.PrintErr("Player: Camera3D not found!");
+			return;
+		}
+		if (_head == null)
+		{
+			GD.PrintErr("Player: Head node not found!");
+			return;
+		}
+
+		_teleporter = new PlayerTeleporter(this, _animationPlayer, _teleportOverlay, _camera, _head);
+		GD.Print("Player: PlayerTeleporter initialized successfully.");
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -222,9 +245,43 @@ public partial class Player : CharacterBody3D
 		return false;
 	}
 
-	public void Teleport(Vector3 targetPosition, Vector3? forwardDirection = null)
+	public void Teleport(Vector3 targetPosition, Vector3 forwardDirection)
 	{
-		_playerTeleporter.StartTeleportAnimation(targetPosition, forwardDirection);
+		if (_teleporter == null)
+		{
+			GD.PrintErr("Player: _teleporter is null. Attempting to reinitialize.");
+			InitializeTeleporter();
+			if (_teleporter == null)
+			{
+				GD.PrintErr("Player: Failed to initialize _teleporter. Teleportation aborted.");
+				return;
+			}
+		}
+		_teleporter.StartTeleportAnimation(targetPosition, forwardDirection);
+	}
+
+	public void FinishTeleportation()
+	{
+		if (_teleporter == null)
+		{
+			GD.PrintErr("Player: _teleporter is null. FinishTeleportation aborted.");
+			return;
+		}
+		_teleporter.FinishTeleportAnimation();
+	}
+
+	public event Action TeleportCompleted
+	{
+		add 
+		{ 
+			if (_teleporter != null) _teleporter.TeleportCompleted += value; 
+			else GD.PrintErr("Player: Cannot add TeleportCompleted event. _teleporter is null.");
+		}
+		remove 
+		{ 
+			if (_teleporter != null) _teleporter.TeleportCompleted -= value; 
+			else GD.PrintErr("Player: Cannot remove TeleportCompleted event. _teleporter is null.");
+		}
 	}
 
 	public void StartFadeOutAnimation()

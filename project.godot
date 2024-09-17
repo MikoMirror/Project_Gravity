@@ -18,7 +18,7 @@ config/icon="res://icon.svg"
 [audio]
 
 music_volume=0.44
-sound_volume=0.22
+sound_volume=0.91
 
 [autoload]
 

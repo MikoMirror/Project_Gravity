@@ -18,7 +18,7 @@ public partial class activatePlatform : Node3D
 	public NodePath AssociatedDoorPath { get; set; }
 
 	[Export]
-	public NodePath CableListPath { get; set; } // Path to the parent node containing all cables
+	public NodePath CableListPath { get; set; } 
 
 	private List<AnimationPlayer> _cableAnimationPlayers = new List<AnimationPlayer>();
 
@@ -70,13 +70,7 @@ public partial class activatePlatform : Node3D
 				GD.PrintErr("ActivatePlatform: Cable list node not found at the specified path.");
 			}
 		}
-
-		// Get the SoundManager node
 		_soundManager = GetNode<SoundManager>("/root/SoundManager");
-
-		// Load and set the audio stream
-		// var stream = GD.Load<AudioStream>("res://assets/Sounds/Platform_Activate.mp3");
-		// _audioPlayer.Stream = stream;
 	}
 
 	private void OnBodyEntered(Node3D body)
@@ -100,48 +94,67 @@ public partial class activatePlatform : Node3D
 	private void ActivatePlatformAndDoor()
 	{
 		_isActivated = true;
-		_platformAnimationPlayer.Play(ActivateAnimationName);
+		if (_platformAnimationPlayer.HasAnimation(ActivateAnimationName))
+		{
+			_platformAnimationPlayer.Play(ActivateAnimationName);
+		}
 		_associatedDoor?.Open();
 
-		// Activate all cables
 		foreach (var cableAnimPlayer in _cableAnimationPlayers)
 		{
-			cableAnimPlayer.Play("cable_enable");
+			if (cableAnimPlayer.HasAnimation("cable_enable"))
+			{
+				cableAnimPlayer.Play("cable_enable");
+			}
 		}
 
-		// Play the activation sound
+		
 		_soundManager.PlaySound(_activationSoundPath);
 	}
 
 	private void DeactivatePlatformAndDoor()
 	{
 		_isActivated = false;
-		_platformAnimationPlayer.PlayBackwards(ActivateAnimationName);
+		if (_platformAnimationPlayer.HasAnimation(ActivateAnimationName))
+		{
+			_platformAnimationPlayer.PlayBackwards(ActivateAnimationName);
+		}
 		_associatedDoor?.Close();
 
-		// Deactivate all cables
 		foreach (var cableAnimPlayer in _cableAnimationPlayers)
 		{
-			cableAnimPlayer.PlayBackwards("cable_enable");
+			if (cableAnimPlayer.HasAnimation("cable_enable"))
+			{
+				cableAnimPlayer.PlayBackwards("cable_enable");
+			}
 		}
-
-		// Optionally, play a deactivation sound if you have one
-		// _audioPlayer.Play();
 	}
 
 	public void ResetState()
 	{
 		_isActivated = false;
 		_objectsOnPlatform = 0;
-		_platformAnimationPlayer.Stop();
-		_platformAnimationPlayer.Seek(0, true);
+
+		if (_platformAnimationPlayer != null && _platformAnimationPlayer.HasAnimation(ActivateAnimationName))
+		{
+			_platformAnimationPlayer.Stop();
+			_platformAnimationPlayer.Play(ActivateAnimationName);
+			_platformAnimationPlayer.Seek(0, true);
+			_platformAnimationPlayer.Stop();
+		}
+
 		_associatedDoor?.ResetState();
 
 		// Reset all cables
 		foreach (var cableAnimPlayer in _cableAnimationPlayers)
 		{
-			cableAnimPlayer.Stop();
-			cableAnimPlayer.Seek(0, true);
+			if (cableAnimPlayer.HasAnimation("cable_enable"))
+			{
+				cableAnimPlayer.Stop();
+				cableAnimPlayer.Play("cable_enable");
+				cableAnimPlayer.Seek(0, true);
+				cableAnimPlayer.Stop();
+			}
 		}
 	}
 }

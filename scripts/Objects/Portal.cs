@@ -104,35 +104,19 @@ public partial class Portal : Node3D
 		player.Teleport(GlobalPosition, -GlobalTransform.Basis.Z);
 
 		// Use CallDeferred to change the level after the animation completes
-		var animationPlayer = player.GetNode<AnimationPlayer>("AnimationPlayer");
-		if (animationPlayer != null)
+		player.TeleportCompleted += () =>
 		{
-			animationPlayer.AnimationFinished += (animName) =>
-			{
-				if (animName == "teleportation")
-				{
-					ChangeLevelDeferred();
-				}
-			};
-		}
-		else
-		{
-			GD.PrintErr("Portal: AnimationPlayer not found in Player. Changing level immediately.");
 			ChangeLevelDeferred();
-		}
+		};
 	}
 
 	private void ChangeLevelDeferred()
 	{
 		var levelManager = GetNode<LevelManager>("/root/LevelManager");
 		if (levelManager != null)
-		{
 			levelManager.CallDeferred(nameof(LevelManager.ChangeLevel), TargetLevelPath);
-		}
 		else
-		{
 			GD.PrintErr("Portal: LevelManager not found. Unable to change level.");
-		}
 	}
 
 	private void TeleportWithinLevel(Player player)

@@ -10,12 +10,12 @@
 [ext_resource type="PackedScene" uid="uid://bogppjxcn8okv" path="res://assets/OWN/Prefabs/door.tscn" id="8_7lt72"]
 [ext_resource type="PackedScene" uid="uid://d25yeq8xge6yd" path="res://assets/OWN/Prefabs/cube.tscn" id="9_76axy"]
 [ext_resource type="PackedScene" uid="uid://0g1bm5vx4bhw" path="res://assets/OWN/Prefabs/portal.tscn" id="10_ejclo"]
-[ext_resource type="PackedScene" uid="uid://cjcbyfq2e6vpb" path="res://assets/OWN/Prefabs/platform.tscn" id="11_7sagp"]
 [ext_resource type="PackedScene" uid="uid://ichovlr7kibt" path="res://assets/OWN/Prefabs/glass_wall_with_door.tscn" id="12_a70qb"]
 [ext_resource type="PackedScene" uid="uid://1cc1ehwwh0tr" path="res://scenes/SupportScenes/Player.tscn" id="13_f2pka"]
 [ext_resource type="PackedScene" uid="uid://caelb0p7olxhc" path="res://assets/OWN/Prefabs/tuttorial_screen.tscn" id="14_bk81q"]
 [ext_resource type="PackedScene" uid="uid://bmoqkjcvpammp" path="res://assets/OWN/Prefabs/gravity_energy.tscn" id="15_nj3ty"]
 [ext_resource type="Script" path="res://scripts/Services/LevelMusicManager.cs" id="16_udmh5"]
+[ext_resource type="PackedScene" uid="uid://tmqcvcgtrbxb" path="res://assets/OWN/Prefabs/paltform.tscn" id="17_4oe5i"]
 [ext_resource type="PackedScene" uid="uid://db5u6fwreypfb" path="res://assets/OWN/Prefabs/table.tscn" id="17_fq1wy"]
 
 [sub_resource type="Environment" id="Environment_h4ijt"]
@@ -223,36 +223,36 @@ transform = Transform3D(-1.19209e-07, 0, -1, 0, 1, 0, 1.5, 0, -5.96046e-08, 2.99
 [node name="Wall31" parent="stage/Wall" instance=ExtResource("5_wkt1e")]
 transform = Transform3D(1.5, 0, -1.58933e-08, 0, 1, 0, 5.36422e-08, 0, 1, -0.00436997, 0, -27.3526)
 
-[node name="Cable" type="Node3D" parent="stage"]
+[node name="Cable2" type="Node3D" parent="stage"]
 
-[node name="Cable2" parent="stage/Cable" instance=ExtResource("6_0jhx3")]
+[node name="Cable2" parent="stage/Cable2" instance=ExtResource("6_0jhx3")]
 transform = Transform3D(2.98023e-08, 0, -1, 0, 1, 0, 1, 0, 2.98023e-08, 5.8, 7.9451, -13.7386)
 
-[node name="Cable3" parent="stage/Cable" instance=ExtResource("6_0jhx3")]
+[node name="Cable3" parent="stage/Cable2" instance=ExtResource("6_0jhx3")]
 transform = Transform3D(2.98023e-08, 0, -1, 0, 1, 0, 1, 0, 2.98023e-08, 5.8, 7.9451, -15.8386)
 
-[node name="Cable4" parent="stage/Cable" instance=ExtResource("6_0jhx3")]
+[node name="Cable4" parent="stage/Cable2" instance=ExtResource("6_0jhx3")]
 transform = Transform3D(2.98023e-08, 0, -1, 0, 1, 0, 1, 0, 2.98023e-08, 5.8, 7.9451, -17.9386)
 
-[node name="Cable5" parent="stage/Cable" instance=ExtResource("6_0jhx3")]
+[node name="Cable5" parent="stage/Cable2" instance=ExtResource("6_0jhx3")]
 transform = Transform3D(2.98023e-08, 0, -1, 0, 1, 0, 1, 0, 2.98023e-08, 5.8, 7.9451, -20.0386)
 
-[node name="Cable6" parent="stage/Cable" instance=ExtResource("6_0jhx3")]
+[node name="Cable6" parent="stage/Cable2" instance=ExtResource("6_0jhx3")]
 transform = Transform3D(2.98023e-08, 0, -1, -1, -4.37114e-08, -2.98023e-08, -4.37114e-08, 1, -1.3027e-15, 5.8, 6.8451, -21.0386)
 
-[node name="Cable7" parent="stage/Cable" instance=ExtResource("6_0jhx3")]
+[node name="Cable7" parent="stage/Cable2" instance=ExtResource("6_0jhx3")]
 transform = Transform3D(2.98023e-08, 0, -1, -1, -4.37114e-08, -2.98023e-08, -4.37114e-08, 1, -1.3027e-15, 5.8, 4.7451, -21.0386)
 
-[node name="Cable8" parent="stage/Cable" instance=ExtResource("6_0jhx3")]
+[node name="Cable8" parent="stage/Cable2" instance=ExtResource("6_0jhx3")]
 transform = Transform3D(2.98023e-08, 0, -1, -1, -4.37114e-08, -2.98023e-08, -4.37114e-08, 1, -1.3027e-15, 5.8, 2.6451, -21.0386)
 
-[node name="Cable9" parent="stage/Cable" instance=ExtResource("6_0jhx3")]
+[node name="Cable9" parent="stage/Cable2" instance=ExtResource("6_0jhx3")]
 transform = Transform3D(-1, -4.37114e-08, 1.39091e-08, 1.39091e-08, 1.91069e-15, 1, -4.37114e-08, 1, -1.3027e-15, 4.8, 1.5451, -21.0386)
 
-[node name="Cable10" parent="stage/Cable" instance=ExtResource("6_0jhx3")]
+[node name="Cable10" parent="stage/Cable2" instance=ExtResource("6_0jhx3")]
 transform = Transform3D(-1, -4.37114e-08, 1.39091e-08, 1.39091e-08, 1.91069e-15, 1, -4.37114e-08, 1, -1.3027e-15, 3.6, 1.5451, -21.0386)
 
-[node name="Cable11" parent="stage/Cable" instance=ExtResource("6_0jhx3")]
+[node name="Cable11" parent="stage/Cable2" instance=ExtResource("6_0jhx3")]
 transform = Transform3D(2.98023e-08, -3.62387e-23, -1, -1, -4.37114e-08, -2.98023e-08, -4.37114e-08, 1, -1.3027e-15, 2.5, 0.545096, -21.0386)
 
 [node name="GlassWall" type="Node3D" parent="stage"]
@@ -300,11 +300,6 @@ _type = 0
 _targetLevelPath = "res://scenes/Levels/level_2.tscn"
 _targetPortalName = "Portals/portal_lvl2"
 
-[node name="platform" parent="." instance=ExtResource("11_7sagp")]
-transform = Transform3D(-2, 3.49691e-07, 0, -1.74846e-07, -4, 0, 0, 0, 2, 5.79512, 7.97389, 9.08636)
-AssociatedDoorPath = NodePath("../Door")
-CableListPath = NodePath("../stage/Cable")
-
 [node name="TuttorialScreen" parent="." instance=ExtResource("14_bk81q")]
 transform = Transform3D(-8.74228e-08, 0, 2, 0, 2, 0, -2, 0, -8.74228e-08, -2.7228, 2.05263, 14.389)
 
@@ -323,3 +318,8 @@ musicTrackPath = "res://assets/Music/Level1.ogg"
 
 [node name="Table" parent="." instance=ExtResource("17_fq1wy")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.2724, 0.0642822, 8.41488)
+
+[node name="Paltform" parent="." instance=ExtResource("17_4oe5i")]
+transform = Transform3D(3, 0, 0, 0, -4, 2.38419e-07, 0, -3.57628e-07, -3, 5.89905, 7.9535, 9.70422)
+AssociatedDoorPath = NodePath("../Door")
+CableListPath = NodePath("../stage/Cable2")

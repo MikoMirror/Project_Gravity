@@ -218,84 +218,137 @@ public partial class LevelManager : Node
 			_pendingTargetPortalName = gameState.TargetPortalName;
 		}
 
-		// Show a loading screen or transition effect here if needed
-
 		GetTree().ChangeSceneToFile(newLevelPath);
 		CallDeferred(nameof(SetupNewLevel));
 	}
 
 	private void SetupNewLevel()
 	{
-		if (IsInsideTree())
-		{
-			GD.Print("LevelManager: Setting up new level");
-			var currentScene = GetTree().CurrentScene;
-			GD.Print($"LevelManager: Current scene: {currentScene?.Name ?? "null"}");
-			ResetLevelObjects();
-			
-			// Delay positioning the player to ensure the scene is fully loaded
-			GetTree().CreateTimer(0.1f).Timeout += () =>
-			{
-				PositionPlayerAtPortal(_pendingTargetPortalName);
-				_pendingTargetPortalName = null;
-				
-				// Play the teleportation animation in reverse for fade-in effect
-				var player = GetTree().CurrentScene.FindChild("Player", true, false) as Player;
-				if (player != null)
-				{
-					var animationPlayer = player.GetNode<AnimationPlayer>("AnimationPlayer");
-					if (animationPlayer != null)
-					{
-						animationPlayer.PlayBackwards("teleportation");
-					}
-					else
-					{
-						GD.PrintErr("LevelManager: AnimationPlayer not found in Player node");
-					}
-				}
-				else
-				{
-					GD.PrintErr("LevelManager: Player not found in the current scene");
-				}
-			};
-
-			// Hide loading screen or transition effect here if used
-			GD.Print("LevelManager: New level setup complete");
-		}
-		else
+		if (!IsInsideTree())
 		{
 			GD.PrintErr("LevelManager: Not inside tree when setting up new level");
+			return;
+		}
+
+		GD.Print("LevelManager: Setting up new level");
+		var currentScene = GetTree().CurrentScene;
+		GD.Print($"LevelManager: Current scene: {currentScene?.Name ?? "null"}");
+
+		ResetLevelObjects();
+		GetTree().CreateTimer(0.5f).Timeout += () =>
+		{
+			if (!IsInstanceValid(currentScene) || !currentScene.IsInsideTree())
+			{
+				GD.PrintErr("LevelManager: Scene is no longer valid or not in tree. Aborting setup.");
+				return;
+			}
+
+			PositionPlayerAtPortal(_pendingTargetPortalName);
+			_pendingTargetPortalName = null;
+
+			var player = currentScene.FindChild("Player", true, false) as Player;
+			if (player != null)
+			{
+				player.FinishTeleportation();
+			}
+			else
+			{
+				GD.PrintErr("LevelManager: Player not found in the current scene");
+			}
+
+			// Force update of lights and materials
+			ForceSceneUpdate(currentScene);
+
+			// Force RenderingServer update
+			RenderingServer.ForceSync();
+
+			// Update WorldEnvironment if present
+			var worldEnvironment = currentScene.GetNodeOrNull<WorldEnvironment>("WorldEnvironment");
+			if (worldEnvironment != null && worldEnvironment.Environment != null)
+			{
+				worldEnvironment.Environment = worldEnvironment.Environment.Duplicate() as Godot.Environment;
+				worldEnvironment.NotifyPropertyListChanged();
+			}
+
+			GD.Print("LevelManager: New level setup complete");
+		};
+	}
+
+	private void ForceSceneUpdate(Node rootNode)
+	{
+		if (rootNode is Light3D light)
+		{
+			light.NotifyPropertyListChanged();
+		}
+		else if (rootNode is MeshInstance3D meshInstance)
+		{
+			for (int i = 0; i < meshInstance.GetSurfaceOverrideMaterialCount(); i++)
+			{
+				var material = meshInstance.GetSurfaceOverrideMaterial(i);
+				if (material != null)
+				{
+					material.NotifyPropertyListChanged();
+				}
+			}
+		}
+
+		foreach (var child in rootNode.GetChildren())
+		{
+			ForceSceneUpdate(child);
 		}
 	}
 
 	private void ResetLevelObjects()
 	{
 		var currentScene = GetTree().CurrentScene;
+		if (currentScene != null)
+		{
 			ResetNodeAnimations(currentScene);
 			ResetObjectStates(currentScene);
+		}
+		else
+		{
+			GD.PrintErr("LevelManager: Current scene is null when trying to reset level objects");
+		}
 	}
 
 	private void ResetObjectStates(Node node)
 	{
+		if (node == null)
+		{
+			return;
+		}
+
+		// Reset animation player if present
+		var animationPlayer = node.GetNodeOrNull<AnimationPlayer>("AnimationPlayer");
+		if (animationPlayer != null)
+		{
+			animationPlayer.Stop();
+			animationPlayer.Seek(0, true);
+		}
+
 		switch (node)
 		{
-			case activatePlatform platform:
+			case activatePlatform platform when platform != null:
 				platform.ResetState();
 				break;
-			case Door door:
+			case Door door when door != null:
 				door.Close();
 				break;
-			case Cable cable:
+			case Cable cable when cable != null:
 				cable.Deactivate();
 				break;
-			case GravityOrb gravityOrb:
+			case GravityOrb gravityOrb when gravityOrb != null:
 				gravityOrb.Reset();
 				break;
 		}
 
 		foreach (var child in node.GetChildren())
 		{
-			ResetObjectStates(child);
+			if (child != null)
+			{
+				ResetObjectStates(child);
+			}
 		}
 	}
 
@@ -342,7 +395,9 @@ public partial class LevelManager : Node
 
 		if (targetPortal != null && player != null)
 		{
+			GD.Print($"LevelManager: Positioning player at portal {targetPortalName}");
 			player.GlobalPosition = targetPortal.GlobalPosition;
+			player.LookAt(player.GlobalPosition + targetPortal.GlobalTransform.Basis.Z);
 		}
 		else
 		{

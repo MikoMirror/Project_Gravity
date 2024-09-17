@@ -1,7 +1,7 @@
 [gd_scene load_steps=17 format=4 uid="uid://v6c7g1r8vhus"]
 
 [ext_resource type="Shader" path="res://shaders/glass.gdshader" id="1_fjj2f"]
-[ext_resource type="Script" path="res://scripts/Objects/BorderGlass.cs" id="1_hpp4l"]
+[ext_resource type="Script" path="res://scripts/Objects/GlassGate.cs" id="1_hpp4l"]
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_u42ab"]
 points = PackedVector3Array(0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5)
@@ -184,7 +184,7 @@ _data = {
 "open_glass": SubResource("Animation_tsqba")
 }
 
-[node name="BorderGlass" type="Node3D"]
+[node name="GlassGate" type="Node3D"]
 script = ExtResource("1_hpp4l")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="."]

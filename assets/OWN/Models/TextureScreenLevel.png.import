@@ -2,20 +2,17 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ifjil3xjf1ul"
-path.s3tc="res://.godot/imported/TuttorialScreen_TextureScreenLevel.png-5ab93b6b2ef0da795fe7a112519b8b0c.s3tc.ctex"
+uid="uid://cgjngtjgh4j6"
+path.s3tc="res://.godot/imported/TextureScreenLevel.png-77a8dc7c39f0405966ae0c5407a186bf.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
-generator_parameters={
-"md5": "6f48d1da668f29ebbf93bf7d2b1662d1"
-}
 
 [deps]
 
-source_file="res://assets/OWN/Models/TuttorialScreen_TextureScreenLevel.png"
-dest_files=["res://.godot/imported/TuttorialScreen_TextureScreenLevel.png-5ab93b6b2ef0da795fe7a112519b8b0c.s3tc.ctex"]
+source_file="res://assets/OWN/Models/TextureScreenLevel.png"
+dest_files=["res://.godot/imported/TextureScreenLevel.png-77a8dc7c39f0405966ae0c5407a186bf.s3tc.ctex"]
 
 [params]
 

@@ -73,4 +73,15 @@ public class PlayerTeleporter
 	public bool IsTeleporting => _isTeleporting;
 
 	public event Action TeleportCompleted;
+
+	public void FinishTeleportAnimation()
+	{
+		if (_animationPlayer != null)
+		{
+			_animationPlayer.PlayBackwards("teleportation");
+		}
+		_teleportOverlay.Visible = false;
+		_isTeleporting = false;
+		TeleportCompleted?.Invoke();
+	}
 }

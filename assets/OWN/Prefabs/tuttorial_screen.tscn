@@ -1,6 +1,6 @@
 [gd_scene load_steps=10 format=4 uid="uid://caelb0p7olxhc"]
 
-[ext_resource type="Texture2D" uid="uid://ifjil3xjf1ul" path="res://assets/OWN/Models/TuttorialScreen_TextureScreenLevel.png" id="1_kke3r"]
+[ext_resource type="Texture2D" uid="uid://cgjngtjgh4j6" path="res://assets/OWN/Models/TextureScreenLevel.png" id="1_bnq3q"]
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_lppwx"]
 points = PackedVector3Array(1, 1, 1, 1, -1, 1, 1, 1, -1, -1, 1, 1, 1, -1, -1, -1, -1, 1, -1, 1, -1, -1, -1, -1)
@@ -49,7 +49,7 @@ points = PackedVector3Array(0.90577, 0.90577, -0.048789, 0.90577, -0.90577, -0.0
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jedqn"]
 resource_name = "ScreenLevel"
 cull_mode = 2
-albedo_texture = ExtResource("1_kke3r")
+albedo_texture = ExtResource("1_bnq3q")
 roughness = 0.5
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_nouv6"]
