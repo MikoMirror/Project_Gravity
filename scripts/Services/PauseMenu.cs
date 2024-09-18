@@ -3,14 +3,16 @@ using System;
 
 public partial class PauseMenu : Control
 {
+	// Fields
 	private Button _resumeButton;
 	private Button _restartLevelButton;
 	private Button _settingsButton;
 	private Button _quitButton;
 	private LevelManager _levelManager;
-	private GameState gameState;
+	private GameState _gameState;
 	private Settings _settingsInstance;
 
+	// Initialization
 	public void Initialize(LevelManager levelManager)
 	{
 		_levelManager = levelManager;
@@ -18,77 +20,58 @@ public partial class PauseMenu : Control
 
 	public override void _Ready()
 	{
-		// Try to find buttons directly under the PauseMenu node
-		_resumeButton = GetNodeOrNull<Button>("VBoxContainer/ResumeButton");
-		_restartLevelButton = GetNodeOrNull<Button>("VBoxContainer/Restart Level");
-		_settingsButton = GetNodeOrNull<Button>("VBoxContainer/Settings");
-		_quitButton = GetNodeOrNull<Button>("VBoxContainer/QuitButton");
-
-		if (_resumeButton != null)
-		{
-			_resumeButton.Pressed += OnResumePressed;
-			_resumeButton.GrabFocus(); // Automatically focus the resume button
-		}
-		else
-		{
-			GD.PrintErr("PauseMenu: ResumeButton not found");
-		}
-
-		if (_restartLevelButton != null)
-		{
-			_restartLevelButton.Pressed += OnRestartLevelPressed;
-		}
-		else
-		{
-			GD.PrintErr("PauseMenu: Restart Level button not found");
-		}
-
-		if (_settingsButton != null)
-		{
-			_settingsButton.Pressed += OnSettingsPressed;
-		}
-		else
-		{
-			GD.PrintErr("PauseMenu: Settings button not found");
-		}
-
-		if (_quitButton != null)
-		{
-			_quitButton.Pressed += OnQuitPressed;
-		}
-		else
-		{
-			GD.PrintErr("PauseMenu: QuitButton not found");
-		}
-
-		// Get the GameState singleton
-		gameState = GetNode<GameState>("/root/GameState");
-		if (gameState == null)
-		{
-			GD.PrintErr("GameState not found. Make sure it's set up as an AutoLoad.");
-		}
-
-		// Set the pause menu to process even when the game is paused
+		SetupButtons();
+		SetupGameState();
 		ProcessMode = ProcessModeEnum.Always;
 	}
 
+	// Button Setup
+	private void SetupButtons()
+	{
+		SetupButton(ref _resumeButton, "VBoxContainer/ResumeButton", OnResumePressed, true);
+		SetupButton(ref _restartLevelButton, "VBoxContainer/Restart Level", OnRestartLevelPressed);
+		SetupButton(ref _settingsButton, "VBoxContainer/Settings", OnSettingsPressed);
+		SetupButton(ref _quitButton, "VBoxContainer/QuitButton", OnQuitPressed);
+	}
+
+	private void SetupButton(ref Button button, string path, Action pressedAction, bool grabFocus = false)
+	{
+		button = GetNodeOrNull<Button>(path);
+		if (button != null)
+		{
+			button.Pressed += pressedAction;
+			if (grabFocus) button.GrabFocus();
+		}
+		else
+		{
+			GD.PrintErr($"PauseMenu: {path} button not found");
+		}
+	}
+
+	private void SetupGameState()
+	{
+		_gameState = GetNode<GameState>("/root/GameState");
+		if (_gameState == null)
+		{
+			GD.PrintErr("GameState not found. Make sure it's set up as an AutoLoad.");
+		}
+	}
+
+	// Input Handling
 	public override void _Input(InputEvent @event)
 	{
-		if (@event.IsActionPressed("ui_cancel")) // ESC key
+		if (@event.IsActionPressed("ui_cancel"))
 		{
 			HandleEscapePress();
-			GetViewport().SetInputAsHandled(); // Prevent the event from propagating
+			GetViewport().SetInputAsHandled();
 		}
 	}
 
 	private void HandleEscapePress()
 	{
-		if (_settingsInstance != null && IsInstanceValid(_settingsInstance))
+		if (_settingsInstance != null && IsInstanceValid(_settingsInstance) && _settingsInstance.HandleEscapePress())
 		{
-			if (_settingsInstance.HandleEscapePress())
-			{
-				OnSettingsBackButtonPressed();
-			}
+			OnSettingsBackButtonPressed();
 		}
 		else
 		{
@@ -96,9 +79,10 @@ public partial class PauseMenu : Control
 		}
 	}
 
+	// Button Actions
 	private void OnResumePressed()
 	{
-		GD.Print("Resume button pressed"); // Add this line for debugging
+		GD.Print("Resume button pressed");
 		if (_levelManager != null)
 		{
 			_levelManager.ClosePauseMenu();
@@ -123,32 +107,26 @@ public partial class PauseMenu : Control
 
 	private void OnSettingsPressed()
 	{
-		// Check if settings are already open
 		if (_settingsInstance != null && IsInstanceValid(_settingsInstance))
 		{
 			GD.Print("Settings are already open");
 			return;
 		}
 
+		OpenSettingsMenu();
+	}
+
+	private void OpenSettingsMenu()
+	{
 		var settingsScene = ResourceLoader.Load<PackedScene>("res://scenes/SupportScenes/settings.tscn");
 		if (settingsScene != null)
 		{
 			_settingsInstance = settingsScene.Instantiate<Settings>();
-			
-			// Set the settings menu to process even when the game is paused
 			_settingsInstance.ProcessMode = ProcessModeEnum.Always;
-			
-			// Add the settings scene as a child of the current scene
 			GetTree().Root.AddChild(_settingsInstance);
-			
-			// Optionally, you can position the settings menu to appear centered
 			_settingsInstance.AnchorRight = 1;
 			_settingsInstance.AnchorBottom = 1;
-			
-			// Hide the pause menu
-			this.Hide();
-			
-			// Connect to the back button pressed signal of the settings menu
+			Hide();
 			_settingsInstance.BackButtonPressed += OnSettingsBackButtonPressed;
 		}
 		else
@@ -159,21 +137,21 @@ public partial class PauseMenu : Control
 
 	private void OnSettingsBackButtonPressed()
 	{
-		// Show the pause menu again
-		this.Show();
-		
-		// Clear the reference to the settings instance
+		Show();
 		_settingsInstance = null;
-		
-		// Set focus back to the resume button
 		_resumeButton?.GrabFocus();
 	}
 
 	private void OnQuitPressed()
 	{
-		if (gameState != null)
+		SaveGameAndQuit();
+	}
+
+	private void SaveGameAndQuit()
+	{
+		if (_gameState != null)
 		{
-			gameState.SaveCurrentLevel();
+			_gameState.SaveCurrentLevel();
 		}
 		else
 		{
@@ -187,10 +165,14 @@ public partial class PauseMenu : Control
 		else
 		{
 			GD.PrintErr("PauseMenu: LevelManager not set");
-			// Fallback to direct scene change if LevelManager is not available
-			GetTree().Paused = false;
-			Input.MouseMode = Input.MouseModeEnum.Visible;
-			GetTree().CallDeferred(SceneTree.MethodName.ChangeSceneToFile, "res://scenes/main_menu.tscn");
+			FallbackQuitToMainMenu();
 		}
+	}
+
+	private void FallbackQuitToMainMenu()
+	{
+		GetTree().Paused = false;
+		Input.MouseMode = Input.MouseModeEnum.Visible;
+		GetTree().CallDeferred(SceneTree.MethodName.ChangeSceneToFile, "res://scenes/main_menu.tscn");
 	}
 }

@@ -4,21 +4,20 @@ using System;
 [Tool]
 public partial class MemoryPuzle : Node3D
 {
+	#region Signals
 	[Signal]
 	public delegate void PlatformStatesChangedEventHandler();
 
 	[Signal]
 	public delegate void SetupCompletedEventHandler();
+	#endregion
 
+	#region Exports
 	[Export]
 	public string TerminalScenePath = "res://assets/OWN/Prefabs/terminal.tscn";
 	
 	[Export]
 	public string PlatformScenePath = "res://assets/OWN/Prefabs/memory_platform.tscn";
-
-	private int _rowCount = 1;
-	private int _columnCount = 1;
-	private Vector3 _spacing = new Vector3(2, 0, 2);
 
 	[Export(PropertyHint.Range, "1,20,1")]
 	public int RowCount
@@ -54,8 +53,6 @@ public partial class MemoryPuzle : Node3D
 		}
 	}
 
-	
-
 	[Export]
 	public Vector3 Spacing
 	{
@@ -76,9 +73,6 @@ public partial class MemoryPuzle : Node3D
 	[Export]
 	public Godot.Collections.Array<bool> PlatformStates { get; set; } = new Godot.Collections.Array<bool>();
 
-	private MemoryPlatform[,] platformInstances;
-
-	private Area3D _puzzleArea;
 	[Export]
 	public Area3D PuzzleArea
 	{
@@ -100,16 +94,26 @@ public partial class MemoryPuzle : Node3D
 		set => _puzzleArea = value;
 	}
 
-	private bool _isPuzzleActive = true;
-	private bool _isInRedState = false;
-
-	private bool _needsUpdate = false;
-
 	[Export]
 	public Node3D[] GlassGates { get; set; } = new Node3D[0];
+	#endregion
 
+	#region Private Fields
+	private int _rowCount = 1;
+	private int _columnCount = 1;
+	private Vector3 _spacing = new Vector3(2, 0, 2);
+	private MemoryPlatform[,] platformInstances;
+	private Area3D _puzzleArea;
+	private bool _isPuzzleActive = true;
+	private bool _isInRedState = false;
+	private bool _needsUpdate = false;
+	#endregion
+
+	#region Public Properties
 	public bool AllActiveSteppedOn { get; private set; } = false;
+	#endregion
 
+	#region Lifecycle Methods
 	public override void _Ready()
 	{
 		if (Engine.IsEditorHint())
@@ -146,6 +150,159 @@ public partial class MemoryPuzle : Node3D
 		}
 	}
 
+	public override void _Process(double delta)
+	{
+		if (Engine.IsEditorHint() && _needsUpdate)
+		{
+			UpdateVisualRepresentation();
+			_needsUpdate = false;
+		}
+	}
+	#endregion
+
+	#region Public Methods
+	public void ResetPuzzle()
+	{
+		if (!_isPuzzleActive) return;
+
+		_isPuzzleActive = false;
+		_isInRedState = true;
+		AllActiveSteppedOn = false;
+		SetAllPlatformsRed();
+		UpdateAllPlatforms();
+	}
+
+	public void UpdatePuzzle()
+	{
+		if (!IsInsideTree()) return;
+
+		GD.Print($"UpdatePuzzle called. Rows: {RowCount}, Columns: {ColumnCount}");
+	   
+		if (Engine.IsEditorHint())
+		{
+			UpdateVisualRepresentation();
+		}
+		else
+		{
+			CreatePlatformGrid();
+		}
+		UpdateTerminalGridSize();
+		UpdateTerminalPosition();
+		UpdatePuzzleArea();
+		EmitSignal(SignalName.SetupCompleted);
+	}
+
+	public void UpdatePlatformState(int row, int col, bool isActive)
+	{
+		GD.Print($"UpdatePlatformState called: row={row}, col={col}, isActive={isActive}");
+	   
+		int index = row * ColumnCount + col;
+		if (index < PlatformStates.Count)
+		{
+			PlatformStates[index] = isActive;
+		   
+			GD.Print($"Platform state updated: index={index}, isActive={isActive}");
+
+			if (Engine.IsEditorHint())
+			{
+				UpdateVisualRepresentation();
+			}
+			else if (platformInstances != null && platformInstances[row, col] != null)
+			{
+				MemoryPlatform memoryPlatform = platformInstances[row, col];
+				if (memoryPlatform != null)
+				{
+					memoryPlatform.IsActive = isActive;
+					memoryPlatform.UpdateVisuals();
+					GD.Print($"MemoryPlatform IsActive set to: {isActive}");
+				}
+				else
+				{
+					GD.PushError($"MemoryPlatform script not found on platform at row={row}, col={col}");
+				}
+			}
+			else
+			{
+				GD.PushError($"Platform instance not found at row={row}, col={col}");
+			}
+
+			// Emit signal to notify about the state change
+			EmitSignal(SignalName.PlatformStatesChanged);
+			CheckPuzzleCompletion();
+
+			if (!isActive)
+			{
+				ResetPuzzle(); // Reset the puzzle when stepping on an inactive platform
+			}
+			else
+			{
+				CheckAllActiveSteppedOn();
+			}
+		}
+		else
+		{
+			GD.PushError($"Invalid platform index: {index}. RowCount={RowCount}, ColumnCount={ColumnCount}");
+		}
+	}
+
+	public void ManualSetup()
+	{
+		UpdatePuzzle();
+		EmitSignal(SignalName.SetupCompleted);
+		EmitSignal(SignalName.PlatformStatesChanged);
+	}
+
+	public void CheckAllActiveSteppedOn()
+	{
+		if (AllActiveSteppedOn) return; 
+
+		if (platformInstances == null)
+		{
+			GD.PrintErr("platformInstances is null in CheckAllActiveSteppedOn");
+			return;
+		}
+
+		AllActiveSteppedOn = true;
+		for (int row = 0; row < RowCount; row++)
+		{
+			for (int col = 0; col < ColumnCount; col++)
+			{
+				int index = row * ColumnCount + col;
+				if (index >= PlatformStates.Count)
+				{
+					GD.PrintErr($"Index {index} is out of range for PlatformStates in CheckAllActiveSteppedOn");
+					AllActiveSteppedOn = false;
+					return;
+				}
+
+				if (PlatformStates[index])
+				{
+					if (platformInstances[row, col] == null)
+					{
+						GD.PrintErr($"Platform instance at [{row}, {col}] is null in CheckAllActiveSteppedOn");
+						AllActiveSteppedOn = false;
+						return;
+					}
+
+					if (!platformInstances[row, col].HasBeenActivated)
+					{
+						AllActiveSteppedOn = false;
+						return;
+					}
+				}
+			}
+		}
+
+		if (AllActiveSteppedOn)
+		{
+			SetInactivePlatformsNeutral();
+			OpenGlassGates();
+			GD.Print("All active platforms have been stepped on!");
+		}
+	}
+	#endregion
+
+	#region Private Methods
 	private void OnBodyEnteredPuzzleArea(Node3D body)
 	{
 		if (body is Player)
@@ -166,17 +323,6 @@ public partial class MemoryPuzle : Node3D
 			_isInRedState = false;
 			SetPlatformsActive(true);
 		}
-	}
-
-	public void ResetPuzzle()
-	{
-		if (!_isPuzzleActive) return;
-
-		_isPuzzleActive = false;
-		_isInRedState = true;
-		AllActiveSteppedOn = false;
-		SetAllPlatformsRed();
-		UpdateAllPlatforms();
 	}
 
 	private void SetAllPlatformsRed()
@@ -244,26 +390,6 @@ public partial class MemoryPuzle : Node3D
 			PlatformStates = newStates;
 			EmitSignal(SignalName.PlatformStatesChanged);
 		}
-	}
-
-	public void UpdatePuzzle()
-	{
-		if (!IsInsideTree()) return;
-
-		GD.Print($"UpdatePuzzle called. Rows: {RowCount}, Columns: {ColumnCount}");
-		
-		if (Engine.IsEditorHint())
-		{
-			UpdateVisualRepresentation();
-		}
-		else
-		{
-			CreatePlatformGrid();
-		}
-		UpdateTerminalGridSize();
-		UpdateTerminalPosition();
-		UpdatePuzzleArea();
-		EmitSignal(SignalName.SetupCompleted);
 	}
 
 	private void UpdateVisualRepresentation()
@@ -435,59 +561,6 @@ public partial class MemoryPuzle : Node3D
 		}
 	}
 
-	public void UpdatePlatformState(int row, int col, bool isActive)
-	{
-		GD.Print($"UpdatePlatformState called: row={row}, col={col}, isActive={isActive}");
-		
-		int index = row * ColumnCount + col;
-		if (index < PlatformStates.Count)
-		{
-			PlatformStates[index] = isActive;
-			
-			GD.Print($"Platform state updated: index={index}, isActive={isActive}");
-
-			if (Engine.IsEditorHint())
-			{
-				UpdateVisualRepresentation();
-			}
-			else if (platformInstances != null && platformInstances[row, col] != null)
-			{
-				MemoryPlatform memoryPlatform = platformInstances[row, col];
-				if (memoryPlatform != null)
-				{
-					memoryPlatform.IsActive = isActive;
-					memoryPlatform.UpdateVisuals();
-					GD.Print($"MemoryPlatform IsActive set to: {isActive}");
-				}
-				else
-				{
-					GD.PushError($"MemoryPlatform script not found on platform at row={row}, col={col}");
-				}
-			}
-			else
-			{
-				GD.PushError($"Platform instance not found at row={row}, col={col}");
-			}
-
-			// Emit signal to notify about the state change
-			EmitSignal(SignalName.PlatformStatesChanged);
-			CheckPuzzleCompletion();
-
-			if (!isActive)
-			{
-				ResetPuzzle(); // Reset the puzzle when stepping on an inactive platform
-			}
-			else
-			{
-				CheckAllActiveSteppedOn();
-			}
-		}
-		else
-		{
-			GD.PushError($"Invalid platform index: {index}. RowCount={RowCount}, ColumnCount={ColumnCount}");
-		}
-	}
-
 	private void UpdatePuzzleArea()
 	{
 		var puzzleArea = PuzzleArea; // This will create the Area3D if it doesn't exist
@@ -522,22 +595,6 @@ public partial class MemoryPuzle : Node3D
 		GD.Print($"Updated PuzzleArea size to: {boxShape.Size}, position to: {puzzleArea.Position}");
 	}
 
-	public override void _Process(double delta)
-	{
-		if (Engine.IsEditorHint() && _needsUpdate)
-		{
-			UpdateVisualRepresentation();
-			_needsUpdate = false;
-		}
-	}
-
-	public void ManualSetup()
-	{
-		UpdatePuzzle();
-		EmitSignal(SignalName.SetupCompleted);
-		EmitSignal(SignalName.PlatformStatesChanged);
-	}
-
 	private void CheckPuzzleCompletion()
 	{
 		bool isPuzzleSolved = true;
@@ -555,55 +612,6 @@ public partial class MemoryPuzle : Node3D
 		if (isPuzzleSolved)
 		{
 			OpenGlassGates();
-		}
-	}
-
-	public void CheckAllActiveSteppedOn()
-	{
-		if (AllActiveSteppedOn) return; 
-
-		if (platformInstances == null)
-		{
-			GD.PrintErr("platformInstances is null in CheckAllActiveSteppedOn");
-			return;
-		}
-
-		AllActiveSteppedOn = true;
-		for (int row = 0; row < RowCount; row++)
-		{
-			for (int col = 0; col < ColumnCount; col++)
-			{
-				int index = row * ColumnCount + col;
-				if (index >= PlatformStates.Count)
-				{
-					GD.PrintErr($"Index {index} is out of range for PlatformStates in CheckAllActiveSteppedOn");
-					AllActiveSteppedOn = false;
-					return;
-				}
-
-				if (PlatformStates[index])
-				{
-					if (platformInstances[row, col] == null)
-					{
-						GD.PrintErr($"Platform instance at [{row}, {col}] is null in CheckAllActiveSteppedOn");
-						AllActiveSteppedOn = false;
-						return;
-					}
-
-					if (!platformInstances[row, col].HasBeenActivated)
-					{
-						AllActiveSteppedOn = false;
-						return;
-					}
-				}
-			}
-		}
-
-		if (AllActiveSteppedOn)
-		{
-			SetInactivePlatformsNeutral();
-			OpenGlassGates();
-			GD.Print("All active platforms have been stepped on!");
 		}
 	}
 
@@ -649,4 +657,5 @@ public partial class MemoryPuzle : Node3D
 			GD.PrintErr("A GlassGate instance is null. Check the Inspector setup.");
 		}
 	}
+	#endregion
 }

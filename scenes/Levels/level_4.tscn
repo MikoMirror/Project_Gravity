@@ -1679,4 +1679,4 @@ transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 1, 8.91002, 0.0520873, -24.6
 [node name="MemmoryPuzzle" parent="." instance=ExtResource("14_3mfok")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.53354, 0.0520869, -20.8718)
 Spacing = Vector3(2.5, 0, 2.5)
-PlatformStates = [false, true, false, false, true, false, false, true, false]
+PlatformStates = [false, true, false, false, false, false, false, false, false]

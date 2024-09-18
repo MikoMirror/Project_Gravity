@@ -319,7 +319,7 @@ musicTrackPath = "res://assets/Music/Level1.ogg"
 [node name="Table" parent="." instance=ExtResource("17_fq1wy")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.2724, 0.0642822, 8.41488)
 
-[node name="Paltform" parent="." instance=ExtResource("17_4oe5i")]
+[node name="Paltform_lvl1" parent="." instance=ExtResource("17_4oe5i")]
 transform = Transform3D(3, 0, 0, 0, -4, 2.38419e-07, 0, -3.57628e-07, -3, 5.89905, 7.9535, 9.70422)
 AssociatedDoorPath = NodePath("../Door")
 CableListPath = NodePath("../stage/Cable2")

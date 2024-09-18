@@ -4,51 +4,66 @@ using System.Collections.Generic;
 
 public partial class LevelManager : Node
 {
+	#region Fields
 	private List<Node3D> _initialSceneState = new();
 	private string _currentLevelScene;
 	private PackedScene _pauseMenuScene;
 	private PauseMenu _pauseMenuInstance;
 	private Player _player;
 	private string _pendingTargetPortalName;
+	#endregion
 
+	#region Initialization
 	public override void _Ready()
+	{
+		InitializeLevel();
+		SetupPlayer();
+		HandlePendingPortal();
+		InitializeMemoryPuzzles();
+	}
+
+	private void InitializeLevel()
 	{
 		_currentLevelScene = GetTree().CurrentScene.SceneFilePath;
 		SaveInitialSceneState();
 		CallDeferred(nameof(HideLevelLoading));
 		_pauseMenuScene = GD.Load<PackedScene>("res://scenes/pause_menu.tscn");
+	}
+
+	private void SetupPlayer()
+	{
 		_player = GetTree().CurrentScene.FindChild("Player", true, false) as Player;
-		
 		var gameState = GetNode<GameState>("/root/GameState");
-		if (gameState != null)
+		if (gameState != null && !string.IsNullOrEmpty(gameState.TargetPortalName))
 		{
-			if (!string.IsNullOrEmpty(gameState.TargetPortalName))
-			{
-				CallDeferred(nameof(PositionPlayerAtPortal), gameState.TargetPortalName);
-			}
+			CallDeferred(nameof(PositionPlayerAtPortal), gameState.TargetPortalName);
 			gameState.IsComingFromPortal = false;
 		}
-
 		_player?.StartFadeOutAnimation();
+	}
 
+	private void HandlePendingPortal()
+	{
 		if (!string.IsNullOrEmpty(_pendingTargetPortalName))
 		{
 			CallDeferred(nameof(DeferredPositionPlayerAtPortal), _pendingTargetPortalName);
 			_pendingTargetPortalName = null;
 		}
-
-		InitializeMemoryPuzzles();
 	}
+	#endregion
 
+	#region Input Handling
 	public override void _Input(InputEvent @event)
-{
-	if (@event.IsActionPressed("ui_cancel") && GetTree().CurrentScene.Name != "MainMenu")
 	{
-		TogglePauseMenu();
-		GetViewport().SetInputAsHandled();
+		if (@event.IsActionPressed("ui_cancel") && GetTree().CurrentScene.Name != "MainMenu")
+		{
+			TogglePauseMenu();
+			GetViewport().SetInputAsHandled();
+		}
 	}
-}
+	#endregion
 
+	#region Scene State Management
 	private void SaveInitialSceneState() => SaveNodeState(GetTree().CurrentScene);
 
 	private void SaveNodeState(Node node)
@@ -80,10 +95,7 @@ public partial class LevelManager : Node
 
 	private void ResetNodeAnimations(Node node)
 	{
-		if (node == null)
-		{
-			return;
-		}
+		if (node == null) return;
 
 		if (node is AnimationPlayer animPlayer)
 		{
@@ -99,11 +111,42 @@ public partial class LevelManager : Node
 			}
 		}
 	}
+	#endregion
 
+	#region Level Management
 	public void RestartLevel()
 	{
 		ClosePauseMenu();
-		GetTree().ReloadCurrentScene();
+		GetTree().CreateTimer(0.1f).Timeout += DeferredRestartLevel;
+	}
+
+	private void DeferredRestartLevel()
+	{
+		if (!IsInsideTree())
+		{
+			CallDeferred(nameof(DeferredRestartLevel));
+			return;
+		}
+
+		try
+		{
+			var sceneTree = GetTree();
+			if (sceneTree != null)
+			{
+				sceneTree.ReloadCurrentScene();
+				sceneTree.CreateTimer(0.1f).Timeout += DeactivateAllPlatforms;
+			}
+			else
+			{
+				GD.PrintErr("LevelManager: Scene tree is null in DeferredRestartLevel");
+				CallDeferred(nameof(DeferredRestartLevel));
+			}
+		}
+		catch (Exception e)
+		{
+			GD.PrintErr($"Error in DeferredRestartLevel: {e.Message}");
+			CallDeferred(nameof(DeferredRestartLevel));
+		}
 	}
 
 	private void RestoreInitialState()
@@ -113,32 +156,37 @@ public partial class LevelManager : Node
 		{
 			if (currentScene.FindChild(savedNode.Name, true, false) is Node3D currentNode)
 			{
-				currentNode.GlobalTransform = savedNode.GlobalTransform;
-				if (currentNode is RigidBody3D rigidBody)
-				{
-					rigidBody.LinearVelocity = Vector3.Zero;
-					rigidBody.AngularVelocity = Vector3.Zero;
-				}
-				
-				switch (currentNode)
-				{
-					case activatePlatform platform:
-						platform.ResetState();
-						break;
-					case Door door:
-						door.Close();
-						break;
-					case Cable cable:
-						cable.Deactivate();
-						break;
-					case GravityOrb gravityOrb:
-						gravityOrb.Reset();
-						break;
-				}
+				ResetNodeState(currentNode, savedNode);
 			}
 		}
 		ResetNodeAnimations(currentScene);
 		GetTree().Paused = false;
+	}
+
+	private void ResetNodeState(Node3D currentNode, Node3D savedNode)
+	{
+		currentNode.GlobalTransform = savedNode.GlobalTransform;
+		if (currentNode is RigidBody3D rigidBody)
+		{
+			rigidBody.LinearVelocity = Vector3.Zero;
+			rigidBody.AngularVelocity = Vector3.Zero;
+		}
+
+		switch (currentNode)
+		{
+			case activatePlatform platform:
+				platform.ResetState();
+				break;
+			case Door door:
+				door.Close();
+				break;
+			case Cable cable:
+				cable.Deactivate();
+				break;
+			case GravityOrb gravityOrb:
+				gravityOrb.Reset();
+				break;
+		}
 	}
 
 	private void HideLevelLoading()
@@ -150,7 +198,9 @@ public partial class LevelManager : Node
 			levelLoading.QueueFree();
 		}
 	}
+	#endregion
 
+	#region Puzzle Management
 	private void InitializeMemoryPuzzles()
 	{
 		var memoryPuzzles = new List<MemoryPuzle>();
@@ -173,7 +223,9 @@ public partial class LevelManager : Node
 			FindMemoryPuzzlesRecursive(child, memoryPuzzles);
 		}
 	}
+	#endregion
 
+	#region Pause Menu
 	public void TogglePauseMenu()
 	{
 		if (_pauseMenuInstance == null)
@@ -207,7 +259,9 @@ public partial class LevelManager : Node
 			Input.MouseMode = Input.MouseModeEnum.Captured;
 		}
 	}
+	#endregion
 
+	#region Level Changing
 	public void ChangeLevel(string newLevelPath)
 	{
 		var gameState = GetNode<GameState>("/root/GameState");
@@ -235,43 +289,35 @@ public partial class LevelManager : Node
 		GD.Print($"LevelManager: Current scene: {currentScene?.Name ?? "null"}");
 
 		ResetLevelObjects();
-		GetTree().CreateTimer(0.5f).Timeout += () =>
+		DeactivateAllPlatforms();
+
+		GetTree().CreateTimer(0.5f).Timeout += () => FinalizeLevelSetup(currentScene);
+	}
+
+	private void FinalizeLevelSetup(Node currentScene)
+	{
+		if (!IsInstanceValid(currentScene) || !currentScene.IsInsideTree())
 		{
-			if (!IsInstanceValid(currentScene) || !currentScene.IsInsideTree())
-			{
-				GD.PrintErr("LevelManager: Scene is no longer valid or not in tree. Aborting setup.");
-				return;
-			}
+			GD.PrintErr("LevelManager: Scene is no longer valid or not in tree. Aborting setup.");
+			return;
+		}
 
-			PositionPlayerAtPortal(_pendingTargetPortalName);
-			_pendingTargetPortalName = null;
+		PositionPlayerAtPortal(_pendingTargetPortalName);
+		_pendingTargetPortalName = null;
 
-			var player = currentScene.FindChild("Player", true, false) as Player;
-			if (player != null)
-			{
-				player.FinishTeleportation();
-			}
-			else
-			{
-				GD.PrintErr("LevelManager: Player not found in the current scene");
-			}
+		var player = currentScene.FindChild("Player", true, false) as Player;
+		player?.FinishTeleportation();
 
-			// Force update of lights and materials
-			ForceSceneUpdate(currentScene);
+		if (player == null)
+		{
+			GD.PrintErr("LevelManager: Player not found in the current scene");
+		}
 
-			// Force RenderingServer update
-			RenderingServer.ForceSync();
+		ForceSceneUpdate(currentScene);
+		RenderingServer.ForceSync();
+		UpdateWorldEnvironment(currentScene);
 
-			// Update WorldEnvironment if present
-			var worldEnvironment = currentScene.GetNodeOrNull<WorldEnvironment>("WorldEnvironment");
-			if (worldEnvironment != null && worldEnvironment.Environment != null)
-			{
-				worldEnvironment.Environment = worldEnvironment.Environment.Duplicate() as Godot.Environment;
-				worldEnvironment.NotifyPropertyListChanged();
-			}
-
-			GD.Print("LevelManager: New level setup complete");
-		};
+		GD.Print("LevelManager: New level setup complete");
 	}
 
 	private void ForceSceneUpdate(Node rootNode)
@@ -284,11 +330,7 @@ public partial class LevelManager : Node
 		{
 			for (int i = 0; i < meshInstance.GetSurfaceOverrideMaterialCount(); i++)
 			{
-				var material = meshInstance.GetSurfaceOverrideMaterial(i);
-				if (material != null)
-				{
-					material.NotifyPropertyListChanged();
-				}
+				meshInstance.GetSurfaceOverrideMaterial(i)?.NotifyPropertyListChanged();
 			}
 		}
 
@@ -298,6 +340,19 @@ public partial class LevelManager : Node
 		}
 	}
 
+	private void UpdateWorldEnvironment(Node currentScene)
+{
+	var worldEnvironment = currentScene.GetNodeOrNull<WorldEnvironment>("WorldEnvironment");
+	if (worldEnvironment?.Environment != null)
+	{
+		worldEnvironment.Environment = worldEnvironment.Environment.Duplicate() as Godot.Environment;
+		worldEnvironment.NotifyPropertyListChanged();
+	}
+}
+
+	#endregion
+
+	#region Object Reset
 	private void ResetLevelObjects()
 	{
 		var currentScene = GetTree().CurrentScene;
@@ -314,34 +369,10 @@ public partial class LevelManager : Node
 
 	private void ResetObjectStates(Node node)
 	{
-		if (node == null)
-		{
-			return;
-		}
+		if (node == null) return;
 
-		// Reset animation player if present
-		var animationPlayer = node.GetNodeOrNull<AnimationPlayer>("AnimationPlayer");
-		if (animationPlayer != null)
-		{
-			animationPlayer.Stop();
-			animationPlayer.Seek(0, true);
-		}
-
-		switch (node)
-		{
-			case activatePlatform platform when platform != null:
-				platform.ResetState();
-				break;
-			case Door door when door != null:
-				door.Close();
-				break;
-			case Cable cable when cable != null:
-				cable.Deactivate();
-				break;
-			case GravityOrb gravityOrb when gravityOrb != null:
-				gravityOrb.Reset();
-				break;
-		}
+		ResetAnimationPlayer(node);
+		ResetSpecificObjects(node);
 
 		foreach (var child in node.GetChildren())
 		{
@@ -352,6 +383,37 @@ public partial class LevelManager : Node
 		}
 	}
 
+	private void ResetAnimationPlayer(Node node)
+	{
+		var animationPlayer = node.GetNodeOrNull<AnimationPlayer>("AnimationPlayer");
+		if (animationPlayer != null)
+		{
+			animationPlayer.Stop();
+			animationPlayer.Seek(0, true);
+		}
+	}
+
+	private void ResetSpecificObjects(Node node)
+	{
+		switch (node)
+		{
+			case activatePlatform platform:
+				platform.ResetState();
+				break;
+			case Door door:
+				door.Close();
+				break;
+			case Cable cable:
+				cable.Deactivate();
+				break;
+			case GravityOrb gravityOrb:
+				gravityOrb.Reset();
+				break;
+		}
+	}
+	#endregion
+
+	#region Game State
 	public void SaveGameState()
 	{
 		var gameState = GetNode<GameState>("/root/GameState");
@@ -365,7 +427,9 @@ public partial class LevelManager : Node
 		Input.MouseMode = Input.MouseModeEnum.Visible;
 		GetTree().CallDeferred(SceneTree.MethodName.ChangeSceneToFile, "res://scenes/main_menu.tscn");
 	}
+	#endregion
 
+	#region Player Positioning
 	public void PositionPlayerAtPortal(string targetPortalName)
 	{
 		_pendingTargetPortalName = targetPortalName;
@@ -411,4 +475,32 @@ public partial class LevelManager : Node
 			gameState.IsComingFromPortal = false;
 		}
 	}
+	#endregion
+
+	#region Platform Management
+	private void DeactivateAllPlatforms()
+	{
+		if (!IsInsideTree())
+		{
+			CallDeferred(nameof(DeactivateAllPlatforms));
+			return;
+		}
+
+		try
+		{
+			var platforms = GetTree().GetNodesInGroup("ActivatePlatforms");
+			foreach (var platform in platforms)
+			{
+				if (platform is activatePlatform activePlatform)
+				{
+					activePlatform.DeactivatePlatformAndDoor();
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			GD.PrintErr($"Error deactivating platforms: {e.Message}");
+		}
+	}
+	#endregion
 }

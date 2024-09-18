@@ -3,29 +3,36 @@ using System.Collections.Generic;
 
 public partial class activatePlatform : Node3D
 {
+	#region Fields
 	private AnimationPlayer _platformAnimationPlayer;
 	private Area3D _area;
 	private bool _isActivated = false;
 	private int _objectsOnPlatform = 0;
 	private Door _associatedDoor;
 	private SoundManager _soundManager;
-	private string _activationSoundPath = "res://assets/Sounds/Platform_Activate.mp3";
-
-	[Export]
-	public string ActivateAnimationName { get; set; } = "activate_platform";
-
-	[Export]
-	public NodePath AssociatedDoorPath { get; set; }
-
-	[Export]
-	public NodePath CableListPath { get; set; } 
-
 	private List<AnimationPlayer> _cableAnimationPlayers = new List<AnimationPlayer>();
 
+	[Export] public string ActivateAnimationName { get; set; } = "activate_platform";
+	[Export] public NodePath AssociatedDoorPath { get; set; }
+	[Export] public NodePath CableListPath { get; set; }
+	[Export] private string _activationSoundPath = "res://assets/Sounds/Platform_Activate.mp3";
+	#endregion
+
+	#region Initialization
 	public override void _Ready()
+	{
+		SetupComponents();
+		SetupAssociatedDoor();
+		SetupCables();
+		AddToGroup("ActivatePlatforms");
+		ResetState();
+	}
+
+	private void SetupComponents()
 	{
 		_platformAnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
 		_area = GetNode<Area3D>("Area3D");
+		_soundManager = GetNode<SoundManager>("/root/SoundManager");
 
 		if (_area != null)
 		{
@@ -36,8 +43,11 @@ public partial class activatePlatform : Node3D
 		{
 			GD.PrintErr("ActivatePlatform: No Area3D found as a child of this node.");
 		}
+	}
 
-		if (AssociatedDoorPath != null && AssociatedDoorPath != "")
+	private void SetupAssociatedDoor()
+	{
+		if (!string.IsNullOrEmpty(AssociatedDoorPath))
 		{
 			_associatedDoor = GetNode<Door>(AssociatedDoorPath);
 			if (_associatedDoor == null)
@@ -45,9 +55,11 @@ public partial class activatePlatform : Node3D
 				GD.PrintErr("ActivatePlatform: Associated door not found at the specified path.");
 			}
 		}
+	}
 
-		// Automatically find all cables
-		if (CableListPath != null && CableListPath != "")
+	private void SetupCables()
+	{
+		if (!string.IsNullOrEmpty(CableListPath))
 		{
 			Node3D cableList = GetNode<Node3D>(CableListPath);
 			if (cableList != null)
@@ -70,9 +82,10 @@ public partial class activatePlatform : Node3D
 				GD.PrintErr("ActivatePlatform: Cable list node not found at the specified path.");
 			}
 		}
-		_soundManager = GetNode<SoundManager>("/root/SoundManager");
 	}
+	#endregion
 
+	#region Event Handlers
 	private void OnBodyEntered(Node3D body)
 	{
 		_objectsOnPlatform++;
@@ -90,62 +103,91 @@ public partial class activatePlatform : Node3D
 			DeactivatePlatformAndDoor();
 		}
 	}
+	#endregion
 
+	#region Platform State Management
 	private void ActivatePlatformAndDoor()
 	{
 		_isActivated = true;
-		if (_platformAnimationPlayer.HasAnimation(ActivateAnimationName))
-		{
-			_platformAnimationPlayer.Play(ActivateAnimationName);
-		}
+		PlayAnimation(ActivateAnimationName);
 		_associatedDoor?.Open();
-
-		foreach (var cableAnimPlayer in _cableAnimationPlayers)
-		{
-			if (cableAnimPlayer.HasAnimation("cable_enable"))
-			{
-				cableAnimPlayer.Play("cable_enable");
-			}
-		}
-
-		
+		AnimateCables("cable_enable");
 		_soundManager.PlaySound(_activationSoundPath);
+		UpdateVisualState(true);
 	}
 
-	private void DeactivatePlatformAndDoor()
+	public void DeactivatePlatformAndDoor()
 	{
-		_isActivated = false;
-		if (_platformAnimationPlayer.HasAnimation(ActivateAnimationName))
+		if (!IsInstanceValid(this) || IsQueuedForDeletion())
 		{
-			_platformAnimationPlayer.PlayBackwards(ActivateAnimationName);
+			return;
 		}
-		_associatedDoor?.Close();
 
-		foreach (var cableAnimPlayer in _cableAnimationPlayers)
-		{
-			if (cableAnimPlayer.HasAnimation("cable_enable"))
-			{
-				cableAnimPlayer.PlayBackwards("cable_enable");
-			}
-		}
+		_isActivated = false;
+		PlayAnimation(ActivateAnimationName, true);
+		_associatedDoor?.Close();
+		AnimateCables("cable_enable", true);
+		UpdateVisualState(false);
 	}
 
 	public void ResetState()
 	{
 		_isActivated = false;
 		_objectsOnPlatform = 0;
+		ResetAnimation(ActivateAnimationName);
+		_associatedDoor?.ResetState();
+		ResetCableAnimations();
+		UpdateVisualState(false);
+	}
+	#endregion
 
-		if (_platformAnimationPlayer != null && _platformAnimationPlayer.HasAnimation(ActivateAnimationName))
+	#region Animation Helpers
+	private void PlayAnimation(string animationName, bool backwards = false)
+	{
+		if (_platformAnimationPlayer != null && _platformAnimationPlayer.HasAnimation(animationName))
+		{
+			if (backwards)
+			{
+				_platformAnimationPlayer.PlayBackwards(animationName);
+			}
+			else
+			{
+				_platformAnimationPlayer.Play(animationName);
+			}
+		}
+	}
+
+	private void ResetAnimation(string animationName)
+	{
+		if (_platformAnimationPlayer != null && _platformAnimationPlayer.HasAnimation(animationName))
 		{
 			_platformAnimationPlayer.Stop();
-			_platformAnimationPlayer.Play(ActivateAnimationName);
+			_platformAnimationPlayer.Play(animationName);
 			_platformAnimationPlayer.Seek(0, true);
 			_platformAnimationPlayer.Stop();
 		}
+	}
 
-		_associatedDoor?.ResetState();
+	private void AnimateCables(string animationName, bool backwards = false)
+	{
+		foreach (var cableAnimPlayer in _cableAnimationPlayers)
+		{
+			if (cableAnimPlayer != null && cableAnimPlayer.HasAnimation(animationName))
+			{
+				if (backwards)
+				{
+					cableAnimPlayer.PlayBackwards(animationName);
+				}
+				else
+				{
+					cableAnimPlayer.Play(animationName);
+				}
+			}
+		}
+	}
 
-		// Reset all cables
+	private void ResetCableAnimations()
+	{
 		foreach (var cableAnimPlayer in _cableAnimationPlayers)
 		{
 			if (cableAnimPlayer.HasAnimation("cable_enable"))
@@ -157,4 +199,16 @@ public partial class activatePlatform : Node3D
 			}
 		}
 	}
+	#endregion
+
+	#region Visual State Management
+	private void UpdateVisualState(bool activated)
+	{
+		var meshInstance = GetNodeOrNull<MeshInstance3D>("PlatformMesh");
+		if (meshInstance != null && meshInstance.MaterialOverride is ShaderMaterial material)
+		{
+			material.SetShaderParameter("activated", activated);
+		}
+	}
+	#endregion
 }

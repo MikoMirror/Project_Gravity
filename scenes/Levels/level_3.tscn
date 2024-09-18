@@ -13,9 +13,9 @@
 [ext_resource type="PackedScene" uid="uid://1cc1ehwwh0tr" path="res://scenes/SupportScenes/Player.tscn" id="10_tmwiq"]
 [ext_resource type="PackedScene" uid="uid://v6c7g1r8vhus" path="res://assets/OWN/Prefabs/GlassGate.tscn" id="11_skk30"]
 [ext_resource type="PackedScene" uid="uid://bbpcuvq045yhj" path="res://scenes/SupportScenes/memory_puzzle.tscn" id="12_wktqx"]
-[ext_resource type="PackedScene" uid="uid://cjcbyfq2e6vpb" path="res://assets/OWN/Prefabs/platform.tscn" id="13_1o0v5"]
 [ext_resource type="PackedScene" uid="uid://d25yeq8xge6yd" path="res://assets/OWN/Prefabs/cube.tscn" id="14_43tvk"]
 [ext_resource type="PackedScene" uid="uid://0g1bm5vx4bhw" path="res://assets/OWN/Prefabs/portal.tscn" id="15_qjy2e"]
+[ext_resource type="PackedScene" uid="uid://tmqcvcgtrbxb" path="res://assets/OWN/Prefabs/paltform.tscn" id="16_qwu7a"]
 
 [sub_resource type="Environment" id="Environment_q07vw"]
 ambient_light_sky_contribution = 0.0
@@ -633,7 +633,7 @@ environment = SubResource("Environment_q07vw")
 compositor = SubResource("Compositor_ouqej")
 
 [node name="Door" parent="." instance=ExtResource("9_llyaq")]
-transform = Transform3D(2.08616e-07, 0, -1, 0, 1, 0, 1.5, 0, 1.19209e-07, 15, 0, 20.6)
+transform = Transform3D(2.08616e-07, 0, -1, 0, 1, 0, 1.5, 0, 1.19209e-07, 15, -0.0244784, 20.5745)
 
 [node name="Player" parent="." instance=ExtResource("10_tmwiq")]
 transform = Transform3D(1, 0, 0, 0, 1.2, 0, 0, 0, 1, -0.9, 1.9, 21.2)
@@ -646,12 +646,7 @@ transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 35, 0.
 RowCount = 6
 ColumnCount = 6
 Spacing = Vector3(2.5, 0, 2.5)
-PlatformStates = [false, false, true, false, false, false, true, true, true, false, false, false, true, false, false, false, false, false, true, false, true, true, true, false, true, true, true, false, true, false, false, false, false, false, true, false]
-
-[node name="platform3" parent="." instance=ExtResource("13_1o0v5")]
-transform = Transform3D(-3, 2.98023e-07, 0, -3.57628e-07, -4, 0, 0, 0, 3, 6, 8, 20.5)
-AssociatedDoorPath = NodePath("../Door")
-CableListPath = NodePath("../stage/cable")
+PlatformStates = [false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false]
 
 [node name="cube2" parent="." instance=ExtResource("14_43tvk")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0.5, 22.5)
@@ -660,3 +655,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0.5, 22.5)
 
 [node name="portal_lvl3" parent="Portals" instance=ExtResource("15_qjy2e")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.3, 18)
+
+[node name="Paltform_lvl3" parent="." instance=ExtResource("16_qwu7a")]
+transform = Transform3D(3, 0, 0, 0, -4, -2.62268e-07, 0, 3.49691e-07, -3, 6.7, 8, 20.5)
+AssociatedDoorPath = NodePath("../Door")
+CableListPath = NodePath("../stage/cable")
