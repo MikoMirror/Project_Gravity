@@ -18,18 +18,22 @@ public partial class MemoryPlatform : Node3D
 
 	public bool HasBeenActivated => _hasBeenActivated;
 
+	private const string ActivateSound = "res://assets/Sounds/Platform_Activate.mp3";
+	private SoundManager _soundManager;
+
 	public override void _Ready()
 	{
 		InitializeComponents();
 		ConnectSignals();
 		UpdateNeonColor();
+		_soundManager = GetNode<SoundManager>("/root/SoundManager");
 	}
 
 	private void InitializeComponents()
 	{
 		_area = GetNode<Area3D>(AreaPath);
 		_neonMesh = GetNode<MeshInstance3D>(NeonPath);
-		_memoryPuzzle = GetParent() as MemoryPuzle;
+		 _memoryPuzzle = GetParent() as MemoryPuzle;
 
 		if (_neonMesh != null)
 		{
@@ -63,10 +67,13 @@ public partial class MemoryPlatform : Node3D
 			_memoryPuzzle.UpdatePlatformState((int)(Position.Z / _memoryPuzzle.Spacing.Z), 
 											  (int)(Position.X / _memoryPuzzle.Spacing.X), 
 											  true);
+			_soundManager.PlaySound(ActivateSound);
 		}
 		else if (!IsActive && !_isNeutral && !_memoryPuzzle.AllActiveSteppedOn)
 		{
-			_memoryPuzzle.ResetPuzzle(); // Call ResetPuzzle instead of ResetActivePlatforms
+			_memoryPuzzle.UpdatePlatformState((int)(Position.Z / _memoryPuzzle.Spacing.Z), 
+											  (int)(Position.X / _memoryPuzzle.Spacing.X), 
+											  false);
 		}
 
 		UpdateNeonColor(true);

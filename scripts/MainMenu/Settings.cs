@@ -37,7 +37,7 @@ public partial class Settings : Control
 	{
 		slider.MinValue = 0;
 		slider.MaxValue = 100;
-		slider.Step = 1; // Adjust this value for desired sensitivity (smaller = more sensitive)
+		slider.Step = 1; 
 		slider.TickCount = 10;
 		slider.TicksOnBorders = true;
 	}

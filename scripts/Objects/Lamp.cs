@@ -21,14 +21,11 @@ public partial class Lamp : Node3D
 		_audioPlayer.Play();
 		_audioPlayer.UnitSize = 10;
 		_audioPlayer.MaxDistance = 20;
-
-		// Set initial volume
 		UpdateVolume();
 	}
 
 	public override void _Process(double delta)
 	{
-		// Update volume each frame to reflect any changes
 		UpdateVolume();
 	}
 

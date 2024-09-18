@@ -17,7 +17,7 @@ public partial class Player
 			WasInAir = true;
 		}
 		Vector2 inputDir = Input.GetVector("move_left", "move_right", "move_forward", "move_back");
-		IsSprinting = Input.IsActionPressed("sprint"); // Add this line to set IsSprinting
+		IsSprinting = Input.IsActionPressed("sprint"); 
 		Vector3 direction = Vector3.Zero;
 		Vector3 cameraForward = -Camera.GlobalTransform.Basis.Z; 
 		Vector3 cameraRight = Camera.GlobalTransform.Basis.X;

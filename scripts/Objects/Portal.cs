@@ -3,13 +3,18 @@ using System;
 
 public partial class Portal : Node3D
 {
+	#region Enums
 	public enum PortalType { BetweenLevels, WithinLevel }
+	#endregion
 
+	#region Exports
 	[Export] private PortalType _type = PortalType.WithinLevel;
 	[Export] private string _targetLevelPath = "";
 	[Export] private string _targetPortalName = "";
 	[Export] private bool _isTeleportActive = true; 
+	#endregion
 
+	#region Properties
 	public PortalType Type
 	{
 		get => _type;
@@ -33,11 +38,15 @@ public partial class Portal : Node3D
 		get => _isTeleportActive;
 		set => _isTeleportActive = value;
 	}
+	#endregion
 
+	#region Private Fields
 	private Area3D _portalArea;
 	private GameState _gameState;
 	private Player _playerInRange;
+	#endregion
 
+	#region Lifecycle Methods
 	public override void _Ready()
 	{
 		_portalArea = GetNodeOrNull<Area3D>("PortalArea");
@@ -68,7 +77,9 @@ public partial class Portal : Node3D
 			}
 		}
 	}
+	#endregion
 
+	#region Event Handlers
 	private void OnBodyEntered(Node3D body)
 	{
 		if (_isTeleportActive && body is Player player)
@@ -86,37 +97,26 @@ public partial class Portal : Node3D
 			_playerInRange = null;
 		}
 	}
+	#endregion
 
+	#region Teleportation Methods
 	private void TeleportBetweenLevels(Player player)
 	{
 		if (string.IsNullOrEmpty(TargetLevelPath) || string.IsNullOrEmpty(TargetPortalName))
 		{
 			GD.PrintErr("Portal: Target level path or portal name is not set!");
 			return;
-		}
+			}
 
 		_gameState.StorePlayerData(player, TargetPortalName);
 		_gameState.IsComingFromPortal = true;
 		_gameState.CurrentLevel = TargetLevelPath;
 		_gameState.SaveCurrentLevel();
-
-		// Start the teleport animation on the player
 		player.Teleport(GlobalPosition, -GlobalTransform.Basis.Z);
-
-		// Use CallDeferred to change the level after the animation completes
 		player.TeleportCompleted += () =>
 		{
 			ChangeLevelDeferred();
 		};
-	}
-
-	private void ChangeLevelDeferred()
-	{
-		var levelManager = GetNode<LevelManager>("/root/LevelManager");
-		if (levelManager != null)
-			levelManager.CallDeferred(nameof(LevelManager.ChangeLevel), TargetLevelPath);
-		else
-			GD.PrintErr("Portal: LevelManager not found. Unable to change level.");
 	}
 
 	private void TeleportWithinLevel(Player player)
@@ -137,4 +137,16 @@ public partial class Portal : Node3D
 			GD.PrintErr($"Portal: Target portal '{TargetPortalName}' not found in the current scene!");
 		}
 	}
+	#endregion
+
+	#region Helper Methods
+	private void ChangeLevelDeferred()
+	{
+		var levelManager = GetNode<LevelManager>("/root/LevelManager");
+		if (levelManager != null)
+			levelManager.CallDeferred(nameof(LevelManager.ChangeLevel), TargetLevelPath);
+		else
+			GD.PrintErr("Portal: LevelManager not found. Unable to change level.");
+	}
+	#endregion
 }

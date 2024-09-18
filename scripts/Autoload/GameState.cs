@@ -16,7 +16,6 @@ public partial class GameState : Node
 
 	public override void _Ready()
 	{
-		// Ensure this node is in the scene tree
 		if (!IsInsideTree())
 		{
 			GetTree().Root.AddChild(this);

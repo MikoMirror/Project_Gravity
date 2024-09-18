@@ -96,17 +96,36 @@ public partial class MemoryPuzle : Node3D
 
 	[Export]
 	public Node3D[] GlassGates { get; set; } = new Node3D[0];
+
+	private bool _showTerminal = true;
+
+	[Export]
+	public bool ShowTerminal
+	{
+		get => _showTerminal;
+		set
+		{
+			if (_showTerminal != value)
+			{
+				_showTerminal = value;
+				UpdateTerminalVisibility();
+			}
+		}
+	}
 	#endregion
 
 	#region Private Fields
-	private int _rowCount = 1;
-	private int _columnCount = 1;
-	private Vector3 _spacing = new Vector3(2, 0, 2);
-	private MemoryPlatform[,] platformInstances;
-	private Area3D _puzzleArea;
 	private bool _isPuzzleActive = true;
 	private bool _isInRedState = false;
 	private bool _needsUpdate = false;
+	private MemoryPlatform[,] platformInstances;
+	private Area3D _puzzleArea;
+	private int _rowCount = 1;
+	private int _columnCount = 1;
+	private Vector3 _spacing = new Vector3(2, 0, 2);
+	private const string WrongPlatformSound = "res://assets/Sounds/wrongPlatform.mp3";
+	private SoundManager _soundManager;
+	private bool _wrongSoundPlayed = false;
 	#endregion
 
 	#region Public Properties
@@ -125,6 +144,7 @@ public partial class MemoryPuzle : Node3D
 		{
 			CallDeferred(nameof(CreatePlatformGrid));
 			CallDeferred(nameof(UpdatePuzzleArea));
+			CallDeferred(nameof(UpdateTerminalVisibility));
 		}
 
 		PuzzleArea.BodyEntered += OnBodyEnteredPuzzleArea;
@@ -148,6 +168,8 @@ public partial class MemoryPuzle : Node3D
 		{
 			GD.Print("MemoryPuzzle: No GlassGates set in the Inspector.");
 		}
+
+		_soundManager = GetNode<SoundManager>("/root/SoundManager");
 	}
 
 	public override void _Process(double delta)
@@ -160,7 +182,33 @@ public partial class MemoryPuzle : Node3D
 	}
 	#endregion
 
-	#region Public Methods
+	#region Event Handlers
+	private void OnBodyEnteredPuzzleArea(Node3D body)
+	{
+		if (body is Player)
+		{
+			_isPuzzleActive = true;
+			_wrongSoundPlayed = false;
+			if (!_isInRedState)
+			{
+				SetPlatformsActive(true);
+			}
+		}
+	}
+
+	private void OnBodyExitedPuzzleArea(Node3D body)
+	{
+		if (body is Player)
+		{
+			_isPuzzleActive = true;
+			_isInRedState = false;
+			SetPlatformsActive(true);
+			_wrongSoundPlayed = false; // Reset the flag when player exits the puzzle area
+		}
+	}
+	#endregion
+
+	#region Puzzle Logic
 	public void ResetPuzzle()
 	{
 		if (!_isPuzzleActive) return;
@@ -170,6 +218,78 @@ public partial class MemoryPuzle : Node3D
 		AllActiveSteppedOn = false;
 		SetAllPlatformsRed();
 		UpdateAllPlatforms();
+
+		if (!_wrongSoundPlayed)
+		{
+			_soundManager.PlaySound(WrongPlatformSound);
+			_wrongSoundPlayed = true;
+		}
+	}
+
+	private void SetAllPlatformsRed()
+	{
+		if (platformInstances != null)
+		{
+			foreach (var platform in platformInstances)
+			{
+				if (platform is MemoryPlatform memoryPlatform)
+				{
+					memoryPlatform.SetRedState();
+					memoryPlatform.SetNeutral(false);
+				}
+			}
+		}
+	}
+
+	private void SetPlatformsActive(bool active)
+	{
+		if (platformInstances != null)
+		{
+			foreach (var platform in platformInstances)
+			{
+				if (platform is MemoryPlatform memoryPlatform)
+				{
+					memoryPlatform.SetInteractive(active);
+					if (active && !_isInRedState)
+					{
+						memoryPlatform.ResetColor();
+					}
+				}
+			}
+		}
+	}
+
+	private void UpdateAllPlatforms()
+	{
+		if (platformInstances != null)
+		{
+			for (int row = 0; row < RowCount; row++)
+			{
+				for (int col = 0; col < ColumnCount; col++)
+				{
+					int index = row * ColumnCount + col;
+					if (platformInstances[row, col] is MemoryPlatform memoryPlatform)
+					{
+						memoryPlatform.ResetActivation();
+					}
+				}
+			}
+		}
+	}
+
+	private void UpdatePlatformStatesArray()
+	{
+		int newSize = RowCount * ColumnCount;
+		if (PlatformStates.Count != newSize)
+		{
+			var newStates = new Godot.Collections.Array<bool>();
+			for (int i = 0; i < newSize; i++)
+			{
+				newStates.Add(i < PlatformStates.Count ? PlatformStates[i] : false);
+			}
+			PlatformStates = newStates;
+			EmitSignal(SignalName.PlatformStatesChanged);
+		}
 	}
 
 	public void UpdatePuzzle()
@@ -177,7 +297,7 @@ public partial class MemoryPuzle : Node3D
 		if (!IsInsideTree()) return;
 
 		GD.Print($"UpdatePuzzle called. Rows: {RowCount}, Columns: {ColumnCount}");
-	   
+		
 		if (Engine.IsEditorHint())
 		{
 			UpdateVisualRepresentation();
@@ -188,6 +308,7 @@ public partial class MemoryPuzle : Node3D
 		}
 		UpdateTerminalGridSize();
 		UpdateTerminalPosition();
+		UpdateTerminalVisibility();
 		UpdatePuzzleArea();
 		EmitSignal(SignalName.SetupCompleted);
 	}
@@ -195,12 +316,12 @@ public partial class MemoryPuzle : Node3D
 	public void UpdatePlatformState(int row, int col, bool isActive)
 	{
 		GD.Print($"UpdatePlatformState called: row={row}, col={col}, isActive={isActive}");
-	   
+		
 		int index = row * ColumnCount + col;
 		if (index < PlatformStates.Count)
 		{
 			PlatformStates[index] = isActive;
-		   
+			
 			GD.Print($"Platform state updated: index={index}, isActive={isActive}");
 
 			if (Engine.IsEditorHint())
@@ -223,20 +344,26 @@ public partial class MemoryPuzle : Node3D
 			}
 			else
 			{
-				GD.PushError($"Platform instance not found at row={row}, col={col}");
+				GD.Print($"Platform instances not created yet. State will be applied when platforms are instantiated.");
 			}
 
-			// Emit signal to notify about the state change
 			EmitSignal(SignalName.PlatformStatesChanged);
-			CheckPuzzleCompletion();
+			
+			// Only check puzzle completion and play sounds when not in editor
+			if (!Engine.IsEditorHint())
+			{
+				CheckPuzzleCompletion();
 
-			if (!isActive)
-			{
-				ResetPuzzle(); // Reset the puzzle when stepping on an inactive platform
-			}
-			else
-			{
-				CheckAllActiveSteppedOn();
+				if (!isActive && !_wrongSoundPlayed)
+				{
+					_soundManager.PlaySound(WrongPlatformSound);
+					_wrongSoundPlayed = true;
+					ResetPuzzle();
+				}
+				else
+				{
+					CheckAllActiveSteppedOn();
+				}
 			}
 		}
 		else
@@ -245,20 +372,33 @@ public partial class MemoryPuzle : Node3D
 		}
 	}
 
-	public void ManualSetup()
+	private void CheckPuzzleCompletion()
 	{
-		UpdatePuzzle();
-		EmitSignal(SignalName.SetupCompleted);
-		EmitSignal(SignalName.PlatformStatesChanged);
+		bool isPuzzleSolved = true;
+		foreach (bool state in PlatformStates)
+		{
+			if (!state)
+			{
+				isPuzzleSolved = false;
+				break;
+			}
+		}
+
+		GD.Print($"Puzzle solved: {isPuzzleSolved}");
+
+		if (isPuzzleSolved)
+		{
+			OpenGlassGates();
+		}
 	}
 
 	public void CheckAllActiveSteppedOn()
 	{
-		if (AllActiveSteppedOn) return; 
+		if (AllActiveSteppedOn || Engine.IsEditorHint()) return; 
 
 		if (platformInstances == null)
 		{
-			GD.PrintErr("platformInstances is null in CheckAllActiveSteppedOn");
+			GD.Print("platformInstances is null in CheckAllActiveSteppedOn. Skipping check.");
 			return;
 		}
 
@@ -300,98 +440,24 @@ public partial class MemoryPuzle : Node3D
 			GD.Print("All active platforms have been stepped on!");
 		}
 	}
+
+	private void SetInactivePlatformsNeutral()
+	{
+		for (int row = 0; row < RowCount; row++)
+		{
+			for (int col = 0; col < ColumnCount; col++)
+			{
+				int index = row * ColumnCount + col;
+				if (!PlatformStates[index])
+				{
+					platformInstances[row, col].SetNeutral(true);
+				}
+			}
+		}
+	}
 	#endregion
 
-	#region Private Methods
-	private void OnBodyEnteredPuzzleArea(Node3D body)
-	{
-		if (body is Player)
-		{
-			_isPuzzleActive = true;
-			if (!_isInRedState)
-			{
-				SetPlatformsActive(true);
-			}
-		}
-	}
-
-	private void OnBodyExitedPuzzleArea(Node3D body)
-	{
-		if (body is Player)
-		{
-			_isPuzzleActive = true;
-			_isInRedState = false;
-			SetPlatformsActive(true);
-		}
-	}
-
-	private void SetAllPlatformsRed()
-	{
-		if (platformInstances != null)
-		{
-			foreach (var platform in platformInstances)
-			{
-				if (platform is MemoryPlatform memoryPlatform)
-				{
-					memoryPlatform.SetRedState();
-					memoryPlatform.SetNeutral(false);
-				}
-			}
-		}
-	}
-
-	private void SetPlatformsActive(bool active)
-	{
-		if (platformInstances != null)
-		{
-			foreach (var platform in platformInstances)
-			{
-				if (platform is MemoryPlatform memoryPlatform)
-				{
-					memoryPlatform.SetInteractive(active);
-					if (active && !_isInRedState)
-					{
-						memoryPlatform.ResetColor(); // Reset color when reactivating and not in red state
-					}
-				}
-			}
-		}
-	}
-
-	private void UpdateAllPlatforms()
-	{
-		if (platformInstances != null)
-		{
-			for (int row = 0; row < RowCount; row++)
-			{
-				for (int col = 0; col < ColumnCount; col++)
-				{
-					int index = row * ColumnCount + col;
-					if (platformInstances[row, col] is MemoryPlatform memoryPlatform)
-					{
-						// We keep the IsActive state as it is
-						memoryPlatform.ResetActivation();
-					}
-				}
-			}
-		}
-	}
-
-	private void UpdatePlatformStatesArray()
-	{
-		int newSize = RowCount * ColumnCount;
-		if (PlatformStates.Count != newSize)
-		{
-			var newStates = new Godot.Collections.Array<bool>();
-			for (int i = 0; i < newSize; i++)
-			{
-				newStates.Add(i < PlatformStates.Count ? PlatformStates[i] : false);
-			}
-			PlatformStates = newStates;
-			EmitSignal(SignalName.PlatformStatesChanged);
-		}
-	}
-
+	#region Visual Updates
 	private void UpdateVisualRepresentation()
 	{
 		if (Engine.IsEditorHint())
@@ -404,7 +470,6 @@ public partial class MemoryPuzle : Node3D
 				}
 			}
 
-			// Create visual representation
 			for (int row = 0; row < RowCount; row++)
 			{
 				for (int col = 0; col < ColumnCount; col++)
@@ -428,7 +493,6 @@ public partial class MemoryPuzle : Node3D
 		}
 		else
 		{
-			// Update the visual appearance of each platform based on its current state in PlatformStates
 			for (int i = 0; i < PlatformStates.Count; i++)
 			{
 				int row = i / ColumnCount;
@@ -455,7 +519,7 @@ public partial class MemoryPuzle : Node3D
 				}
 			}
 		}
-		platformInstances = null; // Ensure the array is reset
+		platformInstances = null;
 	}
 
 	private void CreatePlatformGrid()
@@ -498,6 +562,7 @@ public partial class MemoryPuzle : Node3D
 
 				int index = row * ColumnCount + col;
 				memoryPlatform.IsActive = index < PlatformStates.Count && PlatformStates[index];
+				memoryPlatform.UpdateVisuals();
 
 				GD.Print($"Platform node instantiated at position: {memoryPlatform.Position}, Active: {memoryPlatform.IsActive}");
 
@@ -508,12 +573,24 @@ public partial class MemoryPuzle : Node3D
 
 	private Node3D FindTerminalNode()
 	{
-		foreach (Node child in GetChildren())
+		Node3D terminalNode = GetNodeOrNull<Node3D>("Terminal");
+		if (terminalNode == null && !string.IsNullOrEmpty(TerminalScenePath))
 		{
-			if (child is Node3D node && node.Name == "Terminal")
-				return node;
+			PackedScene terminalScene = ResourceLoader.Load<PackedScene>(TerminalScenePath);
+			if (terminalScene != null)
+			{
+				terminalNode = terminalScene.Instantiate<Node3D>();
+				terminalNode.Name = "Terminal";
+				AddChild(terminalNode);
+				terminalNode.Owner = GetTree().EditedSceneRoot ?? this;
+				UpdateTerminalPosition();
+			}
+			else
+			{
+				GD.PushError($"Failed to load terminal scene from '{TerminalScenePath}'");
+			}
 		}
-		return null;
+		return terminalNode;
 	}
 
 	private void UpdateTerminalGridSize()
@@ -557,13 +634,14 @@ public partial class MemoryPuzle : Node3D
 		if (terminalNode != null)
 		{
 			terminalNode.Position = new Vector3((ColumnCount - 1) * Spacing.X / 2, 0, RowCount * Spacing.Z);
-			GD.Print($"Terminal node moved to position: {terminalNode.Position}");
+			terminalNode.Visible = ShowTerminal;
+			GD.Print($"Terminal node moved to position: {terminalNode.Position}, visibility: {ShowTerminal}");
 		}
 	}
 
 	private void UpdatePuzzleArea()
 	{
-		var puzzleArea = PuzzleArea; // This will create the Area3D if it doesn't exist
+		var puzzleArea = PuzzleArea;
 
 		var collisionShape = puzzleArea.GetNodeOrNull<CollisionShape3D>("CollisionShape3D");
 		if (collisionShape == null)
@@ -594,42 +672,18 @@ public partial class MemoryPuzle : Node3D
 
 		GD.Print($"Updated PuzzleArea size to: {boxShape.Size}, position to: {puzzleArea.Position}");
 	}
+	#endregion
 
-	private void CheckPuzzleCompletion()
+	#region Utility Methods
+	public void ManualSetup()
 	{
-		bool isPuzzleSolved = true;
-		foreach (bool state in PlatformStates)
-		{
-			if (!state)
-			{
-				isPuzzleSolved = false;
-				break;
-			}
-		}
-
-		GD.Print($"Puzzle solved: {isPuzzleSolved}");
-
-		if (isPuzzleSolved)
-		{
-			OpenGlassGates();
-		}
+		UpdatePuzzle();
+		EmitSignal(SignalName.SetupCompleted);
+		EmitSignal(SignalName.PlatformStatesChanged);
 	}
+	#endregion
 
-	private void SetInactivePlatformsNeutral()
-	{
-		for (int row = 0; row < RowCount; row++)
-		{
-			for (int col = 0; col < ColumnCount; col++)
-			{
-				int index = row * ColumnCount + col;
-				if (!PlatformStates[index])
-				{
-					platformInstances[row, col].SetNeutral(true);
-				}
-			}
-		}
-	}
-
+	#region Glass Gate Handling
 	private void OpenGlassGates()
 	{
 		foreach (var glassGate in GlassGates)
@@ -656,6 +710,24 @@ public partial class MemoryPuzle : Node3D
 		{
 			GD.PrintErr("A GlassGate instance is null. Check the Inspector setup.");
 		}
+	}
+	#endregion
+
+	#region Terminal Visibility
+	private void UpdateTerminalVisibility()
+	{
+		Node3D terminalNode = FindTerminalNode();
+		if (terminalNode != null)
+		{
+			terminalNode.Visible = ShowTerminal;
+			GD.Print($"Terminal visibility set to: {ShowTerminal}");
+		}
+	}
+
+	public void ToggleTerminalVisibility(bool show)
+	{
+		ShowTerminal = show;
+		UpdateTerminalVisibility();
 	}
 	#endregion
 }

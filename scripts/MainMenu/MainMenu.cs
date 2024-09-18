@@ -3,14 +3,19 @@ using System;
 
 public partial class MainMenu : Control
 {
+	#region Exports
 	[Export] private NodePath startButtonPath = "VBoxContainer/Start";
 	[Export] private NodePath confirmationDialogPath = "NewGameConfirmationDialog";
 	[Export] private Button settingsButton;
+	#endregion
 
+	#region Private Fields
 	private Button startButton;
 	private NewGameConfirmationDialog newGameConfirmationDialog;
 	private GameState gameState;
+	#endregion
 
+	#region Lifecycle Methods
 	public override void _Ready()
 	{
 		PlayBackgroundMusic();
@@ -19,6 +24,17 @@ public partial class MainMenu : Control
 		SetProcessUnhandledInput(true);
 	}
 
+	public override void _UnhandledInput(InputEvent @event)
+	{
+		if (@event.IsActionPressed("ui_cancel"))
+		{
+			GetViewport().SetInputAsHandled();
+			GD.Print("ESC pressed in Main Menu");
+		}
+	}
+	#endregion
+
+	#region Initialization Methods
 	private void PlayBackgroundMusic()
 	{
 		GetNode<MusicManager>("/root/MusicManager").PlayMusic("res://assets/Music/Main.ogg");
@@ -56,7 +72,9 @@ public partial class MainMenu : Control
 		if (settingsButton != null)
 			settingsButton.Pressed += OnSettingsButtonPressed;
 	}
+	#endregion
 
+	#region Button Event Handlers
 	public void OnStartNewGamePressed()
 	{
 		if (SaveLoadManager.Instance.SaveFileExists())
@@ -91,7 +109,9 @@ public partial class MainMenu : Control
 	{
 		GetTree().Quit();
 	}
+	#endregion
 
+	#region Dialog Event Handlers
 	public void OnConfirmNewGame()
 	{
 		GD.Print("Confirm new game");
@@ -102,7 +122,9 @@ public partial class MainMenu : Control
 	{
 		GD.Print("Cancel new game");
 	}
+	#endregion
 
+	#region Game Management Methods
 	private void StartNewGame()
 	{
 		if (gameState == null)
@@ -130,14 +152,5 @@ public partial class MainMenu : Control
 		else
 			GD.PrintErr("Failed to load game.");
 	}
-
-	public override void _UnhandledInput(InputEvent @event)
-{
-	if (@event.IsActionPressed("ui_cancel"))
-	{
-		GetViewport().SetInputAsHandled();
-		// Optionally, you can add any specific behavior for ESC in the main menu here
-		GD.Print("ESC pressed in Main Menu");
-	}
-}
+	#endregion
 }
