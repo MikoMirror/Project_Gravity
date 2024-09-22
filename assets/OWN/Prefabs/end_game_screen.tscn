@@ -1,8 +1,8 @@
-[gd_scene load_steps=10 format=4 uid="uid://caelb0p7olxhc"]
+[gd_scene load_steps=10 format=4 uid="uid://dsilg5e1s8e6t"]
 
-[ext_resource type="Texture2D" uid="uid://cgjngtjgh4j6" path="res://assets/OWN/Models/TextureScreenLevel.png" id="1_bnq3q"]
+[ext_resource type="Texture2D" uid="uid://ppdbndcfvq4l" path="res://assets/OWN/Models/TextureScreenLevel2.png" id="1_4dihf"]
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_lppwx"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_ygk1t"]
 points = PackedVector3Array(1, 1, 1, 1, -1, 1, 1, 1, -1, -1, 1, 1, 1, -1, -1, -1, -1, 1, -1, 1, -1, -1, -1, -1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_daifs"]
@@ -11,7 +11,7 @@ cull_mode = 2
 albedo_color = Color(0.371604, 0.371318, 0.389465, 1)
 roughness = 0.5
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_vahcp"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_yw730"]
 _surfaces = [{
 "aabb": AABB(-1, -1, -1, 2, 2, 2),
 "format": 34359742465,
@@ -25,7 +25,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_oud13"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_7bn01"]
 resource_name = "TuttorialScreen_Cube_002"
 _surfaces = [{
 "aabb": AABB(-1, -1, -1, 2, 2, 2),
@@ -41,18 +41,18 @@ _surfaces = [{
 "vertex_data": PackedByteArray("AACAvwAAgL8AAIA/AACAvwAAgL8AAIA/AACAvwAAgL8AAIA/AACAvwAAgD8AAIA/AACAvwAAgD8AAIA/AACAvwAAgD8AAIA/AACAvwAAgL8AAIC/AACAvwAAgL8AAIC/AACAvwAAgL8AAIC/AACAvwAAgL8AAIC/AACAvwAAgD8AAIC/AACAvwAAgD8AAIC/AACAvwAAgD8AAIC/AACAPwAAgL8AAIA/AACAPwAAgL8AAIA/AACAPwAAgL8AAIA/AACAPwAAgD8AAIA/AACAPwAAgD8AAIA/AACAPwAAgD8AAIA/AACAPwAAgL8AAIC/AACAPwAAgL8AAIC/AACAPwAAgL8AAIC/AACAPwAAgL8AAIC/AACAPwAAgD8AAIC/AACAPwAAgD8AAIC/AACAPwAAgD8AAIC/juBnv47gZz8AAIC/juBnv47gZz8AAIC/juBnv47gZz8AAIC/juBnv47gZ78AAIC/juBnv47gZ78AAIC/juBnv47gZ78AAIC/juBnP47gZ78AAIC/juBnP47gZ78AAIC/juBnP47gZ78AAIC/juBnP47gZz8AAIC/juBnP47gZz8AAIC/juBnP47gZz8AAIC/AACAvwAAgD8AAIC/AACAvwAAgD8AAIC/AACAvwAAgD8AAIC/AACAvwAAgL8AAIC/AACAvwAAgL8AAIC/AACAvwAAgL8AAIC/AACAPwAAgL8AAIC/AACAPwAAgL8AAIC/AACAPwAAgL8AAIC/AACAPwAAgD8AAIC/AACAPwAAgD8AAIC/AACAPwAAgD8AAIC/juBnv47gZz/w1ke9juBnv47gZz/w1ke9juBnv47gZ7/w1ke9juBnv47gZ7/w1ke9juBnP47gZ7/w1ke9juBnP47gZ7/w1ke9juBnP47gZz/w1ke9juBnP47gZz/w1ke9/3//f/9/////fwAA////vwAA/3//f////3//f/9/////f///AAD/vwAA/3//f////3///////7//f///////v/9/AAD///+/AAD/f/9/////f///////v/9///8AAP+/AAD/f/9/////f/9//3////9/AAD///+/////f/9/////f/9//3////9///8AAP+/////f/9/////f///////v/9///////+//38AAP///7////9//3////9///////+//3///wAA/7////9//3//////////f/7//38AAP///7////9/////v///////f/7//3///////7////9/////v///////f/7//3///////78AAP9/////v///////f/7//38AAP///78AAP9/////v///////f/7//3///////7//f///AAD/v///////f/7//3///////7//f///////v///////f/7//3///////7//f///////v///////f/7//3///////7//f///AAD/v/9/AAD///+/////f////7//f///////v////3////+//3///////78AAP9/////v/9/AAD///+/AAD/f////78=")
 }]
 blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_vahcp")
+shadow_mesh = SubResource("ArrayMesh_yw730")
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_uw3kx"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_tcth6"]
 points = PackedVector3Array(0.90577, 0.90577, -0.048789, 0.90577, -0.90577, -0.048789, -0.90577, 0.90577, -0.048789, -0.90577, -0.90577, -0.048789)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jedqn"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2j57x"]
 resource_name = "ScreenLevel"
 cull_mode = 2
-albedo_texture = ExtResource("1_bnq3q")
+albedo_texture = ExtResource("1_4dihf")
 roughness = 0.5
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_5540x"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_nouv6"]
 _surfaces = [{
 "aabb": AABB(-0.90577, -0.90577, -0.048789, 1.81154, 1.81154, 1e-05),
 "format": 34896613377,
@@ -66,7 +66,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_l4pcx"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_fih5q"]
 resource_name = "TuttorialScreen_Cube_006"
 _surfaces = [{
 "aabb": AABB(-0.90577, -0.90577, -0.048789, 1.81154, 1.81154, 1e-05),
@@ -74,7 +74,7 @@ _surfaces = [{
 "format": 34896613399,
 "index_count": 6,
 "index_data": PackedByteArray("AQADAAAAAQACAAMA"),
-"material": SubResource("StandardMaterial3D_jedqn"),
+"material": SubResource("StandardMaterial3D_2j57x"),
 "name": "ScreenLevel",
 "primitive": 3,
 "uv_scale": Vector4(1.99519, 1.98935, 0, 0),
@@ -82,25 +82,24 @@ _surfaces = [{
 "vertex_data": PackedByteArray("AAD//wAAAAAAAAAAAAAAAP//AAAAAAAA/////wAAAADo/xWA/v//f+j/6X/+//9/")
 }]
 blend_shape_mode = 0
-shadow_mesh = SubResource("ArrayMesh_5540x")
+shadow_mesh = SubResource("ArrayMesh_nouv6")
 
-[node name="TutorialScreen" type="Node3D"]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+[node name="EndGameScreen" type="Node3D"]
 
 [node name="StaticBody3D" type="StaticBody3D" parent="."]
 
 [node name="CollisionShape3D2" type="CollisionShape3D" parent="StaticBody3D"]
 transform = Transform3D(0.566143, 0, 0, 0, 0.836804, 0, 0, 0, -0.0320971, 0, 0, 0)
-shape = SubResource("ConvexPolygonShape3D_lppwx")
+shape = SubResource("ConvexPolygonShape3D_ygk1t")
 
 [node name="Cube_005" type="MeshInstance3D" parent="StaticBody3D/CollisionShape3D2"]
-mesh = SubResource("ArrayMesh_oud13")
+mesh = SubResource("ArrayMesh_7bn01")
 skeleton = NodePath("")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
 transform = Transform3D(0.566143, 0, 0, 0, 0.836804, 0, 0, 0, -0.0320971, 0, 0, 0)
-shape = SubResource("ConvexPolygonShape3D_uw3kx")
+shape = SubResource("ConvexPolygonShape3D_tcth6")
 
 [node name="texture" type="MeshInstance3D" parent="StaticBody3D/CollisionShape3D"]
-mesh = SubResource("ArrayMesh_l4pcx")
+mesh = SubResource("ArrayMesh_fih5q")
 skeleton = NodePath("")

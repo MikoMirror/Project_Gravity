@@ -62,7 +62,8 @@ public partial class Player : CharacterBody3D
 	private bool _isTeleporting = false;
 	private PlayerUI _playerUI;
 	private ColorRect _fadeOverlay;
-	private PlayerTeleporter _playerTeleporter;
+	private PlayerTeleporter _teleporter;
+	
 
 	private SoundManager _soundManager;
 	private List<string> _footstepSoundPaths = new List<string>();
@@ -77,8 +78,6 @@ public partial class Player : CharacterBody3D
 	private ColorRect _deadOverlay;
 	private const float DEATH_ANIMATION_DURATION = 0.2f;
 	private const float DEATH_FREEZE_DURATION = 2.0f;
-
-	private PlayerTeleporter _teleporter;
 
 	public override void _Ready()
 	{
@@ -284,26 +283,36 @@ public partial class Player : CharacterBody3D
 		}
 	}
 
-	public void StartFadeOutAnimation()
+	public void StartSpawnAnimation()
 	{
-		if (_fadeOverlay != null && _animationPlayer != null)
+		if (_fadeOverlay == null || _animationPlayer == null)
 		{
-			_fadeOverlay.Visible = true;
+			GD.PrintErr("Player: Unable to start spawn animation. FadeOverlay or AnimationPlayer is missing.");
+			return;
+		}
+
+		_fadeOverlay.Visible = true;
+		if (_animationPlayer.HasAnimation("fade_out"))
+		{
 			_animationPlayer.Play("fade_out");
-			_animationPlayer.AnimationFinished += OnFadeOutFinished;
+			_animationPlayer.AnimationFinished += OnSpawnAnimationFinished;
 		}
 		else
 		{
-			GD.PrintErr("Player: Unable to start fade out animation. FadeOverlay or AnimationPlayer is null.");
+			GD.PrintErr("Player: 'fade_out' animation not found.");
+			_fadeOverlay.Visible = false;
 		}
 	}
 
-	private void OnFadeOutFinished(StringName animName)
+	private void OnSpawnAnimationFinished(StringName animName)
 	{
-		if (animName == "fade_out")
+		if (animName == "fade_out" && _fadeOverlay != null)
 		{
 			_fadeOverlay.Visible = false;
-			_animationPlayer.AnimationFinished -= OnFadeOutFinished;
+		}
+		if (_animationPlayer != null)
+		{
+			_animationPlayer.AnimationFinished -= OnSpawnAnimationFinished;
 		}
 	}
 

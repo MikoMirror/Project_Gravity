@@ -13,11 +13,12 @@ config_version=5
 config/name="The-photographer"
 run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.3", "C#", "Forward Plus")
+run/max_fps=360
 config/icon="res://icon.svg"
 
 [audio]
 
-music_volume=0.22
+music_volume=0.0
 sound_volume=0.22
 
 [autoload]
@@ -26,7 +27,7 @@ GameState="*res://scripts/Autoload/GameState.cs"
 SaveLoadManager="*res://scripts/Services/SaveLoadManager.cs"
 MusicManager="*res://scripts/Autoload/MusicManager.cs"
 LevelManager="*res://scripts/Autoload/LevelManager.cs"
-SoundManager="*res://scripts/Services/SoundManager.cs"
+SoundManager="*res://scripts/Autoload/SoundManager.cs"
 
 [display]
 
@@ -35,6 +36,7 @@ window/size/viewport_height=1080
 window/size/mode=3
 window/stretch/mode="viewport"
 window/stretch/aspect="ignore"
+window/vsync/vsync_mode=2
 
 [dotnet]
 

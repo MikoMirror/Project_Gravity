@@ -653,6 +653,9 @@ _isTeleportActive = false
 
 [node name="portal" parent="GameObjects/Portals" instance=ExtResource("15_qjy2e")]
 transform = Transform3D(1, 0, 0, 0, -1, 5.96046e-08, 0, -5.96046e-08, -1, 6, 7.8, -9.1)
+_type = 0
+_targetLevelPath = "res://scenes/Levels/level_4.tscn"
+_targetPortalName = "portal1"
 
 [node name="cube2" parent="GameObjects" instance=ExtResource("14_43tvk")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0.5, 22.5)

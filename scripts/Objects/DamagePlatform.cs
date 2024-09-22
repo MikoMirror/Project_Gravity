@@ -21,7 +21,7 @@ public partial class DamagePlatform : Node3D
 
 	private void OnBodyEntered(Node3D body)
 	{
-		GD.Print($"DamagePlatform: Body entered - {body.Name}");
+		
 		if (body is Player player)
 		{
 			GD.Print("DamagePlatform: Player detected, calling Die()");

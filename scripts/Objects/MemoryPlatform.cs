@@ -16,7 +16,16 @@ public partial class MemoryPlatform : Node3D
 	private bool _isNeutral;
 	private MemoryPuzle _memoryPuzzle;
 
-	public bool HasBeenActivated => _hasBeenActivated;
+	// Change this line to allow setting the property
+	public bool HasBeenActivated 
+	{ 
+		get => _hasBeenActivated;
+		set
+		{
+			_hasBeenActivated = value;
+			UpdateNeonColor();
+		}
+	}
 
 	private const string ActivateSound = "res://assets/Sounds/Platform_Activate.mp3";
 	private SoundManager _soundManager;
@@ -33,12 +42,12 @@ public partial class MemoryPlatform : Node3D
 	{
 		_area = GetNode<Area3D>(AreaPath);
 		_neonMesh = GetNode<MeshInstance3D>(NeonPath);
-		 _memoryPuzzle = GetParent() as MemoryPuzle;
+		_memoryPuzzle = GetParent() as MemoryPuzle;
 
 		if (_neonMesh != null)
 		{
 			_neonMaterial = (_neonMesh.GetActiveMaterial(0) as ShaderMaterial).Duplicate() as ShaderMaterial;
-			_neonMesh.SetSurfaceOverrideMaterial(0, _neonMaterial);
+			 _neonMesh.SetSurfaceOverrideMaterial(0, _neonMaterial);
 		}
 	}
 
@@ -52,7 +61,7 @@ public partial class MemoryPlatform : Node3D
 	}
 
 	public void SetInteractive(bool interactive) => _isInteractive = interactive;
-	public void ResetActivation() { _hasBeenActivated = false; UpdateNeonColor(); }
+	public void ResetActivation() { HasBeenActivated = false; UpdateNeonColor(); }
 	public void SetRedState() { _isInRedState = true; UpdateNeonColor(); }
 	public void ResetColor() { _isInRedState = false; UpdateNeonColor(); }
 	public void SetNeutral(bool neutral) { _isNeutral = neutral; UpdateNeonColor(); }
@@ -61,7 +70,7 @@ public partial class MemoryPlatform : Node3D
 	{
 		if (!_isInteractive || !(body is CollisionObject3D) || _memoryPuzzle == null) return;
 
-		if (IsActive && !_hasBeenActivated && !_isInRedState)
+		if (IsActive && !HasBeenActivated && !_isInRedState)
 		{
 			PermanentlyActivate();
 			_memoryPuzzle.UpdatePlatformState((int)(Position.Z / _memoryPuzzle.Spacing.Z), 
@@ -89,7 +98,7 @@ public partial class MemoryPlatform : Node3D
 
 	private void PermanentlyActivate()
 	{
-		_hasBeenActivated = true;
+		HasBeenActivated = true;
 		UpdateNeonColor();
 	}
 
@@ -105,7 +114,7 @@ public partial class MemoryPlatform : Node3D
 	{
 		if (!_isInteractive || _isNeutral) return new Vector3(0.5f, 0.5f, 0.5f);
 		if (_isInRedState) return new Vector3(1.0f, 0.0f, 0.0f);
-		if (_hasBeenActivated) return new Vector3(0.0f, 0.5f, 1.0f);
+		if (HasBeenActivated) return new Vector3(0.0f, 0.5f, 1.0f);
 		if (objectInside) return IsActive ? new Vector3(0.0f, 1.0f, 0.0f) : new Vector3(1.0f, 0.0f, 0.0f);
 		return new Vector3(1.0f, 1.0f, 1.0f);
 	}

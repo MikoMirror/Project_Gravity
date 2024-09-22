@@ -39,7 +39,7 @@ public partial class LevelManager : Node
 			CallDeferred(nameof(PositionPlayerAtPortal), gameState.TargetPortalName);
 			gameState.IsComingFromPortal = false;
 		}
-		_player?.StartFadeOutAnimation();
+		_player?.StartSpawnAnimation();
 	}
 
 	private void HandlePendingPortal()

@@ -78,9 +78,9 @@ shadow_mesh = SubResource("ArrayMesh_nvx4t")
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_117al"]
 points = PackedVector3Array(0.475821, 1.38853, 0.188249, 0.475821, 1.02498, -0.175304, -0.475821, 1.38853, 0.188249, -0.475821, 1.02498, -0.175304)
 
-[sub_resource type="QuadMesh" id="QuadMesh_mfmb6"]
+[sub_resource type="QuadMesh" id="QuadMesh_petkp"]
 
-[sub_resource type="Image" id="Image_nyjnm"]
+[sub_resource type="Image" id="Image_ppxou"]
 data = {
 "data": PackedByteArray("AAAAAA=="),
 "format": "Red8",
@@ -90,9 +90,9 @@ data = {
 }
 
 [sub_resource type="ImageTexture" id="ImageTexture_8yljs"]
-image = SubResource("Image_nyjnm")
+image = SubResource("Image_ppxou")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_yq3w4"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_e4f6a"]
 render_priority = 0
 shader = ExtResource("2_dy1n5")
 shader_parameter/grid_size = Vector2(3, 3)
@@ -121,6 +121,6 @@ shape = SubResource("ConvexPolygonShape3D_117al")
 
 [node name="Screen" type="MeshInstance3D" parent="StaticBody3D/CollisionShape3D2"]
 transform = Transform3D(-0.943828, -0.0122225, 0.030622, -9.19438e-11, 0.377503, 0.945785, 0.00212646, 0.377693, -0.946261, -0.00194376, 1.21601, -0.00525381)
-mesh = SubResource("QuadMesh_mfmb6")
+mesh = SubResource("QuadMesh_petkp")
 skeleton = NodePath("../../..")
-surface_material_override/0 = SubResource("ShaderMaterial_yq3w4")
+surface_material_override/0 = SubResource("ShaderMaterial_e4f6a")

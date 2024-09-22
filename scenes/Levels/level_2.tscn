@@ -348,10 +348,6 @@ transform = Transform3D(1.15, 0, 0, 0, 1, 0, 0, 0, 1, 12.9, -1, -21.3386)
 
 [node name="env" type="Node3D" parent="."]
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="env"]
-transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 10.2576, 20.0541)
-shadow_enabled = true
-
 [node name="WorldEnvironment" type="WorldEnvironment" parent="env"]
 environment = SubResource("Environment_e4x5f")
 compositor = SubResource("Compositor_1nhkm")

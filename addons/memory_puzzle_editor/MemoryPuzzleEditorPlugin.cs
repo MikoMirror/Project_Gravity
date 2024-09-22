@@ -1,3 +1,4 @@
+#if TOOLS
 using Godot;
 using System;
 
@@ -113,3 +114,4 @@ public partial class PlatformStatesInspectorPlugin : EditorInspectorPlugin
 		return null;
 	}
 }
+#endif

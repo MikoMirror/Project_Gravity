@@ -106,7 +106,7 @@ public partial class Portal : Node3D
 		{
 			GD.PrintErr("Portal: Target level path or portal name is not set!");
 			return;
-			}
+		}
 
 		_gameState.StorePlayerData(player, TargetPortalName);
 		_gameState.IsComingFromPortal = true;

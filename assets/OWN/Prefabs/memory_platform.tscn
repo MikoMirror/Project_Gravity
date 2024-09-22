@@ -126,7 +126,6 @@ shadow_mesh = SubResource("ArrayMesh_3so42")
 
 [node name="MemoryPlatform" type="Node3D"]
 script = ExtResource("1_60bw4")
-AreaPath = NodePath("Area3D")
 NeonPath = NodePath("StaticBody3D/CollisionShape3D/NeonMesh")
 
 [node name="Area3D" type="Area3D" parent="."]

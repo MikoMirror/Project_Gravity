@@ -5,9 +5,18 @@ public partial class SoundManager : Node
 {
 	private Dictionary<string, AudioStreamPlayer> _soundPlayers = new Dictionary<string, AudioStreamPlayer>();
 	public float SoundVolume { get; private set; } = 0.5f; // Default to 50%
+	public static SoundManager Instance { get; private set; }
 
 	public override void _Ready()
 	{
+		if (Instance == null)
+		{
+			Instance = this;
+		}
+		else
+		{
+			GD.PushWarning("More than one SoundManager instance detected!");
+		}
 		LoadSoundVolume();
 	}
 
