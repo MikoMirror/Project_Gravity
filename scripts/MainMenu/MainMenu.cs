@@ -7,20 +7,22 @@ public partial class MainMenu : Control
 	[Export] private NodePath startButtonPath = "VBoxContainer/Start";
 	[Export] private NodePath confirmationDialogPath = "NewGameConfirmationDialog";
 	[Export] private Button settingsButton;
+	[Export] private NodePath musicManagerPath = "MusicManager"; // Add this line
 	#endregion
 
 	#region Private Fields
 	private Button startButton;
 	private NewGameConfirmationDialog newGameConfirmationDialog;
 	private GameState gameState;
+	private MusicManager musicManager; // Add this line
 	#endregion
 
 	#region Lifecycle Methods
 	public override void _Ready()
 	{
-		PlayBackgroundMusic();
 		InitializeComponents();
 		ConnectSignals();
+		PlayBackgroundMusic();
 		SetProcessUnhandledInput(true);
 	}
 
@@ -37,7 +39,14 @@ public partial class MainMenu : Control
 	#region Initialization Methods
 	private void PlayBackgroundMusic()
 	{
-		GetNode<MusicManager>("/root/MusicManager").PlayMusic("res://assets/Music/Main.ogg");
+		if (musicManager != null)
+		{
+			musicManager.PlayMusic("res://assets/Music/Main.ogg");
+		}
+		else
+		{
+			GD.PrintErr("MusicManager not found. Check the node path in the inspector.");
+		}
 	}
 
 	private void InitializeComponents()
@@ -45,6 +54,7 @@ public partial class MainMenu : Control
 		startButton = GetNodeOrNull<Button>(startButtonPath);
 		newGameConfirmationDialog = GetNode<NewGameConfirmationDialog>(confirmationDialogPath);
 		gameState = GetNode<GameState>("/root/GameState");
+		musicManager = GetNodeOrNull<MusicManager>(musicManagerPath); // Add this line
 
 		ValidateComponents();
 	}
@@ -59,6 +69,9 @@ public partial class MainMenu : Control
 
 		if (settingsButton == null)
 			GD.PrintErr("Settings button not assigned in the inspector.");
+
+		if (musicManager == null)
+			GD.PrintErr("MusicManager not found. Check the node path in the inspector.");
 	}
 
 	private void ConnectSignals()

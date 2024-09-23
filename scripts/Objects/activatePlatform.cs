@@ -93,6 +93,11 @@ public partial class activatePlatform : Node3D
 		{
 			ActivatePlatformAndDoor();
 		}
+
+		if (body is RigidBody3D rigidBody && _magnetEnabled)
+		{
+			AttachBodyToPlatform(rigidBody);
+		}
 	}
 
 	private void OnBodyExited(Node3D body)
@@ -101,6 +106,60 @@ public partial class activatePlatform : Node3D
 		if (_objectsOnPlatform == 0 && _isActivated)
 		{
 			DeactivatePlatformAndDoor();
+		}
+
+		if (body is RigidBody3D rigidBody)
+		{
+			DetachBodyFromPlatform(rigidBody);
+		}
+	}
+	#endregion
+
+	#region Magnet Effect
+	private Dictionary<RigidBody3D, Vector3> _attachedBodies = new Dictionary<RigidBody3D, Vector3>();
+	private bool _magnetEnabled = true;
+
+	private void AttachBodyToPlatform(RigidBody3D body)
+	{
+		if (!_attachedBodies.ContainsKey(body))
+		{
+			Vector3 relativePosition = body.GlobalPosition - GlobalPosition;
+			_attachedBodies[body] = relativePosition;
+			body.Freeze = true;
+		}
+	}
+
+	private void DetachBodyFromPlatform(RigidBody3D body)
+	{
+		if (_attachedBodies.ContainsKey(body))
+		{
+			_attachedBodies.Remove(body);
+			body.Freeze = false;
+		}
+	}
+
+	public override void _PhysicsProcess(double delta)
+	{
+		if (_magnetEnabled)
+		{
+			UpdateAttachedBodies();
+		}
+	}
+
+	private void UpdateAttachedBodies()
+	{
+		foreach (var kvp in _attachedBodies)
+		{
+			RigidBody3D body = kvp.Key;
+			Vector3 relativePosition = kvp.Value;
+
+			if (body.IsInsideTree() && !body.Freeze)
+			{
+				Vector3 targetPosition = GlobalPosition + relativePosition;
+				Vector3 currentPosition = body.GlobalPosition;
+				Vector3 newPosition = currentPosition.Lerp(targetPosition, 0.1f);
+				body.GlobalPosition = newPosition;
+			}
 		}
 	}
 	#endregion
@@ -211,4 +270,58 @@ public partial class activatePlatform : Node3D
 		}
 	}
 	#endregion
+
+	public void SetMagnetEnabled(bool enabled)
+	{
+		_magnetEnabled = enabled;
+		if (!_magnetEnabled)
+		{
+			foreach (var body in _attachedBodies.Keys)
+			{
+				DetachBodyFromPlatform(body);
+			}
+			_attachedBodies.Clear();
+		}
+	}
+
+	public static void DisableMagnetEffectOnAllPlatforms(RigidBody3D body)
+	{
+		var platforms = body.GetTree().GetNodesInGroup("ActivatePlatforms");
+		foreach (var platformNode in platforms)
+		{
+			if (platformNode is activatePlatform platform)
+			{
+				platform.DisableMagnetEffectForBody(body);
+			}
+		}
+	}
+
+	public void DisableMagnetEffectForBody(RigidBody3D body)
+	{
+		if (_area != null && _area.OverlapsBody(body))
+		{
+			SetMagnetEnabled(false);
+			DetachBodyFromPlatform(body);
+		}
+	}
+
+	public static void EnableMagnetEffectOnNearbyPlatforms(RigidBody3D body)
+	{
+		var space = body.GetWorld3D().DirectSpaceState;
+		var query = new PhysicsShapeQueryParameters3D();
+		query.CollideWithAreas = true;
+		query.CollideWithBodies = false;
+		query.CollisionMask = 1; // Adjust this to match your platform's collision layer
+		query.Shape = new SphereShape3D { Radius = 2.0f }; // Adjust radius as needed
+		query.Transform = new Transform3D(Basis.Identity, body.GlobalPosition);
+
+		var result = space.IntersectShape(query);
+		foreach (var dict in result)
+		{
+			if (dict["collider"].As<Node>().GetParent() is activatePlatform platform)
+			{
+				platform.SetMagnetEnabled(true);
+			}
+		}
+	}
 }

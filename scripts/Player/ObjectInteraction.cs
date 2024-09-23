@@ -72,6 +72,9 @@ public partial class Player
 		HeldObject.AngularDamp = 10;
 		HeldObject.Freeze = false;
 		UpdateHeldObjectPosition();
+
+		// Disable magnet effect on all platforms for this object
+		activatePlatform.DisableMagnetEffectOnAllPlatforms(rigidBody);
 	}
 
 	 private void UpdateHeldObjectPosition()
@@ -112,6 +115,10 @@ public partial class Player
 			HeldObject.LinearVelocity = Vector3.Zero;
 			HeldObject.AngularVelocity = Vector3.Zero;
 			HeldObject.ApplyCentralImpulse(-Camera.GlobalTransform.Basis.Z * 2f);
+
+			// Re-enable magnet effect on nearby platforms
+			activatePlatform.EnableMagnetEffectOnNearbyPlatforms(HeldObject);
+
 			HeldObject = null;
 		}
 		IsLifting = false;
@@ -214,6 +221,6 @@ public partial class Player
 	 private void ChangeObjectGravity(RigidBody3D rigidBody)
 	{
 		rigidBody.GravityScale = -rigidBody.GravityScale;
-		// Optional: Add visual or sound effect to indicate gravity change
+		
 	}
 }

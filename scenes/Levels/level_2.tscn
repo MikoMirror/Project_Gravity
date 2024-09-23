@@ -352,44 +352,46 @@ transform = Transform3D(1.15, 0, 0, 0, 1, 0, 0, 0, 1, 12.9, -1, -21.3386)
 environment = SubResource("Environment_e4x5f")
 compositor = SubResource("Compositor_1nhkm")
 
-[node name="cube" parent="." instance=ExtResource("9_7gqux")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3379, 6.36463, 8.2603)
-gravity_scale = -1.0
-
 [node name="Player" parent="." instance=ExtResource("10_tptqj")]
 transform = Transform3D(1, 0, 0, 0, 1.2, 0, 0, 0, 1, -0.9, 1.9, 21.2)
 
-[node name="MusicManager" type="Node3D" parent="."]
+[node name="GameObjects" type="Node3D" parent="."]
+
+[node name="MusicManager" type="Node3D" parent="GameObjects"]
 script = ExtResource("11_arr0e")
 musicTrackPath = "res://assets/Music/Level1.ogg"
 
-[node name="Portals" type="Node3D" parent="."]
+[node name="Portals" type="Node3D" parent="GameObjects"]
 
-[node name="portal_lvl2ex" parent="Portals" instance=ExtResource("12_3t2hq")]
+[node name="portal_lvl2ex" parent="GameObjects/Portals" instance=ExtResource("12_3t2hq")]
 transform = Transform3D(-1, -8.74228e-08, 0, 8.74228e-08, -1, 0, 0, 0, 1, 5.92317, 7.9755, -15.9099)
 _type = 0
 _targetLevelPath = "res://scenes/Levels/level_3.tscn"
 _targetPortalName = "Portals/portal_lvl3"
 
-[node name="portal_lvl2" parent="Portals" instance=ExtResource("12_3t2hq")]
+[node name="portal_lvl2" parent="GameObjects/Portals" instance=ExtResource("12_3t2hq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.3, 21)
 _targetLevelPath = "res://scenes/Levels/level_3.tscn"
 _targetPortalName = "Portals/portal_lvl3"
 
-[node name="MemoryPuzzle" type="Node3D" parent="."]
+[node name="MemoryPuzzle" type="Node3D" parent="GameObjects"]
 
-[node name="MemmoryPuzzle" parent="MemoryPuzzle" node_paths=PackedStringArray("GlassGates") instance=ExtResource("14_mihul")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.1, 3)
-RowCount = 5
-ColumnCount = 5
+[node name="MemmoryPuzzle" parent="GameObjects/MemoryPuzzle" node_paths=PackedStringArray("GlassGates") instance=ExtResource("14_mihul")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 0.1, 3)
+RowCount = 6
+ColumnCount = 6
 Spacing = Vector3(2.5, 0, 2.5)
-PlatformStates = [false, false, false, true, false, false, false, false, true, false, false, true, true, true, false, false, true, false, false, false, false, true, false, false, false]
+PlatformStates = [false, true, true, true, true, false, false, true, false, false, false, false, true, true, false, false, false, false, true, false, true, true, true, false, true, true, true, false, true, false, false, false, false, false, true, false]
 GlassGates = [NodePath("../../GlassGate")]
 
-[node name="GlassGate" parent="." instance=ExtResource("16_yeim4")]
+[node name="GlassGate" parent="GameObjects" instance=ExtResource("16_yeim4")]
 transform = Transform3D(-0.4, -3.49691e-08, 0, 3.49691e-08, -0.4, 0, 0, 0, 0.4, 8.3, 8, -0.4)
 
-[node name="Paltform_lvl2" parent="." instance=ExtResource("16_mx3ep")]
+[node name="Paltform_lvl2" parent="GameObjects" instance=ExtResource("16_mx3ep")]
 transform = Transform3D(3, 0, 0, 0, 4, 0, 0, 0, 3, 6.1, 0.1, -6)
-AssociatedDoorPath = NodePath("../stage/Enviroment/Door")
-CableListPath = NodePath("../stage/Cable")
+AssociatedDoorPath = NodePath("../../stage/Enviroment/Door")
+CableListPath = NodePath("../../stage/Cable")
+
+[node name="cube" parent="GameObjects" instance=ExtResource("9_7gqux")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3379, 6.36463, 8.2603)
+gravity_scale = -1.0

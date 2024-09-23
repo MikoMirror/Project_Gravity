@@ -288,38 +288,40 @@ shadow_enabled = true
 environment = SubResource("Environment_h4ijt")
 compositor = SubResource("Compositor_tl5p6")
 
-[node name="Door" parent="." instance=ExtResource("8_7lt72")]
-transform = Transform3D(1.5, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.005, -0.415)
-
-[node name="cube" parent="." instance=ExtResource("9_76axy")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3379, 1.66463, 8.6603)
-
-[node name="portal2" parent="." instance=ExtResource("10_ejclo")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.101049, 0.112798, -3.90994)
-_type = 0
-_targetLevelPath = "res://scenes/Levels/level_2.tscn"
-_targetPortalName = "Portals/portal_lvl2"
-
-[node name="TuttorialScreen" parent="." instance=ExtResource("14_bk81q")]
-transform = Transform3D(-8.74228e-08, 0, 2, 0, 2, 0, -2, 0, -8.74228e-08, -2.7228, 2.05263, 14.389)
-
-[node name="GlassWallWithDoor" parent="." instance=ExtResource("12_a70qb")]
-transform = Transform3D(-5.24537e-08, 0, -1, 0, 1.01, 0, 1.2, 0, -4.37114e-08, 9, 0.0391238, 12)
-
 [node name="Player" parent="." instance=ExtResource("13_f2pka")]
 transform = Transform3D(1, 0, 0, 0, 1.2, 0, 0, 0, 1, 11, 2, 16)
 
-[node name="GravityOrb" parent="." instance=ExtResource("15_nj3ty")]
+[node name="GameObjects" type="Node3D" parent="."]
+
+[node name="Door" parent="GameObjects" instance=ExtResource("8_7lt72")]
+transform = Transform3D(1.5, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.005, -0.415)
+
+[node name="cube" parent="GameObjects" instance=ExtResource("9_76axy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.3379, 1.66463, 8.6603)
+
+[node name="portal2" parent="GameObjects" instance=ExtResource("10_ejclo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.101049, 0.112798, -3.90994)
+_type = 0
+_targetLevelPath = "res://scenes/Levels/level_2.tscn"
+_targetPortalName = "GameObjects/Portals/portal_lvl2"
+
+[node name="TuttorialScreen" parent="GameObjects" instance=ExtResource("14_bk81q")]
+transform = Transform3D(-8.74228e-08, 0, 2, 0, 2, 0, -2, 0, -8.74228e-08, -2.7228, 2.05263, 14.389)
+
+[node name="GlassWallWithDoor" parent="GameObjects" instance=ExtResource("12_a70qb")]
+transform = Transform3D(-5.24537e-08, 0, -1, 0, 1.01, 0, 1.2, 0, -4.37114e-08, 9, 0.0391238, 12)
+
+[node name="GravityOrb" parent="GameObjects" instance=ExtResource("15_nj3ty")]
 transform = Transform3D(1, 0, 0, 0, -1, -5.96046e-08, 0, 5.96046e-08, -1, 5.83918, 8.05338, 20.2278)
 
-[node name="MusicManager" type="Node3D" parent="."]
+[node name="MusicManager" type="Node3D" parent="GameObjects"]
 script = ExtResource("16_udmh5")
 musicTrackPath = "res://assets/Music/Level1.ogg"
 
-[node name="Table" parent="." instance=ExtResource("17_fq1wy")]
+[node name="Table" parent="GameObjects" instance=ExtResource("17_fq1wy")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.2724, 0.0642822, 8.41488)
 
-[node name="Paltform_lvl1" parent="." instance=ExtResource("17_4oe5i")]
+[node name="Paltform_lvl1" parent="GameObjects" instance=ExtResource("17_4oe5i")]
 transform = Transform3D(3, 0, 0, 0, -4, 2.38419e-07, 0, -3.57628e-07, -3, 5.89905, 7.9535, 9.70422)
 AssociatedDoorPath = NodePath("../Door")
-CableListPath = NodePath("../stage/Cable2")
+CableListPath = NodePath("../../stage/Cable2")
