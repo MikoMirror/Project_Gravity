@@ -117,18 +117,18 @@ public partial class MemoryPuzle : Node3D
 	}
 
 	[Export]
-	public bool ShowPlatforms
+public bool ShowPlatforms
+{
+	get => _showPlatforms;
+	set
 	{
-		get => _showPlatforms;
-		set
+		if (_showPlatforms != value)
 		{
-			if (_showPlatforms != value)
-			{
-				_showPlatforms = value;
-				CallDeferred(nameof(UpdatePlatformsVisibility));
-			}
+			_showPlatforms = value;
+			UpdatePlatformsVisibility();
 		}
 	}
+}
 	#endregion
 
 	#region Private Fields
@@ -539,120 +539,121 @@ public partial class MemoryPuzle : Node3D
 
 	#region Visual Updates
 	private void UpdateVisualRepresentation()
+{
+	if (Engine.IsEditorHint())
 	{
-		if (Engine.IsEditorHint())
+		foreach (Node child in GetChildren())
 		{
-			foreach (Node child in GetChildren())
+			if (child is CsgBox3D)
 			{
-				if (child is CsgBox3D)
-				{
-					child.QueueFree();
-				}
-			}
-
-			for (int row = 0; row < RowCount; row++)
-			{
-				for (int col = 0; col < ColumnCount; col++)
-				{
-					var visualPlatform = new CsgBox3D();
-					visualPlatform.Name = $"VisualPlatform_{row}_{col}";
-					visualPlatform.Size = new Vector3(1, 0.1f, 1);
-					visualPlatform.Position = new Vector3(col * Spacing.X, 0, row * Spacing.Z);
-
-					int index = row * ColumnCount + col;
-					bool isActive = index < PlatformStates.Count && PlatformStates[index];
-
-					visualPlatform.MaterialOverride = new StandardMaterial3D
-					{
-						AlbedoColor = isActive ? new Color(0, 1, 0, 0.5f) : new Color(0.5f, 0.5f, 0.5f, 0.5f),
-						Transparency = BaseMaterial3D.TransparencyEnum.Alpha
-					};
-					AddChild(visualPlatform);
-					visualPlatform.Visible = ShowPlatforms;
-				}
+				child.QueueFree();
 			}
 		}
-		else
-		{
-			for (int i = 0; i < PlatformStates.Count; i++)
-			{
-				int row = i / ColumnCount;
-				int col = i % ColumnCount;
-				if (platformInstances != null && platformInstances[row, col] != null)
-				{
-					MemoryPlatform platform = platformInstances[row, col];
-					platform.IsActive = PlatformStates[i];
-					platform.UpdateVisuals();
-				}
-			}
-		}
-	}
 
-	private void ClearPlatforms()
-	{
-		if (platformInstances != null)
-		{
-			foreach (var platform in platformInstances)
-			{
-				if (platform != null)
-				{
-					platform.QueueFree();
-				}
-			}
-		}
-		platformInstances = null;
-	}
-
-	private void CreatePlatformGrid()
-	{
-		if (!IsInsideTree() || platformInstances != null) return;
-
-		ClearPlatforms();
-
-		GD.Print($"PlatformScenePath: {PlatformScenePath}");
-		if (string.IsNullOrEmpty(PlatformScenePath))
-		{
-			GD.PushError("PlatformScenePath is not set.");
-			return;
-		}
-
-		GD.Print($"Attempting to load platform scene from: {PlatformScenePath}");
-		PackedScene platformScene = ResourceLoader.Load<PackedScene>(PlatformScenePath);
-		if (platformScene == null)
-		{
-			GD.PushError($"Failed to load platform scene from '{PlatformScenePath}'");
-			return;
-		}
-
-		platformInstances = new MemoryPlatform[RowCount, ColumnCount];
 		for (int row = 0; row < RowCount; row++)
 		{
 			for (int col = 0; col < ColumnCount; col++)
 			{
-				MemoryPlatform memoryPlatform = platformScene.Instantiate<MemoryPlatform>();
-				if (memoryPlatform == null)
-				{
-					GD.PushError("Failed to instantiate platform scene as MemoryPlatform.");
-					continue;
-				}
-
-				AddChild(memoryPlatform);
-				memoryPlatform.Owner = GetTree()?.EditedSceneRoot ?? this;
-				memoryPlatform.Name = $"Platform_{row}_{col}";
-				memoryPlatform.Position = new Vector3(col * Spacing.X, 0, row * Spacing.Z);
+				var visualPlatform = new CsgBox3D();
+				visualPlatform.Name = $"VisualPlatform_{row}_{col}";
+				visualPlatform.Size = new Vector3(1, 0.1f, 1);
+				visualPlatform.Position = new Vector3(col * Spacing.X, 0, row * Spacing.Z);
 
 				int index = row * ColumnCount + col;
-				memoryPlatform.IsActive = index < PlatformStates.Count && PlatformStates[index];
-				memoryPlatform.UpdateVisuals();
+				bool isActive = index < PlatformStates.Count && PlatformStates[index];
 
-				GD.Print($"Platform node instantiated at position: {memoryPlatform.Position}, Active: {memoryPlatform.IsActive}");
-
-				platformInstances[row, col] = memoryPlatform;
+				visualPlatform.MaterialOverride = new StandardMaterial3D
+				{
+					AlbedoColor = isActive ? new Color(0, 1, 0, 0.5f) : new Color(0.5f, 0.5f, 0.5f, 0.5f),
+					Transparency = BaseMaterial3D.TransparencyEnum.Alpha
+				};
+				AddChild(visualPlatform);
+				visualPlatform.Visible = ShowPlatforms; // Ensure visibility respects ShowPlatforms
 			}
 		}
-		UpdatePuzzleArea();
-		UpdatePlatformsVisibility();
 	}
+	else
+	{
+		for (int i = 0; i < PlatformStates.Count; i++)
+		{
+			int row = i / ColumnCount;
+			int col = i % ColumnCount;
+			if (platformInstances != null && platformInstances[row, col] != null)
+			{
+				MemoryPlatform platform = platformInstances[row, col];
+				platform.IsActive = PlatformStates[i];
+				platform.UpdateVisuals();
+			}
+		}
+	}
+}
+
+	private void ClearPlatforms()
+{
+	if (platformInstances != null)
+	{
+		foreach (var platform in platformInstances)
+		{
+			if (platform != null)
+			{
+				platform.QueueFree();
+			}
+		}
+		platformInstances = null;
+	}
+}
+
+	private void CreatePlatformGrid()
+{
+	if (!IsInsideTree() || platformInstances != null) return;
+
+	ClearPlatforms();
+
+	GD.Print($"PlatformScenePath: {PlatformScenePath}");
+	if (string.IsNullOrEmpty(PlatformScenePath))
+	{
+		GD.PushError("PlatformScenePath is not set.");
+		return;
+	}
+
+	GD.Print($"Attempting to load platform scene from: {PlatformScenePath}");
+	PackedScene platformScene = ResourceLoader.Load<PackedScene>(PlatformScenePath);
+	if (platformScene == null)
+	{
+		GD.PushError($"Failed to load platform scene from '{PlatformScenePath}'");
+		return;
+	}
+
+	platformInstances = new MemoryPlatform[RowCount, ColumnCount];
+	for (int row = 0; row < RowCount; row++)
+	{
+		for (int col = 0; col < ColumnCount; col++)
+		{
+			MemoryPlatform memoryPlatform = platformScene.Instantiate<MemoryPlatform>();
+			if (memoryPlatform == null)
+			{
+				GD.PushError("Failed to instantiate platform scene as MemoryPlatform.");
+				continue;
+			}
+
+			AddChild(memoryPlatform);
+			memoryPlatform.Owner = GetTree()?.EditedSceneRoot ?? this;
+			memoryPlatform.Name = $"Platform_{row}_{col}";
+			memoryPlatform.Position = new Vector3(col * Spacing.X, 0, row * Spacing.Z);
+
+			int index = row * ColumnCount + col;
+			memoryPlatform.IsActive = index < PlatformStates.Count && PlatformStates[index];
+			memoryPlatform.UpdateVisuals();
+
+			GD.Print($"Platform node instantiated at position: {memoryPlatform.Position}, Active: {memoryPlatform.IsActive}");
+
+			platformInstances[row, col] = memoryPlatform;
+		}
+	}
+	UpdatePuzzleArea();
+	UpdatePlatformsVisibility();
+}
+
 
 	private Node3D FindTerminalNode()
 	{
@@ -678,25 +679,8 @@ public partial class MemoryPuzle : Node3D
 				var material = screen.GetActiveMaterial(0) as ShaderMaterial;
 				if (material != null)
 				{
-					GD.Print($"Updating grid size to: {ColumnCount}x{RowCount}");
+										GD.Print($"Updating grid size to {RowCount} rows and {ColumnCount} columns");
 					material.SetShaderParameter("grid_size", new Vector2(ColumnCount, RowCount));
-				}
-			}
-		}
-	}
-
-	private void UpdatePlatformPositions()
-	{
-		if (platformInstances != null)
-		{
-			for (int row = 0; row < RowCount; row++)
-			{
-				for (int col = 0; col < ColumnCount; col++)
-				{
-					if (platformInstances[row, col] != null)
-					{
-						platformInstances[row, col].Position = new Vector3(col * Spacing.X, 0, row * Spacing.Z);
-					}
 				}
 			}
 		}
@@ -817,8 +801,9 @@ public partial class MemoryPuzle : Node3D
 		UpdateTerminalPresence();
 	}
 	#endregion
+
 	#region Platform Visibility
-private void UpdatePlatformsVisibility()
+	private void UpdatePlatformsVisibility()
 {
 	if (platformInstances != null)
 	{
@@ -826,47 +811,97 @@ private void UpdatePlatformsVisibility()
 		{
 			if (platform != null)
 			{
-				platform.Visible = ShowPlatforms;
+				if (ShowPlatforms)
+				{
+					platform.Visible = true;
+				}
+				else
+				{
+					platform.QueueFree();
+				}
+			}
+		}
+
+		if (!ShowPlatforms)
+		{
+			platformInstances = null;
+		}
+	}
+
+	if (_puzzleArea != null)
+	{
+		if (ShowPlatforms)
+		{
+			_puzzleArea.Visible = true;
+		}
+		else
+		{
+			_puzzleArea.QueueFree();
+			_puzzleArea = null;
+		}
+	}
+
+	// Update visibility of CsgBox3D visual platforms in the editor
+	if (Engine.IsEditorHint())
+	{
+		foreach (Node child in GetChildren())
+		{
+			if (child is CsgBox3D visualPlatform)
+			{
+				visualPlatform.Visible = ShowPlatforms;
 			}
 		}
 	}
-	
-	if (PuzzleArea != null)
-	{
-		PuzzleArea.Visible = ShowPlatforms;
-	}
 }
 
-private void ResetPlatformsToOriginalState()
-{
-	if (platformInstances != null)
+
+	private void UpdatePlatformPositions()
 	{
-		for (int row = 0; row < RowCount; row++)
+		if (platformInstances != null)
 		{
-			for (int col = 0; col < ColumnCount; col++)
+			for (int row = 0; row < RowCount; row++)
 			{
-				int index = row * ColumnCount + col;
-				if (index < PlatformStates.Count && platformInstances[row, col] != null)
+				for (int col = 0; col < ColumnCount; col++)
 				{
-					platformInstances[row, col].IsActive = PlatformStates[index];
-					platformInstances[row, col].ResetActivation();
-					platformInstances[row, col].UpdateVisuals();
+					if (platformInstances[row, col] != null)
+					{
+						platformInstances[row, col].Position = new Vector3(col * Spacing.X, 0, row * Spacing.Z);
+					}
 				}
 			}
 		}
 	}
-}
 
-private void PlayWrongPlatformSound()
-{
-	if (SoundManager != null)
+	private void ResetPlatformsToOriginalState()
 	{
-		SoundManager.PlaySound(WrongPlatformSound);
+		if (platformInstances != null)
+		{
+			for (int row = 0; row < RowCount; row++)
+			{
+				for (int col = 0; col < ColumnCount; col++)
+				{
+					int index = row * ColumnCount + col;
+					if (index < PlatformStates.Count && platformInstances[row, col] != null)
+					{
+						platformInstances[row, col].IsActive = PlatformStates[index];
+						platformInstances[row, col].ResetActivation();
+						platformInstances[row, col].UpdateVisuals();
+					}
+				}
+			}
+		}
 	}
-	else
+
+	private void PlayWrongPlatformSound()
 	{
-		GD.Print("SoundManager is null, cannot play wrong platform sound.");
+		if (SoundManager != null)
+		{
+			SoundManager.PlaySound(WrongPlatformSound);
+		}
+		else
+		{
+			GD.Print("SoundManager is null, cannot play wrong platform sound.");
+		}
 	}
-}
-#endregion
+	#endregion
 }

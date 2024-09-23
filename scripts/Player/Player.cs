@@ -99,13 +99,12 @@ public partial class Player : CharacterBody3D
 
 		if (_gravityManager == null)
 		{
-			GD.PrintErr("GravityManager not found! Make sure it's a child of the Player node.");
 			_camera = GetNode<Camera3D>("Head/Camera3D");
 			_head = GetNode<Node3D>("Head");
 		}
 		if (_jumpsIndicator == null)
 		{
-			GD.PrintErr("PlayerUI not found in Player!");
+			// Handle missing PlayerUI
 		}
 
 		// Initialize settings
@@ -143,18 +142,10 @@ public partial class Player : CharacterBody3D
 		if (_animationPlayer == null)
 		{
 			_animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
-			if (_animationPlayer == null)
-			{
-				GD.PrintErr("Player: AnimationPlayer not found!");
-			}
 		}
 
 		_deadOverlay = GetNode<ColorRect>("Head/Camera3D/Dead");
-		if (_deadOverlay == null)
-		{
-			GD.PrintErr("Player: Dead overlay ColorRect not found!");
-		}
-		else
+		if (_deadOverlay != null)
 		{
 			_deadOverlay.Visible = false;
 		}
@@ -166,22 +157,18 @@ public partial class Player : CharacterBody3D
 	{
 		if (_animationPlayer == null)
 		{
-			GD.PrintErr("Player: AnimationPlayer not found!");
 			return;
 		}
 		if (_teleportOverlay == null)
 		{
-			GD.PrintErr("Player: TeleportOverlay not found!");
 			return;
 		}
 		if (_camera == null)
 		{
-			GD.PrintErr("Player: Camera3D not found!");
 			return;
 		}
 		if (_head == null)
 		{
-			GD.PrintErr("Player: Head node not found!");
 			return;
 		}
 
@@ -218,19 +205,7 @@ public partial class Player : CharacterBody3D
 		_animation.Play("flash_effect");
 	}
 
-	public void ToggleGravity()
-	{
-		if (_jumpsIndicator.CanJump())
-		{
-			IsGravityReversed = !IsGravityReversed;
-			_isFlipping = true;
-			_gravityFlipTimer = 0f;
-			_gravityManager.UpdateHeldObjectGravity(IsGravityReversed);
-			_jumpsIndicator.UseJump();
-		}
-	}
-
-	public bool TryToggleGravity()
+	public bool ToggleGravity()
 	{
 		if (_jumpsIndicator.CanJump() && !_isFlipping)
 		{
@@ -248,11 +223,9 @@ public partial class Player : CharacterBody3D
 	{
 		if (_teleporter == null)
 		{
-			GD.PrintErr("Player: _teleporter is null. Attempting to reinitialize.");
 			InitializeTeleporter();
 			if (_teleporter == null)
 			{
-				GD.PrintErr("Player: Failed to initialize _teleporter. Teleportation aborted.");
 				return;
 			}
 		}
@@ -263,7 +236,6 @@ public partial class Player : CharacterBody3D
 	{
 		if (_teleporter == null)
 		{
-			GD.PrintErr("Player: _teleporter is null. FinishTeleportation aborted.");
 			return;
 		}
 		_teleporter.FinishTeleportAnimation();
@@ -274,12 +246,10 @@ public partial class Player : CharacterBody3D
 		add 
 		{ 
 			if (_teleporter != null) _teleporter.TeleportCompleted += value; 
-			else GD.PrintErr("Player: Cannot add TeleportCompleted event. _teleporter is null.");
 		}
 		remove 
 		{ 
 			if (_teleporter != null) _teleporter.TeleportCompleted -= value; 
-			else GD.PrintErr("Player: Cannot remove TeleportCompleted event. _teleporter is null.");
 		}
 	}
 
@@ -287,7 +257,6 @@ public partial class Player : CharacterBody3D
 	{
 		if (_fadeOverlay == null || _animationPlayer == null)
 		{
-			GD.PrintErr("Player: Unable to start spawn animation. FadeOverlay or AnimationPlayer is missing.");
 			return;
 		}
 
@@ -299,7 +268,6 @@ public partial class Player : CharacterBody3D
 		}
 		else
 		{
-			GD.PrintErr("Player: 'fade_out' animation not found.");
 			_fadeOverlay.Visible = false;
 		}
 	}
@@ -316,15 +284,6 @@ public partial class Player : CharacterBody3D
 		}
 	}
 
-	public override void _ExitTree()
-	{
-		GD.Print("Player _ExitTree called");
-		if (IsInstanceValid(_playerUI) && _playerUI.IsInsideTree())
-		{
-			_playerUI.QueueFree();
-		}
-	}
-
 	public void ResetGravityJumps()
 	{
 		if (_gravityManager != null)
@@ -335,30 +294,6 @@ public partial class Player : CharacterBody3D
 		{
 			_playerUI.ResetJumps();
 		}
-	}
-
-	private void HandleFootsteps(double delta)
-	{
-		if (IsOnFloor() && Velocity.LengthSquared() > 0.1f)
-		{
-			_currentStepInterval = IsSprinting ? RUN_STEP_INTERVAL : WALK_STEP_INTERVAL;
-			_timeSinceLastStep += (float)delta;
-			if (_timeSinceLastStep >= _currentStepInterval)
-			{
-				PlayRandomFootstep();
-				_timeSinceLastStep = 0f;
-			}
-		}
-		else
-		{
-			_timeSinceLastStep = _currentStepInterval; // Reset timer when not moving
-		}
-	}
-
-	private void PlayRandomFootstep()
-	{
-		int randomIndex = _rng.RandiRange(0, _footstepSoundPaths.Count - 1);
-		_soundManager.PlaySound(_footstepSoundPaths[randomIndex]);
 	}
 
 	private const float WALK_STEP_INTERVAL = 0.45f;
@@ -385,7 +320,6 @@ public partial class Player : CharacterBody3D
 		}
 		else
 		{
-			GD.PrintErr("Player: dead_animation not found or AnimationPlayer is null");
 			OnDeathAnimationFinished();
 		}
 	}
@@ -420,10 +354,6 @@ public partial class Player : CharacterBody3D
 			string currentScenePath = currentScene.SceneFilePath;
 			GD.Print($"Player: Restarting level: {currentScenePath}");
 			GetTree().CallDeferred(SceneTree.MethodName.ChangeSceneToFile, currentScenePath);
-		}
-		else
-		{
-			GD.PrintErr("Player: Unable to restart level, current scene is null");
 		}
 	}
 

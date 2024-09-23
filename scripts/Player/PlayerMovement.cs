@@ -93,4 +93,28 @@ public partial class Player
 		velocity.X = Mathf.MoveToward(velocity.X, 0, Speed);
 		velocity.Z = Mathf.MoveToward(velocity.Z, 0, Speed);
 	}
+	
+	private void HandleFootsteps(double delta)
+	{
+		if (IsOnFloor() && Velocity.LengthSquared() > 0.1f)
+		{
+			_currentStepInterval = IsSprinting ? RUN_STEP_INTERVAL : WALK_STEP_INTERVAL;
+			_timeSinceLastStep += (float)delta;
+			if (_timeSinceLastStep >= _currentStepInterval)
+			{
+				PlayRandomFootstep();
+				_timeSinceLastStep = 0f;
+			}
+		}
+		else
+		{
+			_timeSinceLastStep = _currentStepInterval; 
+		}
+	}
+
+	private void PlayRandomFootstep()
+	{
+		int randomIndex = _rng.RandiRange(0, _footstepSoundPaths.Count - 1);
+		_soundManager.PlaySound(_footstepSoundPaths[randomIndex]);
+	}
 }

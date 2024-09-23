@@ -19,7 +19,7 @@ config/icon="res://icon.svg"
 [audio]
 
 music_volume=0.5
-sound_volume=0.22
+sound_volume=0.67
 
 [autoload]
 
@@ -44,7 +44,7 @@ project/assembly_name="The-photographer"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/JFA_driven_motion_blur_addon-master/addons/SphynxMotionBlurToolkit/plugin.cfg", "res://addons/memory_puzzle_editor/plugin.cfg")
+enabled=PackedStringArray("res://addons/memory_puzzle_editor/plugin.cfg")
 
 [global_group]
 
