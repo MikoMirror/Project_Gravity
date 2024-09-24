@@ -4,11 +4,17 @@
 
 "Project Gravity" is a small puzzle game consisting of 4 levels made with Godot Engine 4.3 Mono. 
 
-Installation Dev:
-To open the game in Godot Engine 4.3 mono download this repository, then import the project. Then in Godot engine click on the “build Project” button and then enable the “Memory Puzzle Editor” plugin in the project settings
+Development Setup
+--
+To open the game in Godot Engine 4.3 (Mono):
+- Clone or download this repository.
+- Open Godot Engine, and import the project.
+- In the Godot editor, click the "Build Project" button to compile the project.
+- Navigate to Project Settings and enable the "Memory Puzzle Editor" plugin.
+  
+---
 
-This project uses a custom “Memory puzzle editor” plugin that I wrote specifically for MemoryPuzzle scene management.
-This plugin enhances the Godot editor by:
+This project includes a custom "Memory Puzzle Editor" plugin, developed specifically for managing the MemoryPuzzle scene. The plugin extends the functionality of the Godot editor by providing the following enhancements:
 
 - Creating a custom grid-based editor for PlatformStates in MemoryPuzzle and CustomPlatformStates in Terminal objects.
 
@@ -24,15 +30,14 @@ This plugin enhances the Godot editor by:
 
 It simplifies the process of designing memory puzzles and terminal layouts by providing a visual, interactive interface within the Godot editor.
 
-![image](https://github.com/user-attachments/assets/94861df8-f408-487e-abc9-5ff2f7379bd2)
+![image](https://github.com/user-attachments/assets/02786199-841f-4c9e-a890-3b18d0e4dd0a)
 ---
 
 # $${\color{red}IMPORTANT}$$
 
-This project uses Vulkan as its rendering engine. For optimal performance:
+This project uses Vulkan as its primary rendering engine. To ensure optimal performance:
 
-1. Make sure your graphics card supports Vulkan. (In some cases, you may need to update your graphics drivers).
+1. Confirm that your graphics card supports Vulkan. In some cases, you may need to update your graphics drivers.
 
-Without proper Vulkan support, the game may fall back to software rendering on the CPU, which could significantly impact performance and visual quality.
-You can check which GPU the game uses by running “ProjectGravity.console.exe”
+If Vulkan is not supported, the game may default to software rendering on the CPU, which can significantly reduce performance and visual quality. You can verify which GPU the game is utilizing by running the ProjectGravity.console.exe tool.
 
