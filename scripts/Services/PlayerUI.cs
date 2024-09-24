@@ -64,11 +64,6 @@ public partial class PlayerUI : Control
 			};
 			_gravityIndicator.Material.Set("shader_parameter/value", value);
 
-			if (isReplenishing)
-			{
-				// You can add a visual effect for replenishing here if needed
-				// For example, a quick flash or color change
-			}
 		}
 		
 		_restartLabel.Visible = _remainingJumps == 0;
