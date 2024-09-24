@@ -44,7 +44,6 @@ public partial class MusicManager : Node
 		{
 			mp3Stream.Loop = LoopMusic;
 		}
-		// Add more conditions for other audio stream types if needed
 	}
 
 	public void OnLoopMusicChanged()
