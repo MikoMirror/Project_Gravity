@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://b71kvu7wicv6n"]
+[gd_scene load_steps=11 format=3 uid="uid://b71kvu7wicv6n"]
 
 [ext_resource type="Shader" path="res://shaders/blur.gdshader" id="1_kp7tx"]
 [ext_resource type="Script" path="res://scripts/Services/PauseMenu.cs" id="1_yxcil"]
@@ -8,6 +8,8 @@
 shader = ExtResource("1_kp7tx")
 shader_parameter/lod = 5.0
 shader_parameter/mix_percentage = 0.3
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vfxka"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wodt3"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
@@ -26,6 +28,12 @@ border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_jqba6"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_7yd7i"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0a0xu"]
 
 [node name="PauseMenu" type="Control"]
 layout_mode = 3
@@ -64,6 +72,7 @@ theme_override_constants/separation = 40
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_m46o0")
 theme_override_font_sizes/font_size = 44
+theme_override_styles/focus = SubResource("StyleBoxEmpty_vfxka")
 theme_override_styles/hover = SubResource("StyleBoxFlat_wodt3")
 theme_override_styles/normal = SubResource("StyleBoxFlat_4gdn4")
 text = "Resume"
@@ -72,6 +81,7 @@ text = "Resume"
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_m46o0")
 theme_override_font_sizes/font_size = 44
+theme_override_styles/focus = SubResource("StyleBoxEmpty_jqba6")
 theme_override_styles/hover = SubResource("StyleBoxFlat_wodt3")
 theme_override_styles/normal = SubResource("StyleBoxFlat_4gdn4")
 text = "Restart Level"
@@ -80,6 +90,7 @@ text = "Restart Level"
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_m46o0")
 theme_override_font_sizes/font_size = 44
+theme_override_styles/focus = SubResource("StyleBoxEmpty_7yd7i")
 theme_override_styles/hover = SubResource("StyleBoxFlat_wodt3")
 theme_override_styles/normal = SubResource("StyleBoxFlat_4gdn4")
 text = "Settings
@@ -89,6 +100,7 @@ text = "Settings
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_m46o0")
 theme_override_font_sizes/font_size = 44
+theme_override_styles/focus = SubResource("StyleBoxEmpty_0a0xu")
 theme_override_styles/hover = SubResource("StyleBoxFlat_wodt3")
 theme_override_styles/normal = SubResource("StyleBoxFlat_4gdn4")
 text = "Quit game

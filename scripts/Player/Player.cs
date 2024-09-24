@@ -102,11 +102,7 @@ public partial class Player : CharacterBody3D
 			_camera = GetNode<Camera3D>("Head/Camera3D");
 			_head = GetNode<Node3D>("Head");
 		}
-		if (_jumpsIndicator == null)
-		{
-			// Handle missing PlayerUI
-		}
-
+		
 		// Initialize settings
 		Gravity = (float)ProjectSettings.GetSetting("physics/3d/default_gravity") * GravityMultiplier;
 		_initialGravity = Gravity;
@@ -150,7 +146,7 @@ public partial class Player : CharacterBody3D
 			_deadOverlay.Visible = false;
 		}
 
-		ResetState(); // Reset the player state when the scene loads
+		ResetState(); 
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -315,7 +311,6 @@ public partial class Player : CharacterBody3D
 		if (_isDead) return; 
 
 		_isDead = true;
-		GD.Print("Player: Die() called");
 
 		if (_deadOverlay != null)
 		{
@@ -324,7 +319,6 @@ public partial class Player : CharacterBody3D
 
 		if (_animationPlayer != null && _animationPlayer.HasAnimation("dead_animation"))
 		{
-			GD.Print("Player: Playing dead_animation");
 			_animationPlayer.Play("dead_animation");
 			GetTree().CreateTimer(DEATH_ANIMATION_DURATION).Timeout += OnDeathAnimationFinished;
 		}
@@ -336,13 +330,11 @@ public partial class Player : CharacterBody3D
 
 	private void OnDeathAnimationFinished()
 	{
-		GD.Print("Player: Death animation finished, starting freeze");
 		GetTree().CreateTimer(DEATH_FREEZE_DURATION).Timeout += OnRestartTimer;
 	}
 
 	private void OnRestartTimer()
 	{
-		GD.Print("Player: OnRestartTimer called");
 		var levelManager = GetTree().CurrentScene.GetNodeOrNull<LevelManager>("LevelManager");
 		if (levelManager != null)
 		{

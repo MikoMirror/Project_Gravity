@@ -16,7 +16,6 @@ public partial class MemoryPlatform : Node3D
 	private bool _isNeutral;
 	private MemoryPuzzle _memoryPuzzle;
 
-	// Change this line to allow setting the property
 	public bool HasBeenActivated 
 	{ 
 		get => _hasBeenActivated;

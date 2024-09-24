@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://bflfuelqq3gsi" path="res://assets/OWN/Prefabs/terminal.tscn" id="2_y0n8p"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_daye6"]
-size = Vector3(14.5, 2, 14.5)
+size = Vector3(17, 2, 17)
 
 [node name="MemmoryPuzzle" type="Node3D" node_paths=PackedStringArray("PuzzleArea")]
 script = ExtResource("1_huamm")

@@ -6,15 +6,16 @@ public partial class MainMenu : Control
 	#region Exports
 	[Export] private NodePath startButtonPath = "VBoxContainer/Start";
 	[Export] private NodePath confirmationDialogPath = "NewGameConfirmationDialog";
-	[Export] private Button settingsButton;
-	[Export] private NodePath musicManagerPath = "MusicManager"; // Add this line
+	[Export] private NodePath musicManagerPath = "MusicManager";
+	[Export] private NodePath settingsButtonPath = "VBoxContainer/Settings"; 
 	#endregion
 
 	#region Private Fields
 	private Button startButton;
+	private Button settingsButton; 
 	private NewGameConfirmationDialog newGameConfirmationDialog;
 	private GameState gameState;
-	private MusicManager musicManager; // Add this line
+	private MusicManager musicManager;
 	#endregion
 
 	#region Lifecycle Methods
@@ -22,7 +23,6 @@ public partial class MainMenu : Control
 	{
 		InitializeComponents();
 		ConnectSignals();
-		PlayBackgroundMusic();
 		SetProcessUnhandledInput(true);
 	}
 
@@ -37,24 +37,13 @@ public partial class MainMenu : Control
 	#endregion
 
 	#region Initialization Methods
-	private void PlayBackgroundMusic()
-	{
-		if (musicManager != null)
-		{
-			musicManager.PlayMusic("res://assets/Music/Main.ogg");
-		}
-		else
-		{
-			GD.PrintErr("MusicManager not found. Check the node path in the inspector.");
-		}
-	}
-
 	private void InitializeComponents()
 	{
 		startButton = GetNodeOrNull<Button>(startButtonPath);
+		settingsButton = GetNodeOrNull<Button>(settingsButtonPath); // Update this line
 		newGameConfirmationDialog = GetNode<NewGameConfirmationDialog>(confirmationDialogPath);
 		gameState = GetNode<GameState>("/root/GameState");
-		musicManager = GetNodeOrNull<MusicManager>(musicManagerPath); // Add this line
+		musicManager = GetNodeOrNull<MusicManager>(musicManagerPath); 
 
 		ValidateComponents();
 	}
@@ -68,10 +57,7 @@ public partial class MainMenu : Control
 			GD.PrintErr("NewGameConfirmationDialog not found. Check the node path in the inspector.");
 
 		if (settingsButton == null)
-			GD.PrintErr("Settings button not assigned in the inspector.");
-
-		if (musicManager == null)
-			GD.PrintErr("MusicManager not found. Check the node path in the inspector.");
+			GD.PrintErr("Settings button not found. Check the node path.");
 	}
 
 	private void ConnectSignals()

@@ -3,8 +3,8 @@ using Godot;
 public partial class MusicManager : Node
 {
 	private AudioStreamPlayer _musicPlayer;
-	public float MusicVolume { get; private set; } = 0.5f; // Default to 50%
-	public bool LoopMusic { get; set; } = true; // Add this line
+	public float MusicVolume { get; private set; } = 0.5f; 
+	public bool LoopMusic { get; set; } = true; 
 
 	public override void _Ready()
 	{

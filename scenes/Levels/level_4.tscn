@@ -115,6 +115,8 @@ PlatformStates = [false, false, false, true, true, true, false, false, false, tr
 GlassGates = [NodePath("../GlassGate3")]
 ShowTerminal = false
 
+[node name="PuzzleArea" type="Area3D" parent="GameObjects/MemmoryPuzzle3"]
+
 [node name="Stage" type="Node3D" parent="."]
 
 [node name="Floor" type="Node3D" parent="Stage"]

@@ -186,17 +186,17 @@ public partial class Player
 				}
 				else
 				{
-					GD.Print("GlassWallWithDoor script not found"); // Debug print
+					GD.Print("GlassWallWithDoor script not found"); 
 				}
 			}
 			else
 			{
-				GD.Print("Hit object is not a StaticBody3D"); // Debug print
+				GD.Print("Hit object is not a StaticBody3D");
 			}
 		}
 		else
 		{
-			GD.Print("Ray did not hit anything"); // Debug print
+			GD.Print("Ray did not hit anything"); 
 		}
 	}
 
