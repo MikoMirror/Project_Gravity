@@ -31,8 +31,8 @@ It simplifies the process of designing memory puzzles and terminal layouts by pr
 
 This project uses Vulkan as its rendering engine. For optimal performance:
 
-1. Ensure your graphics card supports Vulkan.
-2. If you have a discrete GPU, make sure it's selected for this application.
+1. Make sure your graphics card supports Vulkan. (In some cases, you may need to update your graphics drivers).
 
 Without proper Vulkan support, the game may fall back to software rendering on the CPU, which could significantly impact performance and visual quality.
+You can check which GPU the game uses by running “ProjectGravity.console.exe”
 
