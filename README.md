@@ -25,4 +25,14 @@ This plugin enhances the Godot editor by:
 It simplifies the process of designing memory puzzles and terminal layouts by providing a visual, interactive interface within the Godot editor.
 
 ![image](https://github.com/user-attachments/assets/94861df8-f408-487e-abc9-5ff2f7379bd2)
+---
+
+# $${\color{red}IMPORTANT}$$
+
+This project uses Vulkan as its rendering engine. For optimal performance:
+
+1. Ensure your graphics card supports Vulkan.
+2. If you have a discrete GPU, make sure it's selected for this application.
+
+Without proper Vulkan support, the game may fall back to software rendering on the CPU, which could significantly impact performance and visual quality.
 
