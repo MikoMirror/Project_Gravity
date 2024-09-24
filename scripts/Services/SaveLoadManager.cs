@@ -29,7 +29,6 @@ public partial class SaveLoadManager : Node
 			["PlayerPosition"] = new float[] { gameState.PlayerPosition.X, gameState.PlayerPosition.Y, gameState.PlayerPosition.Z },
 			["TargetPortalName"] = gameState.TargetPortalName,
 			["IsComingFromPortal"] = gameState.IsComingFromPortal
-			// Add any other game state data you want to save
 		};
 
 		string jsonString = JsonSerializer.Serialize(saveData);
