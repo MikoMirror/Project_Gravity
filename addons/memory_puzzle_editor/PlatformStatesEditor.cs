@@ -42,7 +42,7 @@ public partial class PlatformStatesEditor : EditorProperty
 		int rows, columns;
 		Godot.Collections.Array<bool> states;
 
-		if (targetObject is MemoryPuzle memoryPuzle)
+		if (targetObject is MemoryPuzzle memoryPuzle)
 		{
 			rows = memoryPuzle.RowCount;
 			columns = memoryPuzle.ColumnCount;
@@ -95,7 +95,7 @@ public partial class PlatformStatesEditor : EditorProperty
 		var newStates = GetPlatformStates();
 		EmitChanged(GetEditedProperty(), newStates);
 
-		if (targetObject is MemoryPuzle memoryPuzle)
+		if (targetObject is MemoryPuzzle memoryPuzle)
 		{
 			memoryPuzle.PlatformStates = newStates;
 			memoryPuzle.UpdatePlatformState(row, col, toggled);

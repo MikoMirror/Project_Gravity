@@ -51,11 +51,11 @@ public partial class Terminal : Node3D
 	{
 		if (!Engine.IsEditorHint())
 		{
-			var memoryPuzle = GetParent() as MemoryPuzle;
+			var memoryPuzle = GetParent() as MemoryPuzzle;
 			if (memoryPuzle != null)
 			{
-				memoryPuzle.Connect(MemoryPuzle.SignalName.SetupCompleted, new Callable(this, nameof(OnMemoryPuzleSetupCompleted)));
-				memoryPuzle.Connect(MemoryPuzle.SignalName.PlatformStatesChanged, new Callable(this, nameof(UpdatePlatformStates)));
+				memoryPuzle.Connect(MemoryPuzzle.SignalName.SetupCompleted, new Callable(this, nameof(OnMemoryPuzleSetupCompleted)));
+				memoryPuzle.Connect(MemoryPuzzle.SignalName.PlatformStatesChanged, new Callable(this, nameof(UpdatePlatformStates)));
 				
 				OnMemoryPuzleSetupCompleted();
 			}
@@ -148,7 +148,7 @@ public partial class Terminal : Node3D
 			return;
 		}
 
-		var memoryPuzle = GetParent() as MemoryPuzle;
+		var memoryPuzle = GetParent() as MemoryPuzzle;
 		if (memoryPuzle == null) return;
 
 		int rows = memoryPuzle.RowCount;

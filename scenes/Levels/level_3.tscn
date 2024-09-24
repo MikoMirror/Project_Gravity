@@ -669,7 +669,7 @@ PlatformStates = [false, false, false, false, true, false, false, false, false, 
 GlassGates = [NodePath("../GlassGateMain/GlassGate"), NodePath("../GlassGateMain/GlassGate2")]
 
 [node name="Door" parent="GameObjects" instance=ExtResource("9_llyaq")]
-transform = Transform3D(2.08616e-07, 0, -1, 0, 1, 0, 1.5, 0, 1.19209e-07, 15, -0.0244784, 20.5745)
+transform = Transform3D(2.08616e-07, 0, -1, 0, 1, 0, 1.5, 0, 1.19209e-07, 15, 0.0102798, 20.5745)
 
 [node name="GlassGateMain" type="Node3D" parent="GameObjects"]
 

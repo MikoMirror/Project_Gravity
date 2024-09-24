@@ -203,7 +203,7 @@ public partial class LevelManager : Node
 	#region Puzzle Management
 	private void InitializeMemoryPuzzles()
 	{
-		var memoryPuzzles = new List<MemoryPuzle>();
+		var memoryPuzzles = new List<MemoryPuzzle>();
 		FindMemoryPuzzlesRecursive(GetTree().CurrentScene, memoryPuzzles);
 		foreach (var memoryPuzle in memoryPuzzles)
 		{
@@ -211,11 +211,11 @@ public partial class LevelManager : Node
 		}
 	}
 
-	private void FindMemoryPuzzlesRecursive(Node node, List<MemoryPuzle> memoryPuzzles)
+	private void FindMemoryPuzzlesRecursive(Node node, List<MemoryPuzzle> memoryPuzzles)
 	{
-		if (node is MemoryPuzle memoryPuzle)
+		if (node is MemoryPuzzle memoryPuzzle)
 		{
-			memoryPuzzles.Add(memoryPuzle);
+			memoryPuzzles.Add(memoryPuzzle);
 		}
 
 		foreach (var child in node.GetChildren())

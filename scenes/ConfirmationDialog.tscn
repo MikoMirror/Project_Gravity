@@ -1,9 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://cb4h1qwuntmae"]
+[gd_scene load_steps=8 format=3 uid="uid://cb4h1qwuntmae"]
 
 [ext_resource type="Script" path="res://scripts/NewGameConfirmationDialog.cs" id="1_l43bh"]
 [ext_resource type="FontFile" uid="uid://7vf1snbtikvm" path="res://assets/OWN/UI/Fonts/RobotoSlab-Bold.ttf" id="2_7lbg1"]
 
 [sub_resource type="Theme" id="Theme_odbku"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ii3wd"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_etop4"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
@@ -16,6 +18,8 @@ corner_radius_top_left = 20
 corner_radius_top_right = 20
 corner_radius_bottom_right = 20
 corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_l5rst"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rq3yj"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
@@ -93,6 +97,7 @@ theme_override_constants/separation = 225
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_7lbg1")
 theme_override_font_sizes/font_size = 44
+theme_override_styles/focus = SubResource("StyleBoxEmpty_ii3wd")
 theme_override_styles/normal = SubResource("StyleBoxFlat_etop4")
 text = "Yes"
 
@@ -100,5 +105,6 @@ text = "Yes"
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_7lbg1")
 theme_override_font_sizes/font_size = 44
+theme_override_styles/focus = SubResource("StyleBoxEmpty_l5rst")
 theme_override_styles/normal = SubResource("StyleBoxFlat_rq3yj")
 text = "No"

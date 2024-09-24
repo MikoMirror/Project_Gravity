@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://bfgs4wvy0bhph"]
+[gd_scene load_steps=22 format=3 uid="uid://bfgs4wvy0bhph"]
 
 [ext_resource type="Script" path="res://scripts/Autoload/LevelManager.cs" id="1_a1hqr"]
 [ext_resource type="PackedScene" uid="uid://egv34vmwijbn" path="res://assets/OWN/Prefabs/floor.tscn" id="2_hd7wy"]
@@ -19,6 +19,7 @@
 [ext_resource type="PackedScene" uid="uid://c0q21bnwdopjb" path="res://assets/OWN/Prefabs/glass_wall.tscn" id="17_3seng"]
 [ext_resource type="Script" path="res://scripts/Services/LevelMusicManager.cs" id="18_nias1"]
 [ext_resource type="PackedScene" uid="uid://dsilg5e1s8e6t" path="res://assets/OWN/Prefabs/end_game_screen.tscn" id="20_6uk3q"]
+[ext_resource type="PackedScene" uid="uid://blpnfwjnb0kin" path="res://assets/OWN/Prefabs/cable.tscn" id="20_47qkm"]
 
 [sub_resource type="Environment" id="Environment_hnt66"]
 
@@ -46,6 +47,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.56862, 1.0141, -5.167)
 [node name="platform2" parent="GameObjects" instance=ExtResource("14_v8a1e")]
 transform = Transform3D(2, 0, 0, 0, 4, 0, 0, 0, 2, 10.016, 0.0520869, -30.8067)
 AssociatedDoorPath = NodePath("../Door")
+CableListPath = NodePath("../../cable")
 
 [node name="MemmoryPuzzle" parent="GameObjects" node_paths=PackedStringArray("GlassGates") instance=ExtResource("15_y6xp2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0540953, 0.0520869, -24.9014)
@@ -63,57 +65,55 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.25, 0, 15)
 [node name="GlassGate" parent="GameObjects" instance=ExtResource("9_tuaik")]
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.5, 8.3, 0.1, -27.4)
 
-[node name="MemmoryPuzzle2" parent="GameObjects" instance=ExtResource("15_y6xp2")]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -11.4933, 0.1, -6)
-RowCount = 6
-ColumnCount = 6
-Spacing = Vector3(2.5, 0, 2.5)
-PlatformStates = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false]
-
 [node name="GlassGate2" parent="GameObjects" instance=ExtResource("9_tuaik")]
 transform = Transform3D(0.4, 0, 0, 0, -1.74846e-08, 0.5, 0, -0.4, -2.18557e-08, -19.1, 8, -3.5)
 
 [node name="GlassGate3" parent="GameObjects" instance=ExtResource("9_tuaik")]
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, -0.5, -14.6, 8.1, -3.5)
 
-[node name="MemmoryPuzzle3" parent="GameObjects" node_paths=PackedStringArray("GlassGates") instance=ExtResource("15_y6xp2")]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 4.06926, 1)
-RowCount = 6
-ColumnCount = 6
-PlatformStates = [false, true, true, true, true, false, true, true, false, false, false, false, true, false, false, false, false, false, true, true, true, true, true, false, false, false, true, false, true, false, false, false, true, false, false, false]
-GlassGates = [NodePath("../GlassGate2")]
-ShowPlatforms = false
-
-[node name="Terminal2" parent="GameObjects/MemmoryPuzzle3" instance=ExtResource("9_ab3vy")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 12)
-
 [node name="portal5" parent="GameObjects" instance=ExtResource("11_qq2jh")]
-transform = Transform3D(1, -1.74846e-07, 0, 1.74846e-07, 1, 0, 0, 0, 1, -15.8, 0.2, 0)
+transform = Transform3D(1, -1.74846e-07, 0, 1.74846e-07, 1, 0, 0, 0, 1, -14.8, 0.2, 0)
 _targetPortalName = "portal6"
 
 [node name="portal6" parent="GameObjects" instance=ExtResource("11_qq2jh")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 96, 0.2, -15)
 
-[node name="MemmoryPuzzle4" parent="GameObjects" instance=ExtResource("15_y6xp2")]
-transform = Transform3D(-1, -8.74228e-08, 0, 8.74228e-08, -1, 0, 0, 0, 1, -7, 11.9, -27)
-RowCount = 7
-ColumnCount = 7
-Spacing = Vector3(2.5, 0, 2.5)
-PlatformStates = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false]
-
-[node name="MemmoryPuzzle5" parent="GameObjects" instance=ExtResource("15_y6xp2")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 8.7, -27)
-RowCount = 7
-ColumnCount = 7
-Spacing = Vector3(2.5, 0, 2.5)
-PlatformStates = [false, false, false, true, true, true, false, true, true, true, true, false, true, false, true, false, false, false, false, true, true, true, false, false, false, false, false, true, true, false, true, true, true, false, true, true, true, true, false, true, true, true, false, false, false, false, false, true, false]
-ShowPlatforms = false
-
-[node name="Terminal2" parent="GameObjects/MemmoryPuzzle5" instance=ExtResource("9_ab3vy")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 0, 17.5)
-
 [node name="GravityOrb" parent="GameObjects" instance=ExtResource("11_8kg8a")]
 transform = Transform3D(-1, -8.74228e-08, 0, 8.74228e-08, -1, 0, 0, 0, 1, -15.046, 12, -1.04983)
+
+[node name="MemmoryPuzzle2" parent="GameObjects" node_paths=PackedStringArray("GlassGates") instance=ExtResource("15_y6xp2")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -11.232, 0.1, -8)
+RowCount = 6
+ColumnCount = 6
+Spacing = Vector3(2.5, 0, 2.5)
+PlatformStates = [false, false, false, true, false, false, false, true, true, true, false, false, true, true, false, false, false, false, true, false, true, true, true, false, true, false, true, false, true, false, true, true, true, false, true, false]
+GlassGates = [NodePath("../GlassGate2")]
+ShowTerminal = false
+
+[node name="Fake" type="Node3D" parent="GameObjects"]
+
+[node name="MemmoryPuzzle3" parent="GameObjects/Fake" instance=ExtResource("15_y6xp2")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -1, 4.1, -1)
+RowCount = 6
+ColumnCount = 6
+PlatformStates = [false, false, false, true, false, false, false, true, true, true, false, false, true, true, false, false, false, false, true, false, true, true, true, false, true, false, true, false, true, false, true, true, true, false, true, false]
+ShowPlatforms = false
+
+[node name="MemmoryPuzzle4" parent="GameObjects/Fake" instance=ExtResource("15_y6xp2")]
+transform = Transform3D(1, -1.98419e-09, 0, 1.98419e-09, 1, 0, 0, 0, 1, -20, 8.1, -23)
+RowCount = 7
+ColumnCount = 7
+PlatformStates = [false, false, false, true, true, true, false, false, false, true, true, false, true, false, true, true, true, false, false, true, true, true, false, false, false, false, false, true, true, false, true, true, true, false, true, true, true, true, false, true, true, true, false, false, false, false, false, true, false]
+ShowPlatforms = false
+
+[node name="MemmoryPuzzle3" parent="GameObjects" node_paths=PackedStringArray("GlassGates") instance=ExtResource("15_y6xp2")]
+transform = Transform3D(-1, -8.74228e-08, 0, 8.74228e-08, -1, 0, 0, 0, 1, -8.3, 11.9, -25.9)
+RowCount = 7
+ColumnCount = 7
+Spacing = Vector3(2.5, 0, 2.5)
+PlatformStates = [false, false, false, true, true, true, false, false, false, true, true, false, true, false, true, true, true, false, false, true, true, true, false, false, false, false, false, true, true, false, true, true, true, false, true, true, true, true, false, true, true, true, false, false, false, false, false, true, false]
+GlassGates = [NodePath("../GlassGate3")]
+ShowTerminal = false
 
 [node name="Stage" type="Node3D" parent="."]
 
@@ -1278,3 +1278,35 @@ transform = Transform3D(1.2, 0, 0, 0, 1, 0, 0, 0, 1.2, -6.1, 4, -12.4045)
 
 [node name="EndGameScreen" parent="." instance=ExtResource("20_6uk3q")]
 transform = Transform3D(-8.74228e-08, 0, -1, 0, 2, 0, 2, 0, -4.37114e-08, 104.7, 2.4, -13)
+
+[node name="cable" type="Node3D" parent="."]
+
+[node name="Cable" parent="cable" instance=ExtResource("20_47qkm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.1841, 0.0972328, -30.7761)
+
+[node name="Cable2" parent="cable" instance=ExtResource("20_47qkm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.1841, 0.0972328, -30.7761)
+
+[node name="Cable3" parent="cable" instance=ExtResource("20_47qkm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.1841, 0.0972328, -30.7761)
+
+[node name="Cable4" parent="cable" instance=ExtResource("20_47qkm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1841, 0.0972328, -30.7761)
+
+[node name="Cable5" parent="cable" instance=ExtResource("20_47qkm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.184101, 0.0972328, -30.7761)
+
+[node name="Cable6" parent="cable" instance=ExtResource("20_47qkm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8159, 0.0972328, -30.7761)
+
+[node name="Cable7" parent="cable" instance=ExtResource("20_47qkm")]
+transform = Transform3D(-5.96046e-08, -1, 0, 1, -5.96046e-08, 0, 0, 0, 1, -2.8159, 1.09723, -30.7761)
+
+[node name="Cable8" parent="cable" instance=ExtResource("20_47qkm")]
+transform = Transform3D(-5.96046e-08, -1, 0, 1, -5.96046e-08, 0, 0, 0, 1, -2.8159, 3.09723, -30.7761)
+
+[node name="Cable9" parent="cable" instance=ExtResource("20_47qkm")]
+transform = Transform3D(-5.96046e-08, -1, 0, 1, -5.96046e-08, 0, 0, 0, 1, -2.8159, 5.09723, -30.7761)
+
+[node name="Cable10" parent="cable" instance=ExtResource("20_47qkm")]
+transform = Transform3D(-5.96046e-08, -1, 0, 1, -5.96046e-08, 0, 0, 0, 1, -2.8159, 7.09723, -30.7761)

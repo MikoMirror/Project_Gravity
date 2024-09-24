@@ -96,7 +96,6 @@ public partial class Player
 	{
 		if (@event.IsActionPressed("change_gravity"))
 		{
-			_gravityManager.ToggleGravity();
 			_gravityManager.FlipPlayerBody(this);
 		}
 			
@@ -155,7 +154,7 @@ public partial class Player
 	}
 
 	private const string InteractionAction = "ui_interaction";
-	private const float InteractionDistance = 2.0f; // Adjust as needed
+	private const float InteractionDistance = 2.0f; 
 
 	private void TryInteractWithDoor()
 	{
@@ -173,7 +172,7 @@ public partial class Player
 		if (result.Count > 0)
 		{
 			var collider = result["collider"].As<Node>();
-			GD.Print($"Ray hit: {collider.Name}"); // Debug print
+			GD.Print($"Ray hit: {collider.Name}"); 
 
 			// Check if the collider is a StaticBody3D
 			if (collider is StaticBody3D staticBody)
@@ -182,7 +181,7 @@ public partial class Player
 				var glassWallWithDoor = staticBody.GetParent()?.GetParent() as GlassWallWithDoor;
 				if (glassWallWithDoor != null)
 				{
-					GD.Print("Interacting with door"); // Debug print
+					GD.Print("Interacting with door"); 
 					glassWallWithDoor.ToggleDoor();
 				}
 				else

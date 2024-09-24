@@ -44,13 +44,6 @@ public partial class GravityManager : Node
 		}
 	}
 
-	public void ToggleGravity()
-	{
-		if (TryToggleGravity())
-		{
-			// Additional logic if needed when gravity is successfully toggled
-		}
-	}
 
 	public bool TryToggleGravity()
 	{

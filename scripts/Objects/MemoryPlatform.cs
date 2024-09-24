@@ -14,7 +14,7 @@ public partial class MemoryPlatform : Node3D
 	private bool _isInteractive = true;
 	private bool _isInRedState;
 	private bool _isNeutral;
-	private MemoryPuzle _memoryPuzzle;
+	private MemoryPuzzle _memoryPuzzle;
 
 	// Change this line to allow setting the property
 	public bool HasBeenActivated 
@@ -42,7 +42,7 @@ public partial class MemoryPlatform : Node3D
 	{
 		_area = GetNode<Area3D>(AreaPath);
 		_neonMesh = GetNode<MeshInstance3D>(NeonPath);
-		_memoryPuzzle = GetParent() as MemoryPuzle;
+		_memoryPuzzle = GetParent() as MemoryPuzzle;
 
 		if (_neonMesh != null)
 		{

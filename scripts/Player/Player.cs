@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public partial class Player : CharacterBody3D
 {
+	#region Exported Variables
 	[Export] private float Speed = 5.0f;
 	[Export] private float SprintSpeed = 8.0f;
 	[Export] private float JumpVelocity = 4.5f;
@@ -22,10 +23,10 @@ public partial class Player : CharacterBody3D
 	[Export] private float RotationSpeed = 2.0f;
 	[Export] private float GravityFlipDuration = 0.5f;
 	[Export] private float RewindDuration = 1.0f; 
+	#endregion
 
+	#region Player State
 	public bool IsCameraInverted { get; set; } = false;
-
-	// Player state
 	public float VerticalRotation { get; set; } = 0f;
 	public float HorizontalRotation { get; set; } = 0f;
 	public float Gravity { get; set; }
@@ -33,18 +34,19 @@ public partial class Player : CharacterBody3D
 	public float ShakeTime { get; set; } = 0f;
 	public float LandingShake { get; set; } = 0f;
 	public bool IsSprinting { get; set; } = false;
-
 	public RigidBody3D HeldObject { get; set; } = null;
 	public bool IsLifting { get; set; } = false;
 	public Vector3 LiftTarget { get; set; }
+	#endregion
 
-	// Gravity change state
+	#region Gravity Change State
 	public bool IsGravityReversed { get; set; } = false;
 	private float _gravityFlipTimer = 0f;
 	private float _initialGravity;
 	private bool _isFlipping = false;
+	#endregion
 
-	// Nodes
+	#region Nodes
 	private GravityManager _gravityManager;
 	private PlayerUI _jumpsIndicator;
 	private Node3D Head;
@@ -63,22 +65,20 @@ public partial class Player : CharacterBody3D
 	private PlayerUI _playerUI;
 	private ColorRect _fadeOverlay;
 	private PlayerTeleporter _teleporter;
-	
-
 	private SoundManager _soundManager;
 	private List<string> _footstepSoundPaths = new List<string>();
-
 	private AudioStreamPlayer3D _footstepPlayer;
 	private List<AudioStream> _footstepSounds = new List<AudioStream>();
 	private RandomNumberGenerator _rng = new RandomNumberGenerator();
 	private float _timeSinceLastStep = 0f;
 	private const float STEP_INTERVAL = 0.2f; // Adjust this value to change how often footsteps play
-
 	private bool _isDead = false;
 	private ColorRect _deadOverlay;
 	private const float DEATH_ANIMATION_DURATION = 0.2f;
 	private const float DEATH_FREEZE_DURATION = 2.0f;
+	#endregion
 
+	#region Godot Methods
 	public override void _Ready()
 	{
 		// Get nodes and initialize
@@ -153,6 +153,17 @@ public partial class Player : CharacterBody3D
 		ResetState(); // Reset the player state when the scene loads
 	}
 
+	public override void _PhysicsProcess(double delta)
+	{
+		HandleMovement(delta);
+		HandleObjectLifting(delta);
+		ApplyCameraShakes(delta);
+		UpdateCameraRotation();
+		HandleFootsteps(delta);
+	}
+	#endregion
+
+	#region Initialization Methods
 	private void InitializeTeleporter()
 	{
 		if (_animationPlayer == null)
@@ -175,16 +186,9 @@ public partial class Player : CharacterBody3D
 		_teleporter = new PlayerTeleporter(this, _animationPlayer, _teleportOverlay, _camera, _head);
 		GD.Print("Player: PlayerTeleporter initialized successfully.");
 	}
+	#endregion
 
-	public override void _PhysicsProcess(double delta)
-	{
-		HandleMovement(delta);
-		HandleObjectLifting(delta);
-		ApplyCameraShakes(delta);
-		UpdateCameraRotation();
-		HandleFootsteps(delta);
-	}
-
+	#region Configuration Methods
 	private void ConfigureInteractionRay()
 	{
 		InteractionRay.Enabled = true;
@@ -199,7 +203,9 @@ public partial class Player : CharacterBody3D
 		Input.MouseMode = Input.MouseModeEnum.Captured;
 		CameraOverlay.Visible = true;
 	}
+	#endregion
 
+	#region Player Actions
 	public void TriggerFlashEffect()
 	{
 		_animation.Play("flash_effect");
@@ -295,14 +301,18 @@ public partial class Player : CharacterBody3D
 			_playerUI.ResetJumps();
 		}
 	}
+	#endregion
 
+	#region Footsteps
 	private const float WALK_STEP_INTERVAL = 0.45f;
 	private const float RUN_STEP_INTERVAL = 0.3f;
 	private float _currentStepInterval = WALK_STEP_INTERVAL;
+	#endregion
 
+	#region Death and Respawn
 	public void Die()
 	{
-		if (_isDead) return; // Prevent multiple deaths
+		if (_isDead) return; 
 
 		_isDead = true;
 		GD.Print("Player: Die() called");
@@ -373,4 +383,5 @@ public partial class Player : CharacterBody3D
 			}
 		}
 	}
+	#endregion
 }

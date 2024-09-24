@@ -73,7 +73,7 @@ public partial class Player
 		HeldObject.Freeze = false;
 		UpdateHeldObjectPosition();
 
-		// Disable magnet effect on all platforms for this object
+		
 		activatePlatform.DisableMagnetEffectOnAllPlatforms(rigidBody);
 	}
 
@@ -116,7 +116,7 @@ public partial class Player
 			HeldObject.AngularVelocity = Vector3.Zero;
 			HeldObject.ApplyCentralImpulse(-Camera.GlobalTransform.Basis.Z * 2f);
 
-			// Re-enable magnet effect on nearby platforms
+			
 			activatePlatform.EnableMagnetEffectOnNearbyPlatforms(HeldObject);
 
 			HeldObject = null;

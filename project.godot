@@ -14,12 +14,12 @@ config/name="The-photographer"
 run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.3", "C#", "Forward Plus")
 run/max_fps=360
-config/icon="res://icon.svg"
+config/icon="res://assets/OWN/cube-3d.png"
 
 [audio]
 
-music_volume=0.5
-sound_volume=0.67
+music_volume=0.66
+sound_volume=0.39
 
 [autoload]
 

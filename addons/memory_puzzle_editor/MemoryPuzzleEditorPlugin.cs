@@ -39,7 +39,7 @@ public partial class PlatformStatesInspectorPlugin : EditorInspectorPlugin
 
 	public override bool _CanHandle(GodotObject @object)
 	{
-		return @object is MemoryPuzle || @object is Terminal;
+		return @object is MemoryPuzzle || @object is Terminal;
 	}
 
 	public override bool _ParseProperty(GodotObject @object, Variant.Type type, string name, PropertyHint hintType, string hintString, PropertyUsageFlags usageFlags, bool wide)
@@ -49,7 +49,7 @@ public partial class PlatformStatesInspectorPlugin : EditorInspectorPlugin
 			return false;
 		}
 
-		if ((@object is MemoryPuzle && name == "PlatformStates") || 
+		if ((@object is MemoryPuzzle && name == "PlatformStates") || 
 			(@object is Terminal && name == "CustomPlatformStates"))
 		{
 			if (platformStatesEditor != null && IsInstanceValid(platformStatesEditor))
@@ -60,7 +60,7 @@ public partial class PlatformStatesInspectorPlugin : EditorInspectorPlugin
 			AddPropertyEditor(name, platformStatesEditor);
 			return true;
 		}
-		else if ((@object is MemoryPuzle && (name == "RowCount" || name == "ColumnCount")) ||
+		else if ((@object is MemoryPuzzle && (name == "RowCount" || name == "ColumnCount")) ||
 				 (@object is Terminal && (name == "CustomRows" || name == "CustomColumns")))
 		{
 			var editor = GetEditorForProperty(name, type, hintType, hintString, usageFlags, @object);
@@ -99,7 +99,7 @@ public partial class PlatformStatesInspectorPlugin : EditorInspectorPlugin
 				{
 					platformStatesEditor.UpdateGrid();
 				}
-				if (@object is MemoryPuzle memoryPuzle)
+				if (@object is MemoryPuzzle memoryPuzle)
 				{
 					memoryPuzle.UpdatePuzzle();
 				}

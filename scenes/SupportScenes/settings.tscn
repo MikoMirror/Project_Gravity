@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://c8rf1f8rnkmch"]
+[gd_scene load_steps=10 format=3 uid="uid://c8rf1f8rnkmch"]
 
 [ext_resource type="Shader" path="res://shaders/blur.gdshader" id="1_sms2f"]
 [ext_resource type="Script" path="res://scripts/MainMenu/Settings.cs" id="1_x8yec"]
@@ -10,6 +10,8 @@
 shader = ExtResource("1_sms2f")
 shader_parameter/lod = 5.0
 shader_parameter/mix_percentage = 0.3
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_y0los"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_f3fww"]
 texture = ExtResource("3_ctb33")
@@ -92,6 +94,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_fonts/font = ExtResource("2_aion5")
 theme_override_font_sizes/font_size = 54
+theme_override_styles/focus = SubResource("StyleBoxEmpty_y0los")
 theme_override_styles/hover = SubResource("StyleBoxTexture_f3fww")
 theme_override_styles/normal = SubResource("StyleBoxTexture_7jccj")
 text = "Back to Main Menu"

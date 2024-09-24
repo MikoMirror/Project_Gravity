@@ -2,7 +2,7 @@ using Godot;
 using System;
 
 [Tool]
-public partial class MemoryPuzle : Node3D
+public partial class MemoryPuzzle : Node3D
 {
 	#region Signals
 	[Signal]
@@ -841,7 +841,6 @@ public bool ShowPlatforms
 		}
 	}
 
-	// Update visibility of CsgBox3D visual platforms in the editor
 	if (Engine.IsEditorHint())
 	{
 		foreach (Node child in GetChildren())
