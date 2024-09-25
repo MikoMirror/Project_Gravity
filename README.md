@@ -2,11 +2,11 @@
 ![image](https://github.com/user-attachments/assets/4c569bde-1d91-484d-b7d8-d2ce17d1b10b)
 ---
 
-"Project Gravity" is a small puzzle game consisting of 4 levels made with Godot Engine 4.3 Mono. 
+"Project Gravity" is a small puzzle game consisting of 4 levels made with Godot Engine 4.3 .Net. 
 
 Development Setup
 --
-To open the game in Godot Engine 4.3 (Mono):
+To open the game in Godot Engine 4.3 (.Net):
 - Clone or download this repository.
 - Open Godot Engine, and import the project.
 - In the Godot editor, click the "Build Project" button to compile the project.
